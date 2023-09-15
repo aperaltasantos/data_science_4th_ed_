@@ -1,0 +1,1251 @@
+---
+title: "Data vizualization with ggplot2"
+author: "A. Peralta-Santos"
+date: today
+date-format: long
+format:
+  html:
+    smooth-scroll: true
+    self-contained: true
+    toc: true
+    toc-location: left
+theme: cosmo
+smooth-scroll: true
+execute:
+  warning: false
+project:
+  output-dir: outputs/documents
+---
+
+## Data visualization
+
+This is a great resource to chose the right visual to each problem
+
+[Data to viz website](https://www.data-to-viz.com/)
+
+[Principles of good visuals](https://github.com/GraphicsPrinciples/CheatSheet/blob/master/NVSCheatSheet.pdf)
+
+[Extensions of ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
+
+Load library
+
+```{r}
+# install.packages("ggthemes")
+# install.packages("scales")
+# install.packages("patchwork")
+# install.packages("sf")
+# install.packages("rgeos")
+```
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(ggthemes)
+library(scales)
+library(patchwork)
+library(sf)
+library(rgeos)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse    = TRUE,
+  warning     = FALSE, # Whether to display warnings
+  message     = FALSE, # Whether to display messages
+  echo        = TRUE,  # In this case we want to see the code 
+  eval        = TRUE   # Whether to evaluate the code and include its results
+  )
+```
+
+### Clean enviorment
+
+```{r}
+rm(list = ls(all.names = TRUE)) #will clear all objects includes hidden objects.
+
+```
+
+### Load datasets
+
+```{r}
+# change outpurs to output
+inpatient_hospital_lite <- read_csv("output/datasets/inpatient_hospital_lite.csv")
+
+## são equivalentes
+
+inpatient_hospital_lite <- read_csv(here("output", "datasets", "inpatient_hospital_lite.csv"))
+```
+
+# ggplot basics
+
+For a plot with ggplot there is a specific grammar 1. Dataframe 2. Aestetics (define x and y axis) 3. Define the geometrics (point, line, etc...) 4. Facets - similar to group by 5. Theme 6. Labels
+
+### Data and aestetics
+
+```{r}
+# In ggplot2 we need to specify the data, and the variables for x and y axis
+
+p1 <- ggplot(
+  data = inpatient_hospital_lite, 
+  mapping = aes(x = tipo_instituicao, y = doentes_saidos_var)
+)
+
+p1
+```
+
+### Geometrics
+
+#### Box plot
+
+```{r}
+# We need another argument to specify the type of plot
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot()
+
+p1
+```
+
+```{r}
+# IMPORTANT
+# We can create a generic ggplot argument if we want to combite 2 diferent datasets with the same x and y axis
+p1<- ggplot() +
+    geom_boxplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao   , y = doentes_saidos_var ),
+            outlier.shape = NA) #NEW to Exclude outliers
+p1
+```
+
+### Facets
+
+```{r}
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot( outlier.shape = NA) +
+  facet_wrap(~tipo_de_especialidade)
+p1
+
+```
+
+```{r}
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_de_especialidade, y = doentes_saidos_var)) +
+  geom_boxplot( outlier.shape = NA) +
+  facet_wrap(~tipo_instituicao)
+p1
+
+```
+
+### Labels
+
+```{r}
+# We can now add the plot title and axis legend
+
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot(outlier.shape = NA) + 
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal")
+p1
+```
+
+### Theme
+
+```{r}
+# Theme classic
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot(outlier.shape = NA) + 
+  theme_classic() + 
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of  hospital", 
+         caption = "Source: Ministry of Health, Portugal")
+  
+
+p1
+```
+
+```{r}
+# Theme Black and white
+# Good for publishing
+
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot( outlier.shape = NA) + 
+  theme_bw()  + 
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of  hospital", 
+         caption = "Source: Ministry of Health, Portugal")
+
+p1
+```
+
+### Labels
+
+```{r}
+
+
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_point() +
+  geom_boxplot(outlier.shape = NA) + 
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  ylim(0,4000) +
+  theme_classic()
+
+p1
+```
+
+```{r}
+# Let's change the caracteristics of the box plot
+# Change the colours and theme
+# Dont show the NA in the plot
+
+p_final_1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, 
+                y = doentes_saidos_var)
+            ) +
+  geom_boxplot(outlier.shape = NA,
+               fill = "gray", 
+               colour = "black") + 
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  ylim(0,4000) +
+  theme_minimal()
+  #theme(plot.background = element_rect("white")
+        #)
+
+ p_final_1
+```
+
+# Save plot
+
+```{r}
+# ggsave | Saves the last plot in the memory 
+# We can use the package here to specify the output directory
+# We can specify the output format 
+# The size
+# The resolution in dpi 
+
+ggsave(
+  p_final_1,
+  filename = here::here("output", "figures", paste0( "hospital_inpatients", ".png")),
+  width = 20,
+  height = 10,
+  units = c("cm"),
+  dpi = "retina",
+  bg = "white"
+)
+```
+
+```{r}
+# We can specify the plot to save and change the format to PDF
+
+ggsave( filename = "output/figures/hospital_inpatients.pdf",
+        plot= p_final_1,
+        width = 25.49,
+        height = 12.3,
+        units = c("cm"),
+        dpi = 600 )
+```
+
+```{r}
+# We can specify the plot to save and change the format to jpeg
+# Verificar porque nao esta a correr 
+
+ggsave( filename = here::here("output_figures", 
+                  paste0( "hospital_inpatients", ".jpeg")),
+        plot= p_final_1,
+        width = 25.49,
+        height = 12.3,
+        units = "cm",
+        dpi = 600 )
+```
+
+# Types of plots
+
+## Jitter plot
+
+```{r}
+# Let's change the caracteristics of the box plot
+# Change the colours and theme
+# Dont show the NA in the plot
+
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, 
+                y = doentes_saidos_var)
+            ) +
+  geom_jitter(alpha=0.05, # Transparencia 1- sem transparencia 0- transparente
+              width = 0.3,
+              colour = "gray") +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  theme_minimal()
+p1
+```
+
+### Statistics in plots
+
+```{r}
+# Let's change the caracteristics of the box plot
+# Change the colours and theme
+# Dont show the NA in the plot
+
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, 
+                y = doentes_saidos_var)
+            ) +
+  stat_summary(
+    geom = "point",
+    fun.y = "median",
+    col = "black",
+    size = 3,
+    shape = 2,
+    fill = "black") +
+  
+  geom_jitter(alpha=0.02,
+              width = 0.3,
+              colour = "gray") +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  ylim(0, 4000)
+  
+  theme_minimal()
+p1
+```
+
+```{r}
+# Let's change the caracteristics of the box plot
+# Change the colours and theme
+# Dont show the NA in the plot
+
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, 
+                y = doentes_saidos_var)
+            ) +
+        stat_summary(
+    geom = "point",
+    fun.y = "mean",
+    col = "black",
+    size = 3,
+    shape = 3,
+    fill = "blue") +
+  ylim(0, 4000) +
+  
+  stat_summary(
+    geom = "point",
+    fun.y = "median",
+    col = "black",
+    size = 3,
+    shape = 1,
+    fill = "red") +
+  
+
+  
+  geom_jitter(alpha=0.02,
+              width = 0.2,
+              colour = "gray") +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  theme_minimal()
+p1
+```
+
+## Line plot
+
+```{r}
+inpatient_hospital_sum <- inpatient_hospital_lite %>%
+  group_by(periodo, tipo_instituicao) %>%
+  summarise(
+    doentes_saidos_var = sum(doentes_saidos_var, na.rm = TRUE)
+  )
+    
+```
+
+```{r}
+# Now let's make a similar plot but with a line across time
+
+p1<- ggplot() +
+  
+  geom_line(data= inpatient_hospital_sum, 
+            aes(x = periodo, 
+                y = doentes_saidos_var,
+                colour = tipo_instituicao)) +
+
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  
+  theme_minimal() 
+
+p1
+
+```
+
+### Change legend place
+
+```{r}
+# Lets change the position of the legend
+
+p1<- ggplot() +
+  geom_line(data= inpatient_hospital_sum, 
+            aes(x = periodo, 
+                y = doentes_saidos_var,
+                colour=tipo_instituicao)) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour = "") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+
+```
+
+### Add a vertical line and text
+
+```{r}
+# 
+
+p1<- ggplot() +
+  geom_line(data= inpatient_hospital_sum, 
+            aes(x = periodo, 
+                y = doentes_saidos_var,
+                colour=tipo_instituicao)) +
+  
+  # geom_vline(xintercept=as.numeric(as.Date("2020-03-01")), 
+  #            colour="red") + 
+    geom_vline(xintercept=as.Date("2020-03-01"), 
+             colour="red") + 
+    geom_hline(yintercept=30000, 
+             colour="green") + 
+  
+  geom_text(aes(x=as.Date("2020-05-15"), 
+                label="COVID-19",
+                y=41000), 
+            colour="black", 
+            angle=90, 
+          #  vjust = 1.2,
+            size = 3) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour = "") +
+  theme_minimal() +
+  theme(legend.position="bottom",
+        plot.background = element_rect("white"))
+
+p1
+
+
+```
+
+```{r}
+ggsave( filename = "output/figures/hospital_line_plot.pdf",
+        plot= p1,
+        width = 25.49,
+        height = 12.3,
+        units = c("cm"),
+        dpi = 600 )
+```
+
+```{r}
+ggsave( filename = "output/figures/hospital_line_plot.png",
+        plot= p1,
+        width = 25.49,
+        height = 12.3,
+        units = c("cm"),
+        dpi = 600 )
+```
+
+### Ribbon
+
+Ribbon is very useful because it enables us to specify a max and min and colour that area
+
+```{r}
+p_final_2<- ggplot() +
+    # NEW
+  geom_ribbon(data= inpatient_hospital_sum,
+              aes(y = doentes_saidos_var ,
+                  xmin = as.Date("2020-03-01"), 
+                  xmax = as.Date("2022-01-01")), 
+              fill = "grey70",
+              alpha=0.5) +
+  
+  geom_line(data= inpatient_hospital_sum, 
+            aes(x = periodo, 
+                y = doentes_saidos_var,
+                colour=tipo_instituicao)) +
+  geom_vline(xintercept=as.numeric(as.Date("2020-03-01")), 
+             colour="grey70") + 
+  
+  geom_text(aes(x=as.Date("2020-04-01"), 
+                label="COVID-19",y=20000), 
+            colour="black", 
+            angle=90, 
+            vjust = 1.2,
+            size = 2) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour = "") +
+  theme_minimal() +
+  theme(legend.position="bottom",
+        plot.background = element_rect("white"))
+
+p_final_2
+```
+
+### Save line plot
+
+```{r}
+ggsave( filename = here::here("output", "figures", 
+                  paste0( "hospital_time_series", ".png")),
+                  width = 20.49,
+                  height = 10.3,
+                  units = c("cm"),
+                  dpi = "retina")
+```
+
+```{r}
+ggsave( filename = here::here("output", "figures", 
+                  paste0( "hospital_time_series", ".pdf")),
+                  width = 20.49,
+                  height = 10.3,
+                  units = c("cm"),
+                  dpi = "retina")
+```
+
+## Bar plots
+
+Bar plots are very versatile, we only need to know a few tricks
+
+Use stat="identity", the default is stat="bin" and will count the number of observation in each group
+
+Position is also very important when we want to specify groups of bar. position="dodge" will group them by each other
+
+```{r}
+inpatient_hospital_year <- inpatient_hospital_lite %>%
+  group_by(year, tipo_instituicao) %>%
+  summarise(
+    doentes_saidos_var = sum(doentes_saidos_var, na.rm = TRUE)
+  )
+    
+```
+
+### Dodge bar plot
+
+```{r}
+p1<- ggplot(data= inpatient_hospital_year, 
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=tipo_instituicao) # ALERT
+            ) +
+  geom_bar(position="dodge", 
+           stat="identity"
+           ) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") 
+
+p1
+
+```
+
+Specify the colours of the bar plots
+
+```{r}
+
+#fee0d2
+#fc9272
+#de2d26
+library(scales)
+#extract hex color codes for a plot with three elements in ggplot2 
+hex <- hue_pal()(3)
+hex 
+
+inpatient_hospital_year <- inpatient_hospital_year %>%
+  mutate(
+    tipo_instituicao = factor(tipo_instituicao, levels = c("Hospital", "University", "Cancer hospital"))
+  ) 
+
+
+p1<-  ggplot( data = inpatient_hospital_year,
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=tipo_instituicao)
+            ) +
+  geom_bar(position="dodge", 
+           stat="identity"
+           ) +
+  
+  scale_y_continuous(labels = comma) +
+  
+  scale_fill_manual(values=c("#bae4b3","#fc9272" ,"#de2d26")) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+       fill="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+
+```
+
+#### Save plot
+
+```{r}
+ggsave( filename = here::here("output", "figures", 
+                  paste0( "hospital_bars", ".pdf")),
+                  width = 20.49,
+                  height = 10.3,
+                  units = c("cm"),
+                  dpi = "retina")
+```
+
+### Geom text
+
+We can add the values in the plot with a few changes
+
+```{r}
+
+
+#extract hex color codes for a plot with three elements in ggplot2 
+# hex <- hue_pal()(4)
+# hex 
+
+p_final_3<-  ggplot( data = inpatient_hospital_year,
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=factor(tipo_instituicao, 
+                            levels = c("Hospital", "University", "Cancer hospital")))
+            ) +
+  geom_bar(position = position_dodge(width = 1.01), 
+           stat="identity"
+           ) +
+  
+  geom_text(aes(label = doentes_saidos_var),
+            position = position_dodge(width = 1),
+            size=2.5,
+            vjust=-0.9
+            ) +
+  
+  scale_y_continuous(labels = comma) +
+  scale_fill_manual(values=c("#00BA38","#619CFF" ,"#F8766D")) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "", 
+         caption = "Source: Ministry of Health, Portugal",
+       fill="") +
+  theme_minimal() +
+  theme(legend.position="bottom",
+      #  axis.text.y=element_blank(),
+      #  axis.ticks.y=element_blank() 
+        )
+
+p_final_3
+
+ggsave( filename = here::here("output", "figures", 
+                  paste0( "hospital_bars", ".pdf")),
+                  width = 20.49,
+                  height = 15.3,
+                  units = c("cm"),
+                  dpi = "retina")
+```
+
+### Stacked bar plot
+
+```{r}
+p1<-  ggplot( data = inpatient_hospital_year,
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=factor(tipo_instituicao, 
+                            levels = c("Hospital", "University", "Cancer hospital")))
+            ) +
+  geom_bar(position="stack", 
+           stat="identity"
+           ) +
+  
+  scale_y_continuous(labels = comma) +
+  scale_fill_manual(values=c("#00BA38","#619CFF" ,"#F8766D")) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+       fill="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+```
+
+## Scatterplot
+
+Scatter plots are used to visualize two continuous variables
+
+```{r}
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  filter(dias_de_internamento_var<40000)
+```
+
+```{r}
+library(ggthemes)
+ggplot(data = inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, y=doentes_saidos_var)) + 
+  geom_point(alpha=0.5) +
+  theme_clean()
+
+```
+
+This needs some work,
+
+```{r}
+
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, y=doentes_saidos_var)) + 
+  geom_point(alpha=0.1) +
+  labs(x="Dias de internamento",
+       y="Doentes saidos")+
+  theme_clean()
+
+p1
+```
+
+```{r}
+
+p1<- ggplot(data = inpatient_hospital_lite, 
+       mapping = aes(x=dias_de_internamento_var, y=doentes_saidos_var, colour=tipo_de_especialidade))+ 
+  geom_point(alpha=0.2) +
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour="") +
+  ylim(0, 3000) +
+  xlim(0, 25000) +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+```
+
+We can add expression to the colour
+
+```{r}
+
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, 
+           y=doentes_saidos_var, 
+           colour=dias_de_internamento_var > 10000)
+       ) + 
+  geom_point(alpha=0.1
+             ) +
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+```
+
+**ATENTION** If you want to set the color, you need to specify outside the aestetics
+
+```{r}
+
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, 
+           y=doentes_saidos_var,
+           shape = tipo_de_especialidade)
+       ) + 
+  geom_point(alpha=0.9,
+       color="#0868ac"
+             ) +
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+```
+
+Add some trend measures, like linear or non-linear models
+
+```{r}
+
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, 
+           y=doentes_saidos_var, 
+           colour=tipo_de_especialidade)) + 
+  geom_point(alpha=0.1) +
+  # NEW
+  geom_smooth(method=lm, 
+              se=TRUE,
+              linetype="dashed") +
+  
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+
+```
+
+```{r}
+
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, 
+           y=doentes_saidos_var, 
+           colour=tipo_de_especialidade)) + 
+  geom_point(alpha=0.1
+             ) +
+  # NEW
+  geom_smooth(method=loess, 
+              se=TRUE,
+              linetype="dashed") +
+  
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+
+```
+
+## Distribution plots
+
+This kind of plots are very useful to determine the distrubition of a variable
+
+```{r}
+
+p1<- ggplot(data=inpatient_hospital_lite, 
+       aes(x=doentes_saidos_var)
+       ) +
+  geom_density()
+
+p1
+```
+
+by type of speciality
+
+```{r}
+
+p1<- ggplot(data=inpatient_hospital_lite, 
+       aes(x=doentes_saidos_var,
+           colour=tipo_de_especialidade)
+       ) +
+  geom_density()
+
+p1
+```
+
+```{r}
+p10 <- ggplot(data=inpatient_hospital_lite, 
+       aes(x=doentes_saidos_var,
+           colour=tipo_instituicao)
+       ) +
+  geom_density()
+
+p10
+```
+
+## Combine plots
+
+[Patchwork package](https://patchwork.data-imaginist.com/)
+
+```{r}
+library(patchwork)
+
+p_final_1 / p_final_2
+
+p_final_1 / (p_final_2 + p_final_3)
+
+plot_final <- (p_final_1 + p_final_3 ) / p_final_2
+
+plot_final
+
+
+p_final_1
+p_final_2
+
+finalissmo <- p_final_1 + p_final_1 + p_final_1
+finalissmo
+```
+
+# Create a Map
+
+To create a map we need a shapefile first, shapefile can be found in many places. Be aware to chose one that is not too heavy
+
+Steps 1. Choose a shapefile 2. Chose the data you want to add to the shapefile 3. Linkage the data
+
+```{r}
+library(sf)
+comm_pt <- st_read(
+  "datasets/map_json_portugal/concelhos_portugal_light.json")
+```
+
+```{r}
+
+covid_inc <- read_csv("datasets/covid_inc.csv") 
+
+
+covid_inc <- covid_inc %>%
+  rename(NAME_2=Concelho) %>%
+  mutate( NAME_2=recode(NAME_2,
+                         'Ponte de Sor' = "Ponte de Sôr"
+                         ))
+
+## Erro frequente com Logoa, Calheta, Mealhada, Sátão
+
+
+comm_pt <-left_join(comm_pt,
+                     covid_inc,
+                     by = "NAME_2")
+
+sanity <-anti_join(comm_pt,
+                     covid_inc,
+                     by = "NAME_2")
+
+```
+
+We need to specify the fill variable and the color variable (boundaries)
+
+```{r}
+p1<- ggplot() + 
+  geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 1,
+              color = "black"
+          ) 
+
+p1
+```
+
+We can chage the thickness of the boundaries and the color
+
+```{r}
+library(ggthemes)
+
+p1<- ggplot() + 
+  geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) 
+
+p1
+```
+
+We now will add a theme and labels
+
+```{r}
+p <- ggplot() +
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) +
+    # add a theme
+   theme_classic() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022")
+p
+
+
+```
+
+We can change the default specification
+
+```{r}
+theme_map <- function(...) {
+  theme_minimal() +
+  theme(
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    ...
+  )
+}
+```
+
+```{r}
+p <- ggplot() +
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) +
+    # add the theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022")
+p
+
+
+```
+
+We can change the colors now
+
+```{r}
+
+# It's recommended to use a named vector
+# Use this website https://colorbrewer2.org/#type=sequential&scheme=OrRd&n=5 
+
+cols <- c("#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000")
+
+p <- ggplot() +
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "gray"
+          ) +
+    # add the previously defined basic theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022") +
+    # and we use guide_legend instead of guide_colourbar
+  scale_fill_manual(values = cols,
+                    name = "Incidência") +
+  theme(legend.position = "right",
+        legend.direction = "vertical",
+        legend.text = element_text(size = 8, colour = "gray50")) 
+p
+```
+
+#### Advanced mapping operations
+
+```{r}
+comm_ars<- comm_pt %>%
+  group_by(ARS) %>% 
+  summarize(geometry = st_union(geometry)
+            )
+```
+
+```{r}
+p <- ggplot() +
+      geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "gray"
+          ) +
+        geom_sf(data = comm_ars, 
+              size = 0.1,
+              color = "black",
+              alpha = 0
+          ) +
+    # add the previously defined basic theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022") +
+    # and we use guide_legend instead of guide_colourbar
+  scale_fill_manual(values = cols,
+                    name = "") +
+  theme(legend.position = "right",
+        legend.direction = "vertical",
+        legend.text = element_text(size = 8, colour = "gray50")) 
+p
+```
+
+#### Save plot
+
+```{r}
+ggsave( filename = here::here("output", "figures", 
+                  paste0( "map_covid", ".pdf")),
+                  width = 12.49,
+                  height = 15.3,
+                  units = c("cm"),
+                  dpi = "retina")
+```
+
+```{r}
+comm_lvt<- comm_pt %>%
+  filter(ARS=="Lisboa e Vale do Tejo")  
+
+geo_hospitals <-  read_csv("datasets/geo_location_hospitals.csv")
+  
+```
+
+```{r}
+p <- ggplot() +
+        geom_sf(data = comm_lvt, 
+              size = 0.2,
+              color = "black",
+              fill="gray",
+              alpha = 0.3
+          ) +
+      geom_point(data = geo_hospitals, 
+                 aes(x = long, 
+                     y = lat), 
+                 size = 2, 
+        shape = 23, 
+        fill = "red") +
+    # add the previously defined basic theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's Hospital location in Lisbon and Tagus Valey", 
+         subtitle = "January, 2022", 
+         caption = "Data: MoH, 2022") 
+p
+```
+
+```{r}
+mean_inc_ars <- covid_inc  %>% 
+  group_by(ARS) %>% 
+  summarise(mean_inc= mean(Incidencia)
+            )
+```
+
+```{r}
+mean_inc_ars$ARS <- factor(mean_inc_ars$ARS,                                    # Factor levels in decreasing order
+                  levels = mean_inc_ars$ARS[order(mean_inc_ars$mean_inc, 
+                                                  decreasing = TRUE)])
+
+p1<- mean_inc_ars %>% 
+ 
+  ggplot( aes(x=ARS,
+              y = mean_inc) 
+            ) +
+  geom_bar(position="dodge", 
+           stat="identity"
+           )
+p1
+```
+
+#### Save plot
+
+```{r}
+ggsave( filename = here::here("outputs", "figures", 
+                  paste0( "map_covid_lvt", ".pdf")),
+                  width = 20.49,
+                  height = 10.3,
+                  units = c("cm"),
+                  dpi = "retina")
+```
+
+# Extentions
+
+[extensions of ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
+
+## Animate
+
+```{r}
+# library(gganimate)
+# 
+# inpatient_hospital_lite$year <- as.numeric(inpatient_hospital_lite$year)
+# 
+# p1<- ggplot(inpatient_hospital_lite, 
+#        aes(x=dias_de_internamento_var, 
+#            y=doentes_saidos_var, 
+#            colour=tipo_de_especialidade)) + 
+#   geom_point(alpha=0.1
+#              ) +
+#     # Here comes the gganimate specific bits
+#   transition_time(year) +
+#     labs(title = "Number of inpatients discharged and length of stay",
+#          subtitle = 'Year: {frame_time}',
+#          y = "Number of inpatients discharged",
+#          x = "Length of stay ", 
+#          caption = "Source: Ministry of Health, Portugal",
+#        colour="") +
+#   theme_minimal() +
+#   theme(legend.position="bottom")
+# 
+# p1
+```
+
+# Excercise
+
+Create the best plot to show the median and IRQ for "trabalhadores_por_grupo_profissional" dataset
+
+```{r}
+library(readr)
+trabalhadores_por_grupo_profissional <- read_delim("datasets/trabalhadores_por_grupo_profissional.csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+```
+
+# THE END

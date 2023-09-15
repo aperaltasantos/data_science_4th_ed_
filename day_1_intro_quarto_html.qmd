@@ -1,0 +1,280 @@
+---
+title: "Day 1 | Quarto Basics "
+subtitle: "Introduction to html quarto"
+author: "A. Peralta-Santos"
+date: today
+date-format: long
+format:
+  html:
+    smooth-scroll: true
+    toc: true
+    toc-location: left
+theme: cosmo
+smooth-scroll: true
+lang: pt   
+execute:
+  warning: false
+  echo: TRUE
+bibliography: references2.bib 
+---
+
+# Título 1
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eu tempor velit. Fusce accumsan ultrices fringilla. Praesent sed odio mi. Mauris non ligula turpis. Duis posuere lacus nec diam interdum dictum suscipit magna molestie. Vestibulum nibh dolor, interdum eget rhoncus ut, sodales eget justo. Morbi blandit lorem sit amet nulla egestas aliquam. Nunc pharetra est at nibh ullamcorper in commodo erat dignissim. Cras et suscipit enim.
+
+## Título 2
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eu tempor velit. Fusce accumsan ultrices fringilla. Praesent sed odio mi. Mauris non ligula turpis. Duis posuere lacus nec diam interdum dictum suscipit magna molestie. Vestibulum nibh dolor, interdum eget rhoncus ut, sodales eget justo. Morbi blandit lorem sit amet nulla egestas aliquam. Nunc pharetra est at nibh ullamcorper in commodo erat dignissim. Cras et suscipit enim.
+
+## Título 2
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neque ex, vehicula dictum risus fermentum, feugiat faucibus neque. Etiam purus quam, lacinia vel porta in, malesuada ac nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed bibendum placerat tellus, ac finibus lectus euismod eget. [@strabelli2020covid]
+
+### Título 3
+
+Este é o *quarto* [curso]{.underline} de **R**
+
+Nulla mattis diam vitae bibendum consequat. Etiam vitae eros tristique, porta sapien a, aliquet mauris. Praesent ultricies mi nulla, et dignissim nulla mattis at. Fusce rhoncus leo quis odio euismod, hendrerit facilisis risus tincidunt. Aenean at lectus justo. Cras fringilla lacus nisl, ac convallis odio tincidunt vel. Integer vel egestas nisi. Curabitur vitae imperdiet justo.
+
+> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+> penso logo existo - Descartes
+
+<!--- citacao importante --->
+
+## Definir a configuração markdown
+
+```{r setup, include=FALSE}
+# Configurações gerais para o pacote knitr
+knitr::opts_chunk$set(
+  collapse    = TRUE,  # Agrupa os blocos de código e output
+  warning     = FALSE, # Desativar exibição de avisos
+  message     = FALSE, # Desativar exibição de mensagens
+  echo        = FALSE, # Evitar imprimir o código R que gerou o gráfico
+  eval        = TRUE   # Avaliar e incluir os resultados do código
+  )
+
+# Configurações para reprodutibilidade e formatação numérica
+set.seed(1)       # Define a semente para garantir a reprodutibilidade
+options(scipen=5) # Define o número de casas decimais
+```
+
+## Criar um URL inline
+
+Exemplo [aqui](https://www.statpower.net/Content/310/R%20Stuff/SampleMarkdown.html)
+
+[hiperlink publico](www.publico.pt)
+
+[jornal expresso](www.expresso.pt)
+
+[hyperlink google](www.google.com)
+
+Novas ideias [Quarto website](https://quarto.org/docs/output-formats/html-basics.html)
+
+Link para a localização do curso [ENSP](www.ensp.unl.pt)
+
+## Adicionar outra imagem
+
+![figure 1](images/lisboa.jpeg)
+
+![Escola Nacional de Saúde Pública](https://www.ensp.unl.pt/wp-content/uploads/2022/10/w3b8330-e1666611629891-768x384.jpg)
+
+::: {#fig-maps layout-ncol="2"}
+![European Map](images/map_eu.png){#fig-europa width="360"}
+
+![Portugal](images/map_pt.jpeg){#fig-pt width="250"}
+
+Mapas da Europa e Portugal
+:::
+
+## Referências
+
+Veja @fig-maps para exemplos. Em particular, @fig-pt ou @fig-europa
+
+## Flowcharts
+
+```{mermaid}
+flowchart TD
+  A[Population] --> B(Study population)
+
+  B --> C{Salt substitute}
+
+  C --> D[Exposed]
+
+  C --> E[Not exposed]
+```
+
+::: panel-tabset
+## ENSP
+
+Escola
+
+## Data Science
+
+R
+
+## Melhor edição
+
+Esta é que é a melhor
+:::
+
+::: panel-tabset
+## Introdução
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neque ex, vehicula dictum risus fermentum, feugiat faucibus neque. Etiam purus quam, lacinia vel porta in, malesuada ac nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae
+
+## Imagens
+
+![Logotipo do curso](images/logo.png "Logo of our course"){width="6cm"}
+
+![Portugal](images/map_pt.jpeg){width="250"}
+:::
+
+## Equações
+
+Usar dois símbolos de dólar para uma equação separada do texto, e assim por diante.$$
+E(log(Y_t)) 
+$$
+
+$$ E(log(Y_t)) = \beta_0 + \beta_{1-11} \sum_{m=1}^{m=12} MONTH_t + \beta_{12} TIME + \beta_{13} INT_t + \beta_{14} TIME*INT_t + log(POP_t) + \epsilon_t$$
+
+equação simples $Y=ax+2$
+
+usar um símbolo de dólar para equações inline no texto $E(log(Y_t))$
+
+## Código Inline
+
+```{r}
+# O resultado de x será mostrado abaixo
+x <- 2+2
+x
+```
+
+```{r}
+# Z e a media de idades
+media_idade  <- 43
+```
+
+```{r}
+y <- 10*2 
+```
+
+```{r}
+a <- 50  
+b <- 12
+c <- 8 
+
+d <- a+b+c 
+```
+
+O resultado de X é `r x` dias.
+
+O número total de doente é `r y`.
+
+O número de B é `r b`.
+
+O número de cirurgias desta semana é `r d`.
+
+A média de idades e `r media_idade`.
+
+```{r}
+x <- 20
+```
+
+Afinal, o resultado de X é `r x` dias.
+
+# Formatação de Texo
+
+## Footnote
+
+Os estudantes de Data Science for healthcare são os melhores. [^1][^2]
+
+[^1]: Isto é uma nota de rodapé.
+
+[^2]: Readers Digest
+
+Adoramos R! [^3]
+
+[^3]: Isto é outra nota de rodapé
+
+Outra nota. [^4]
+
+[^4]: outro teste
+
+### Criar um quadro
+
+| Tipo                        | Número | Estadia Média |
+|-----------------------------|--------|---------------|
+| Hospitais                   | 5000   | 10            |
+| Cuidados de Saúde Primários | 20000  | 1             |
+| Cuidados de Longa Duração   | 2000   | 100           |
+
+: Isto é um quadro
+
+| Alunos  | Nota | Total |
+|---------|------|-------|
+| Liliana |      |       |
+|         |      |       |
+|         |      |       |
+
+: 4.ª Edição
+
+| dia    | doentes |
+|--------|---------|
+| `r  c` | 150     |
+| 2      | 160     |
+
+#### Inserir um URL
+
+[this is a URL](https://www.ensp.unl.pt/cursos/cursos-de-curta-duracao/data-science-with-r-in-healthcare/)
+
+Escrever em **negrito**
+
+Escrever em *itálico*
+
+#### Criar listas
+
+Sem ordem
+
+-   item 1
+-   item 2
+-   item 3
+
+Com ordem
+
+1.  item 1
+2.  item 2
+3.  item 3
+
+Vamos tentar fazer knitting a este markdown
+
+-   item 1
+-   item 2
+
+1.  primeiro
+2.  segundo
+
+## Criar referências
+
+[@santos2022omicron]
+
+[@litaker2005context]
+
+[@cowin2005cadherins]
+
+[@sharma2010various]
+
+[@perkins2020increasing]
+
+A COVID mata toda a gente com EAM. [@strabelli2020covid]
+
+## Problemas
+
+Instalar pandoc https://pandoc.org/installing.html
+
+Para macbook M2 https://github.com/rstudio/rstudio/issues/12512
+
+# Referências
+
+::: {#refs}
+:::

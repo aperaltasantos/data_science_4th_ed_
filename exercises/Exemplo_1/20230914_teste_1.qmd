@@ -1,0 +1,130 @@
+---
+title: "Exercício da aula"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(readxl)
+library(janitor)
+```
+
+```{r}
+rm(list = ls(all.names = TRUE)) # limpa todos os objetos, incluindo os ocultos
+```
+
+```{r}
+raw_data <- read_excel(here("data", "hypoxia.xlsx"))
+
+data <- clean_names(raw_data)
+```
+
+```{r}
+data <- data |>
+  rename(
+    "iv_morphin_eq" = "iv_morphine_eq"
+  ) |>
+  select(
+    iv_morphin_eq,
+    age,
+    female,
+    race,
+    bmi,
+    smoking,
+    diabetes,
+    propofol_induction, 
+    crystalloids, 
+    colloids,
+    municipality,
+    min_sao2
+  )
+```
+
+```{r}
+older <- data |>
+  filter(
+    age > 25
+  )
+```
+
+```{r}
+sum <- data |>
+  mutate(
+    nome = crystalloids + colloids
+  )
+```
+
+```{r}
+summarise <- data |>
+  group_by(female) |>
+  summarise(
+    mean = mean(bmi),
+    sd = sd(bmi)
+  )
+```
+
+## Exercício 3
+
+```{r}
+municip <- read_excel(here("data", "municípios.xlsx"))
+```
+
+```{r}
+municip <- municip |>
+  clean_names() |>
+  rename(
+    municipality = municipio
+  )
+
+full <- left_join(
+    data,
+    municip,
+    by = "municipality"
+  ) |>
+  group_by(nuts_2, female) |>
+  summarise(
+    count = n()
+  )
+
+```
+
+```{r}
+p <- ggplot() +
+  geom_point(
+    data = data,
+    mapping = aes(
+      x = min_sao2,
+      y = bmi
+    )
+  ) + 
+  theme_minimal()
+  
+p
+```
+
+```{r}
+data_plot <- data %>%
+  mutate(
+    diabetes = factor(diabetes, labels = c("Sem diabetes", "Com diabetes"))
+  )
+
+
+p <- ggplot() +
+  geom_boxplot(
+    data = data_plot,
+    mapping = aes(
+      x = diabetes,
+      y = bmi
+    )
+  )+
+  labs(
+    title = "Relação entre IMC e diabetes",
+    x = "",
+    y = "IMC"
+  )+
+  theme_minimal()
+  
+p
+```

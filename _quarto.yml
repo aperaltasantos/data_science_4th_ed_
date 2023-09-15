@@ -1,0 +1,14 @@
+project:
+  output-dir: output/documents
+
+toc: true
+bibliography: references.bib  
+
+format:
+  html:
+    smooth-scroll: true
+    self-contained: true
+    toc: true
+    toc-location: left
+docx:
+  template: template1.docx

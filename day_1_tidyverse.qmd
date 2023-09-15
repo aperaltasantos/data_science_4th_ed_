@@ -1,0 +1,677 @@
+---
+title: "Day 1 | Data manipulation with tidyverse"
+author: "A. Peralta-Santos"
+date: today
+date-format: long
+format:
+  html:
+    toc: true
+    toc-location: left
+execute:
+  warning: false
+title-block-style: default
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## Setup
+
+Esta parte garante que tem as configurações padrão para todos os blocos de código R
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse    = TRUE,
+  warning     = FALSE, # Mostrar ou não avisos
+  message     = FALSE, # Mostrar ou não mensagens
+  echo        = TRUE,  # Queremos ver o código neste caso
+  eval        = TRUE   # Se o código deve ser avaliado e os resultados incluídos
+  )
+```
+
+#### Limpar o ambiente
+
+```{r}
+rm(list = ls(all.names = TRUE)) # limpa todos os objetos, incluindo os ocultos
+```
+
+#### Definir seed
+
+É importante definir a seed sempre que o R precisa realizar cálculos aleatórios, para que os resultados permaneçam constantes
+
+```{r}
+set.seed(123)
+```
+
+## Instalar e carregar biblioteca
+
+Sempre que se inicia uma nova sessão, as bibliotecas têm de ser carregadas.
+
+```{r}
+# install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+# install.packages("readxl", repos = "http://cran.us.r-project.org")
+# install.packages("lubridate", repos = "http://cran.us.r-project.org")
+# install.packages("janitor")
+# install.packages("data.table", repos = "http://cran.us.r-project.org")
+# install.packages("here")
+# install.packages("haven")
+
+library(janitor)
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(data.table)
+library(here)
+library(haven)
+```
+
+## Carregar os dados
+
+A partir de um Excel
+
+```{r}
+# Nome do novo conjunto de dados <- read_excel("caminho")
+# Use um caminho genérico para garantir a reprodutibilidade
+
+inpatient_hospital <- read_excel("datasets/atividade_internamento_hospitalar.xlsx")
+
+# Vamos inspecionar o conjunto de dados
+View(inpatient_hospital)
+
+covid_inc <- read_csv("datasets/covid_inc.csv")
+hypoxia <- read_excel("datasets/hypoxia.xlsx")
+```
+
+```{r}
+# Limpar nomes
+# Este comando garante que todos os nomes das variáveis estão em minúsculas e sem espaços
+inpatient_hospital <- clean_names(inpatient_hospital)
+
+covid_inc_limp <- clean_names(covid_inc)
+```
+
+## Tidyverse | Manipulação de Dados
+
+### Select
+- Este argumento permite selecionar variáveis; temos 7 variáveis em nosso conjunto de dados. Vamos verificar se precisamos de todas elas.
+
+```{r}
+# 1. Nome do conjunto de dados final
+# 2. Nome do conjunto de dados original
+# 3. tubo %>%
+# 4. argumento, neste caso, é select
+
+inpatient_hospital_lite <- inpatient_hospital %>% 
+  select(
+    periodo, 
+    instituicao, 
+    tipo_de_especialidade,
+    doentes_saidos,
+    dias_de_internamento
+  ) 
+
+test <- inpatient_hospital %>% select(periodo, instituicao)
+
+# Também podemos não selecionar algumas variáveis
+# PASSOS:
+# 1. Crie um vetor com as variáveis alvo
+# 2. use o argumento lógico ! para excluir as variáveis alvo
+
+target <- c("regiao", "localizacao_geografica")
+
+inpatient_hospital_exclude <- inpatient_hospital %>%
+  select(
+    !target
+  )
+
+inpatient_hospital_exclude1 <- inpatient_hospital %>%
+  select(
+    -regiao,
+    -localizacao_geografica,
+    -dias_de_internamento
+  )
+```
+
+### Filter
+
+-    Este argumento permite filtrar valores ou strings dentro das variáveis
+
+```{r}
+# 1. Nome do conjunto de dados final
+# 2. Nome do conjunto de dados original
+# 3. pipe %>%
+# 4. argumento, neste caso, é filter
+# 5. use um argumento lógico <, >, <=, ==
+
+inpatient_hospital_less_1000 <- inpatient_hospital_lite %>%
+  filter(dias_de_internamento <= 1000)
+
+# Vamos inspecionar o conjunto de dados
+View(inpatient_hospital_less_1000)
+
+# Podemos usar filter para strings
+inpatient_hospital_surgery <- inpatient_hospital_lite %>%
+  filter(tipo_de_especialidade == "Especialidade Cirurgica")
+
+inpatient_hospital_medicine <- inpatient_hospital_lite %>%
+  filter(tipo_de_especialidade == "Especialidade Médica")
+  
+# Também podemos combinar vários filtros com argumentos lógicos & (e), | (ou)
+# Podemos usar filter para strings
+inpatient_hospital_surgery_less_500 <- inpatient_hospital_lite %>%
+  filter(tipo_de_especialidade=="Especialidade Cirurgica" & 
+           dias_de_internamento<=500)
+```
+
+
+### Mutate
+
+-   Este argumento cria uma nova variável
+
+```{r}
+# 1. Nome do conjunto de dados final
+# 2. Nome do conjunto de dados original
+# 3. pipe %>%
+# 4. argumento, neste caso, é mutate
+# 5. especifique o nome da nova variável
+# 6. adicione a função
+
+inpatient_hospital_lite <- inpatient_hospital_lite |>
+  mutate(
+    length_patient =
+      round((dias_de_internamento/doentes_saidos), digits = 1)
+    )
+
+# Vamos inspecionar o conjunto de dados
+View(inpatient_hospital_lite)
+
+# Também podemos criar uma nova variável com valores fixos
+
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  mutate(
+    new_var = 2,
+    fonte = "transparencia_sns",
+    multiplicacao = dias_de_internamento*doentes_saidos
+  )
+
+# Vamos inspecionar o conjunto de dados
+View(inpatient_hospital_lite)
+```
+
+
+### Datas
+
+-  Lidar com datas pode ser complicado, mas é uma competência importante de dominar
+
+```{r}
+# Precisamos de um truque para alterar o conjunto de dados existente nas datas
+# Vamos usar paste0, que permite colar valores em uma variável
+
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  mutate(
+    periodo=paste0(periodo, "-01")
+  )
+
+# Agora precisamos definir a variável periodo como uma data
+
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  mutate(
+    periodo=as.Date(periodo, format = "%Y-%m-%d")
+  )
+
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  mutate(
+    year = year(periodo),
+    month=lubridate::month(periodo, label = FALSE),
+    week=week(periodo),
+    weekday=lubridate::wday(periodo, label=TRUE)
+  )
+  
+# Vamos inspecionar o conjunto de dados
+View(inpatient_hospital_lite)
+
+# É possível desagrupar por dia, semana, mês e ano.
+```
+
+### Summarise
+
+-   Este argumento permite resumir as variáveis
+
+```{r}
+# Crie uma variável com o número de todos os doentes que tiveram alta do hospital
+# PASSOS
+# 1. Confirme que uma variável data válida e definida como as.Date
+# 2.
+
+sum_patients <- inpatient_hospital_lite %>%
+  summarise(
+    all_patients = sum(doentes_saidos) 
+  )
+
+anyNA(inpatient_hospital_lite$doentes_saidos)
+
+# ALERT
+# We did not get a valid result because there are NA in the dataset, we need to specify to ignore the NA values
+# To do that we use na.rm = TRUE
+
+sum_patients <- inpatient_hospital_lite %>%
+  summarise(
+    all_patients=sum(doentes_saidos, na.rm = TRUE)
+  )
+
+# Now let's sum all the days as well 
+sum_patients <- inpatient_hospital_lite %>%
+  summarise(
+    all_patients = sum(doentes_saidos, na.rm = TRUE),
+    days_patients = sum(dias_de_internamento, na.rm = TRUE),
+    mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
+    sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
+    max_patient_days = max(dias_de_internamento, na.rm = TRUE),
+    min_patient_days = min(dias_de_internamento, na.rm = TRUE)
+  )
+```
+
+### Group by
+
+-   Por vezes é necessário agregar ou criar novas variáveis agregadas por outras
+    variáveis. Vamos repetir o exercício anterior, mas com dados agregados por ano
+
+
+```{r}
+sum_patients_year <- inpatient_hospital_lite %>%
+  group_by(year) %>%
+  summarise(
+    all_patients = sum(doentes_saidos, na.rm = TRUE),
+    days_patients = sum(dias_de_internamento, na.rm = TRUE),
+    mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
+    sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
+    max_patient_days = max(dias_de_internamento, na.rm = TRUE),
+    min_patient_days = min(dias_de_internamento, na.rm = TRUE)
+  )
+
+# Podemos agregar por mais que uma variável 
+
+sum_patients_year_speciality <- inpatient_hospital_lite %>%
+  group_by(year, tipo_de_especialidade) %>%
+  summarise(
+    all_patients = sum(doentes_saidos, na.rm = TRUE),
+    days_patients = sum(dias_de_internamento, na.rm = TRUE),
+    mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
+    sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
+    max_patient_days = max(dias_de_internamento, na.rm = TRUE),
+    min_patient_days = min(dias_de_internamento, na.rm = TRUE)
+  )
+```
+
+# Exercício 1
+
+- No dataset covid_inc, calcule a média e desvio padrao da incidencia por ARS.
+
+```{r}
+mean_covid <-covid_inc %>%
+  group_by(ARS) %>% 
+  summarise(
+    mean_Incidencia=mean(Incidencia, na.rm=TRUE),
+    SD_Incidencia=sd(Incidencia, na.rm=TRUE)
+  )
+```
+
+### Ordenar Dados
+
+-   A função arrange permite ordenar valores dentro de uma variável
+
+```{r}
+# Ordenar os doentes por ano e especialidade, em ordem crescente do número total de pacientes
+sum_patients_year_speciality <- sum_patients_year_speciality %>%
+  arrange(all_patients)
+
+# Visualizar o dataframe ordenado
+view(sum_patients_year_speciality)
+
+# Ordenar em ordem descendente pelo número total de pacientes
+sum_patients_year_speciality <- sum_patients_year_speciality %>%
+  arrange(-all_patients)
+```
+
+-   Misturar funções
+
+```{r}
+sum_patients_hospital <- inpatient_hospital_lite %>%
+  filter(
+    tipo_de_especialidade == "Especialidade Cirurgica" &
+    month == "12"
+  ) %>%
+  group_by(instituicao) %>%
+  summarise(
+    mean_patients = mean(doentes_saidos, na.rm = TRUE),
+    sd_patients = sd(doentes_saidos, na.rm = TRUE),
+    median_patients = median(doentes_saidos, na.rm = TRUE), 
+    iqr_patients = IQR(doentes_saidos, na.rm = TRUE),
+  )
+```
+
+### Príncipios de data wrangling avançado
+
+-   Variáveis lag e lead
+
+Podemos criar variáveis que representam o atraso ou avanço em relação a outras variaveis.
+
+```{r}
+# O nosso objetivo é criar uma variação mensal das nossas variáveis de resultado
+# O nosso dataset está organizado por tipo_de_especialidade e instituição
+# E também com resultados acumulados por ano
+# Precisamos de definir a unidade de atraso (lag)
+
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  group_by(
+    instituicao,
+    tipo_de_especialidade,
+    year
+  ) %>%
+  mutate(
+    doentes_saidos_lag = 
+      lag(doentes_saidos, n = 1, order_by = periodo ),
+    dias_de_internamento_lag = 
+      lag(dias_de_internamento, n = 1, order_by = periodo )
+  )
+
+sanity <- inpatient_hospital_lite %>% 
+  select(
+    periodo,
+    instituicao,
+    tipo_de_especialidade,
+    year,
+    doentes_saidos,
+    doentes_saidos_lag
+  )
+```
+
+```{r}
+hospital<-inpatient_hospital_lite %>%
+  filter(
+    instituicao=="Centro Hospitalar de Setúbal, EPE",
+    tipo_de_especialidade=="Especialidade Cirurgica",
+    year=="2015"
+  ) %>%
+  select(
+    periodo,
+    year,
+    instituicao,
+    doentes_saidos
+  ) %>%
+  mutate(
+    doentes_saidos_lag = 
+      lag(doentes_saidos, n = 1, order_by = periodo ),
+    doentes_saidos_var = doentes_saidos-doentes_saidos_lag,
+    doentes_saidos_var1 =
+      ifelse(is.na(doentes_saidos_var), doentes_saidos, doentes_saidos_var)
+  )
+```
+
+Exercicio
+1. Dataset inpatient_hospital_lite
+2. So queremos metricas de hospitais universitários 
+3. Criar metricas de medias e SD dos doentes saidos so para o mes de janeiro
+4. Hospitais superiores a media global sao codificados como zero, os outros como 1
+
+```{r}
+tipo_esp01 <-inpatient_hospital_lite %>%
+  select(tipo_de_especialidade)%>%
+  mutate(
+    esp01=ifelse(tipo_de_especialidade=="Especialidade Cirurgica", 0,1)
+  )
+```
+
+Criar Variáveis de Diferença Mensal
+
+```{r}
+# Calcular a diferença mensal para pacientes e dias de internamento
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  mutate(doentes_saidos_var = doentes_saidos - doentes_saidos_lag,
+         dias_de_internamento_var = dias_de_internamento - dias_de_internamento_lag)
+```
+
+### Instruções If-Else ###
+
+```{r}
+# ifelse é um argumento muito útil
+# PASSOS
+# ifelse(define condição, valor quando a condição é VERDADEIRA, valor quando a condição é FALSA)
+
+inpatient_hospital_lite <- inpatient_hospital_lite %>% 
+  mutate(
+    doentes_saidos_var =
+      ifelse(is.na(doentes_saidos_var), doentes_saidos, doentes_saidos_var),
+    dias_de_internamento_var = 
+      ifelse(is.na(dias_de_internamento_var), dias_de_internamento, dias_de_internamento_var)
+  )
+
+inpatient_hospital_lite <- inpatient_hospital_lite %>% 
+  mutate(
+    cat1 = ifelse(doentes_saidos >= 1000, "Muitos doentes", "Poucos doentes"),
+    cat2 = ifelse(cat1 == "Poucos doentes", "Pouquissímos doentes", cat1)
+  )
+
+
+sanaty <- inpatient_hospital_lite %>% 
+  select(periodo, instituicao, tipo_de_especialidade, year, doentes_saidos, doentes_saidos_lag, doentes_saidos_var)
+```
+
+### Case_when
+
+```{r}
+# Por vezes, precisamos de alterar as categorias dentro de uma variável
+# Podemos usar case_when para fazer isso
+# Podemos ver que o Hospital de Vila Franca de Xira e o Hospital de Braga têm duas designações diferentes que precisam de ser unificadas
+
+# Corrigir designações inconsistentes na variável 'instituicao'
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  mutate(
+    instituicao1 = case_when(
+      instituicao =="Hospital de Vila Franca de Xira, PPP"  ~ "Hospital de Vila Franca de Xira, EPE",
+      instituicao =="Hospital de Braga, PPP" ~ "Hospital de Braga, EPE"
+    )
+  )
+
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  mutate(
+    instituicao2 = recode(
+      instituicao,
+      "Hospital de Vila Franca de Xira, PPP"  = "Hospital de Vila Franca de Xira, EPE",
+      "Hospital de Braga, PPP" = "Hospital de Braga, EPE"
+    )
+  )
+
+
+
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  mutate(
+    instituicao1 = case_when(
+      instituicao =="Hospital de Vila Franca de Xira, PPP"  ~ "Hospital de Vila Franca de Xira, EPE",
+      instituicao =="Hospital de Braga, PPP" ~ "Hospital de Braga, EPE"
+    ),
+    instituicao1 = ifelse(is.na(instituicao1), instituicao, instituicao1)
+  )
+
+inpatient_hospital_lite1 <- inpatient_hospital_lite %>%
+  mutate(
+    instituicao = case_when(
+      instituicao =="Hospital de Vila Franca de Xira, PPP"  ~ "Hospital de Vila Franca de Xira, EPE",
+      instituicao =="Hospital de Braga, PPP" ~ "Hospital de Braga, EPE",
+      TRUE ~ instituicao
+      )
+  )
+```
+
+### Criar Novas Variáveis ###
+
+```{r}
+# Criar variável de duração da estadia
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  mutate(
+    length_stay_var = dias_de_internamento_var / doentes_saidos_var, 
+    length_stay_var = as.numeric(length_stay_var)
+  ) %>%
+  drop_na(length_stay_var) %>%
+  filter(length_stay_var!="Inf")
+
+# Filtrar apenas duração de estadia positiva
+inpatient_hospital_lite_apenas_pos <- inpatient_hospital_lite %>%
+  filter(length_stay_var >= 0)
+```
+
+Agora vamos criar um data wrangling mais complexo. Se a variável contiver uma expressão, podemos usar grepl para capturá-la e criar uma nova variável.
+
+```{r}
+# Os valores de length_stay_var tem valores impossiveis
+# Decidi eliminar valores abaixo de zero e acima de 150 porque me pareceu razoavel 
+
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+    mutate(
+      tipo_instituicao = 
+        case_when(
+          grepl("Universitário", instituicao, ignore.case = TRUE) ~ "University",
+          grepl("Oncologia", instituicao, ignore.case = TRUE) ~ "Cancer hospital"
+        ),
+    tipo_instituicao = 
+      replace_na(tipo_instituicao, "Hospital"),
+    length_stay_var = 
+      ifelse(length_stay_var<=0 | length_stay_var>150, NA, length_stay_var),
+    doentes_saidos_var = 
+      ifelse(doentes_saidos_var<=0 , NA, doentes_saidos_var)
+  ) 
+
+
+```
+
+### Wide e Long tables
+
+```{r}
+# Agrupar dados por período e tipo de instituição
+inpatient_hospital_sum <- inpatient_hospital_lite %>%
+  group_by(periodo, tipo_instituicao) %>%
+  summarise(doentes_saidos_var = sum(doentes_saidos_var, na.rm = TRUE))
+```
+
+```{r}
+# We can convert long and wide tables very easily 
+# STEPS
+# 1. Specify the category variable
+# 2. Specify the numeric variable 
+
+inpatient_hospital_wide <- inpatient_hospital_sum %>%
+  pivot_wider(names_from = tipo_instituicao, values_from = doentes_saidos_var)
+
+# Now back to long format
+# STEPS
+# 1. Specify the  variable that wont be changed
+# 2. Specify the categorical variable name
+# 3. Specify the numerical variable name 
+inpatient_hospital_long <- inpatient_hospital_wide %>%
+  pivot_longer(!periodo, names_to = "tipo_instituicao", values_to = "doentes_saidos_var")
+
+```
+
+### Saving the new data
+
+```{r}
+# A função fwrite permite guardar ficheiros csv muito grandes 
+
+fwrite(
+  inpatient_hospital_lite,
+  file = here::here("output", "datasets", paste0("inpatient_hospital_lite", ".csv")) 
+)
+```
+
+```{r}
+# SPSS
+write_sav(
+  inpatient_hospital_lite,
+  file = here::here("output", "datasets", paste0("inpatient_hospital_lite_", Sys.Date, ".sav"))
+)
+
+## São equivalentes, mas a primeira é mais robusta.
+
+write_sav(
+  inpatient_hospital_lite,
+  file = "output/datasets/inpatient_hospital_lite.sav"
+)
+
+## gerar ficheiros com nome dinâmicos
+
+write_sav(
+  inpatient_hospital_lite,
+  file = here::here("output", "datasets", paste0("inpatient_hospital_lite_", Sys.Date, ".sav"))
+)
+
+# STATA
+write_dta(
+  file = here::here("output", "datasets", paste0("inpatient_hospital_lite", ".dta"))
+)
+```
+
+## Juntar datasets
+
+```{r}
+inpatient <- inpatient_hospital_lite %>%
+  group_by(periodo, instituicao) %>%
+  summarise(all_patients=sum(doentes_saidos, na.rm = TRUE))
+```
+
+```{r}
+library(readr)
+workers <- read_delim("datasets/trabalhadores_por_grupo_profissional.csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+workers <- janitor::clean_names(workers)
+```
+
+```{r}
+# https://data-lessons.github.io/gapminder-R/12-joins.html
+
+# Ler dados sobre trabalhadores
+workers <- workers %>%
+  select(periodo, instituicao, total_geral) %>%
+  mutate(
+    periodo=paste0(periodo, "-01"),
+    periodo=as.Date(periodo)
+  )
+```
+
+```{r}
+# left_join(a, b, by = "x1") Join matching rows from b to a.
+# right_join(a, b, by = "x1") Join matching rows from a to b.
+# inner_join(a, b, by = "x1") Join data. Retain only rows in both sets.
+# full_join(a, b, by = "x1") Join data. Retain all values, all rows.
+# anti_join(a, b, by = "x1") All rows in a that do not have a match in b.
+
+inpatient_workers <- left_join(
+  inpatient,
+  workers,
+  by= c("periodo", "instituicao")
+)
+
+inpatient_workers_inner <- inner_join(
+  inpatient,
+  workers,
+  by = c("periodo", "instituicao")
+) %>% ## |>
+  mutate(
+    inpatient_worker_ratio = round(all_patients/ total_geral, digits = 4)
+  )
+
+
+anti_inpatient_workers <- anti_join(
+  inpatient,
+  workers,
+  by=c("periodo", "instituicao")
+)
+```
+
+### Exercício
+Crie a média e a mediana dos doentes seguidos e dias de internamento, por ano para os hospitais de oncologia (agrupados).
+
+## FIM
+
+
+

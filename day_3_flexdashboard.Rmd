@@ -1,0 +1,307 @@
+---
+title: "ENSP | `r format(Sys.time(),'%d %b %y-%H:%m')`"
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
+output: 
+  flexdashboard::flex_dashboard:
+    theme: lumen
+    orientation: rows
+    social: [ "twitter", "facebook", "menu" ]
+    navbar:
+      - { title: "Sobre", href:"https://www.ensp.unl.pt/cursos/"}
+---
+
+```{=html}
+<style>                     
+.navbar {
+  background-color:"#fdbe85";
+  border-color:grey;
+}
+.navbar-brand {
+color:black!important;
+}
+</style>
+```
+
+
+
+```{r setup, include=FALSE}
+
+# install.packages("flexdashboard")
+
+library(flexdashboard)
+library(tidyverse)
+```
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  echo = FALSE,
+  eval = TRUE
+  )
+
+set.seed(1) # Set the seed is important for getting reproducible reports 
+## Clean the envorment 
+rm(list=ls())
+options(scipen=4)
+```
+
+```{r}
+# READ THIS
+# https://pkgs.rstudio.com/flexdashboard/articles/flexdashboard.html 
+inpatient_hospital_lite <- read_csv("output/datasets/inpatient_hospital_lite.csv")
+
+```
+
+```{r}
+inpatient2022 <- inpatient_hospital_lite %>%
+  filter(year==2022)
+
+inpatient2022_sum <- inpatient2022 %>%
+  summarise(doentes_saidos_var=sum(doentes_saidos_var, na.rm = TRUE),
+            dias_de_internamento_var=sum(dias_de_internamento_var, na.rm = TRUE),
+            )
+```
+
+# Produção hospitalar
+
+## Row
+
+### Doentes Saídos
+
+```{r}
+x1 <- inpatient2022_sum$doentes_saidos_var
+
+valueBox(x1, 
+         icon = "fa-file-medical",
+         color="#fdd49e")
+
+```
+
+### Dias internamento
+
+```{r}
+x2 <- inpatient2022_sum$dias_de_internamento_var
+
+valueBox(x2, 
+         icon = "fa-hospital",
+         color="#fc8d59")
+```
+
+### Óbitos
+
+```{r}
+
+x3<- 23
+
+valueBox(x3, 
+         icon = "fa-infinity",
+         color="#bdbdbd")
+```
+
+## Row {.tabset .tabset-fade}
+
+```{r}
+
+inpatient_sum <- inpatient_hospital_lite %>%
+  group_by(periodo) %>%
+  summarise(doentes_saidos_var=sum(doentes_saidos_var, na.rm = TRUE),
+            dias_de_internamento_var=sum(dias_de_internamento_var, na.rm = TRUE),
+            )
+
+```
+
+### Doentes saídos
+
+```{r}
+library(highcharter)
+
+highchart() %>% 
+  hc_chart(type = "column") %>% 
+  hc_add_theme(hc_theme_smpl()) %>% 
+  hc_title(text = "Doentes saídos dos hospitais em Portugal") %>% 
+  hc_subtitle(text = "Fonte: Ministério da Saúde") %>% 
+  hc_xAxis(categories = format(inpatient_sum$periodo, "%b %Y")) %>% 
+  hc_yAxis(title = list(text = "Doentes saídos (Mensal)")) %>% 
+  hc_add_series(data = inpatient_sum$doentes_saidos_var,
+                name = "Doentes saídos", color = "#e6550d") %>% 
+  hc_exporting(
+    enabled = TRUE
+  )
+```
+
+
+### Dias de internamento
+
+```{r}
+library(highcharter)
+
+highchart() %>% 
+  hc_chart(type = "column") %>% 
+  hc_add_theme(hc_theme_smpl()) %>% 
+  hc_title(text = "Dias de internamento dos hospitais em Portugal") %>% 
+  hc_subtitle(text = "Fonte: Ministério da Saúde") %>% 
+  hc_xAxis(categories = format(inpatient_sum$periodo, "%b %Y")) %>% 
+  hc_yAxis(title = list(text = "Dias de internamento (Mensal)")) %>% 
+  hc_add_series(data = inpatient_sum$dias_de_internamento_var,
+                name = "Doentes saídos", color = "#e6550d") %>% 
+  hc_exporting(
+    enabled = TRUE
+  )
+```
+
+
+
+# COVID-19
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+library(sf)
+comm_pt <- st_read(
+  "datasets/map_json_portugal/concelhos_portugal_light.json")
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+covid_inc <- read_csv("datasets/covid_inc.csv") 
+
+covid_inc <- covid_inc %>%
+  rename(NAME_2=Concelho) %>%
+  mutate( NAME_2=recode(NAME_2,
+                         'Ponte de Sor' = "Ponte de Sôr"
+                         ))
+
+
+comm_pt <-left_join(comm_pt,
+                     covid_inc,
+                     by = "NAME_2")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+sum_ars <- covid_inc %>%
+  group_by(ARS) %>%
+  summarise(
+    inc=round(mean(Incidencia),1)
+  )
+
+min<- min(covid_inc$Incidencia)
+max<- max(covid_inc$Incidencia)
+
+```
+
+## Row
+
+### Incidência ARS Norte
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+sum_norte <- sum_ars %>%
+  filter(ARS=="Norte")
+
+rate <- sum_norte$inc
+
+gauge(rate, 
+      min = 0, 
+      max = 960, 
+      symbol = '', 
+      gaugeSectors(
+  success = c(0, 120), 
+  warning = c(120, 480), 
+  danger = c(480, 960)
+))
+```
+
+### Incidência ARS LVT
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+rate <- 300
+gauge(rate, min = 0, max = 960, symbol = '', gaugeSectors(
+  success = c(0, 120), warning = c(120, 480), danger = c(480, 960)
+))
+```
+
+### Incidência ARS Alentejo
+
+```{r}
+
+rate <- 480
+gauge(rate, min = 0, max = 960, symbol = '', gaugeSectors(
+  success = c(0, 120), warning = c(120, 480), danger = c(480, 960)
+))
+```
+
+## Row {.tabset .tabset-fade}
+
+### Mapa COVID-19
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+#install.packages("leaflet")
+library(leaflet)
+
+mybins <- c(0,60,120,240,480,Inf)
+mycolors <- c("#f7f7f7","#fee391","#fb6a4a","#cb181d","#67000d")
+mypalette <- colorBin( palette=mycolors, domain=comm_pt$Incidencia, na.color="transparent", bins=mybins)
+
+# Prepare the text for tooltips:
+mytext <- paste(
+    "Concelho: ", comm_pt$NAME_2,"<br/>",
+    "Incidência: ", comm_pt$Incidencia, "<br/>",
+    "Categoria: ", comm_pt$Incidencia_descritivo,
+    sep="") %>%
+  lapply(htmltools::HTML)
+
+# Final Map
+leaflet(comm_pt)%>%
+  addTiles()  %>%
+  setView( lat=39.5, lng=-7.6, zoom=7) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(
+    fillColor = ~mypalette(Incidencia),
+    stroke=TRUE,
+    fillOpacity = 0.9,
+    color="grey",
+    weight=0.3,
+    label = mytext,
+    labelOptions = labelOptions(
+      style = list("font-weight" = "normal", padding = "3px 8px"),
+      textsize = "13px",
+      direction = "auto"
+    )
+  ) %>%
+  addLegend( pal=mypalette, values=~Incidencia, opacity=0.9, title = "Incidência", position = "bottomleft" )
+
+
+```
+
+### Tabela COVID-19
+
+```{r}
+library(reactable)
+#library(htmltools)
+
+covid_inc <- covid_inc %>%
+  rename(concelho=NAME_2)
+
+reactable(covid_inc, 
+          defaultSorted = list(Incidencia = "desc"),
+          searchable = TRUE,
+          columns = list(
+  Incidencia = colDef(
+    style = function(value) {
+      if (value >= 120) {
+        color <- "#e00000"
+      } else if (value < 120) {
+        color <- "#008000"
+      } else {
+        color <- "#777"
+      }
+      list(color = color, fontWeight = "bold")
+    }
+  )
+))
+
+```

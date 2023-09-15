@@ -1,0 +1,68 @@
+---
+title: "Day 1 | Quarto Basics | Word"
+subtitle: "Escola Nacional de Saúde Pública"
+author: "A. Peralta-Santos"
+date: today
+date-format: long
+lang: pt  
+format: 
+  docx: 
+    reference-doc: templates/template2.docx
+    toc: true
+editor: visual
+bibliography: references.bib
+csl: templates/vancouver.csl 
+---
+
+{{< pagebreak >}}
+
+# Título 1
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eu tempor velit. Fusce accumsan ultrices fringilla. Praesent sed odio mi. Mauris non ligula turpis. Duis posuere lacus nec diam interdum dictum suscipit magna molestie. Vestibulum nibh dolor, interdum eget rhoncus ut, sodales eget justo. Morbi blandit lorem sit amet nulla egestas aliquam. Nunc pharetra est at nibh ullamcorper in commodo erat dignissim. Cras et suscipit enim.
+
+## Título 2
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neque ex, vehicula dictum risus fermentum, feugiat faucibus neque. Etiam purus quam, lacinia vel porta in, malesuada ac nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed bibendum placerat tellus, ac finibus lectus euismod eget.
+
+### Título 3
+
+Este é o *quarto* [curso]{.underline} de **R**
+
+Nulla mattis diam vitae bibendum consequat. Etiam vitae eros tristique, porta sapien a, aliquet mauris. Praesent ultricies mi nulla, et dignissim nulla mattis at. Fusce rhoncus leo quis odio euismod, hendrerit facilisis risus tincidunt. Aenean at lectus justo. Cras fringilla lacus nisl, ac convallis odio tincidunt vel. Integer vel egestas nisi. Curabitur vitae imperdiet justo.
+
+> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+## Criação de um URL inline
+
+Link para a localização do curso [ENSP](https://www.ensp.unl.pt/)
+
+[jornal](https://www.publico.pt)
+
+## Adicionar uma imagem
+
+![Logótipo do curso](images/logo.png "Logo of our course"){#fig-logo width="6cm"}
+
+::: {#fig-maps layout-ncol="2"}
+![Mapa europeu](images/map_eu.png){#fig-eu width="360"}
+
+![Mara de Portugal Continental](images/map_pt.jpeg){#fig-pt width="250"}
+
+Mapas da Europa e Portugal Continental
+:::
+
+## Referências
+
+Veja @fig-maps para exemplos. Em particular, @fig-pt.
+
+## Equações
+
+Use 2 sinais de dolar (\$\$) para inserir uma equação separada do texto. $$ E(log(Y_t)) = \beta_0 + \beta_{1-11} \sum_{m=1}^{m=12} MÊS_t  + \epsilon_t$$
+
+# Conclusão
+
+Lorem ipsum dolor sit amet [@litaker2005context], consectetur adipiscing elit. Proin eu tempor velit. Fusce accumsan ultrices fringilla [@cowin2005cadherins]. Praesent sed odio mi. Mauris non ligula turpis. Duis posuere lacus nec diam interdum dictum suscipit magna molestie. Vestibulum nibh dolor, interdum eget rhoncus ut, sodales eget justo. Morbi blandit lorem sit amet nulla egestas aliquam. Nunc pharetra est at nibh ullamcorper in commodo erat dignissim. Cras et suscipit enim.
+
+# Referências bibliográficas
+
+::: {#refs}
+:::

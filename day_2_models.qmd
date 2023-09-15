@@ -1,0 +1,398 @@
+---
+title: "Day 2 | Data models"
+author: "A. Peralta-Santos"
+date: today
+date-format: long
+format:
+  html:
+    smooth-scroll: true
+    self-contained: true
+    toc: true
+    toc-location: left
+theme: cosmo
+smooth-scroll: true
+execute:
+  warning: false
+project:
+  output-dir: outputs/documents
+---
+
+# Setup
+
+This ensures you have the default settings for all the R chunks of case
+
+```{r setup, include=FALSE}
+# Configurações gerais para o pacote knitr
+knitr::opts_chunk$set(
+  collapse    = TRUE,  # Agrupa os blocos de código e output
+  warning     = FALSE, # Desativar exibição de avisos
+  message     = FALSE, # Desativar exibição de mensagens
+  echo        = TRUE, # Neste caso nós queremos ver o código
+  eval        = TRUE   # Avaliar e incluir os resultados do código
+  )
+```
+
+### Clean enviorment
+
+```{r}
+rm(list = ls(all.names = TRUE)) # limpa todos os objetos, incluindo os ocultos
+```
+
+### Set seed
+
+Set seed in important everytime R needs to do random calculations, having the set seed ensure the results remain constant
+
+```{r}
+set.seed(123)
+```
+
+### Load library
+
+```{r}
+# install.packages("kableExtra")
+# install.packages("gapminder")
+
+library(broom)
+library(MLDataR)
+library(tidyverse)
+library(readr)
+library(broom)
+library(janitor)
+library(kableExtra)
+library(gapminder)
+library(gt)
+```
+
+### Load data
+
+```{r}
+# name of the new dataset <- read_excel("pathway")
+# Use a generic pathway to ensure reproducibility 
+# chande output to outputs
+
+inpatient_hospital_lite <- read_csv("output/datasets/inpatient_hospital_lite.csv")
+
+# Let's inspect the dataset 
+View (inpatient_hospital_lite)
+```
+
+```{r}
+inpatient_hospital_model <-  inpatient_hospital_lite %>%
+  mutate(
+    length_stay_var= (dias_de_internamento_var/doentes_saidos_var),
+    length_stay_var= ifelse(length_stay_var<0 , NA, length_stay_var),
+    length_stay_var= ifelse(length_stay_var> 150 , NA, length_stay_var),
+    ) %>%
+  drop_na(length_stay_var)
+```
+
+# Regression Models
+
+## Linear models
+
+### Univariate regression
+
+```{r}
+# How to create a linear model 
+# STEPS
+# 1. Make sure your outcome is a numeric variable with no impossible values
+# 2. lm(outcome ~ variable, data=dataset of origin ) 
+
+# For this regression we want to specify Hospital as the reference level 
+vec_levels <- c("University", "Hospital", "Cancer hospital")
+
+inpatient_hospital_model$tipo_instituicao <- 
+  factor(
+    inpatient_hospital_model$tipo_instituicao,
+    level = vec_levels
+    )
+
+#inpatient_hospital_model$tipo_instituicao <- relevel(inpatient_hospital_model$tipo_instituicao, ref = 2) 
+
+model1 <- lm(length_stay_var ~ tipo_instituicao, data= inpatient_hospital_model)
+
+
+# lm(formula, data)
+# formula = var_dependente ~ var_independente + (covariaveis)
+# data = dataset onde o modelo vai buscar a informação.
+
+summary(model1)
+```
+
+```{r}
+# We can with the Broom package make the model object in a tidy model 
+model1_tidy <- tidy(model1, conf.int = TRUE)
+model1_tidy
+
+# Inspect the model 
+model1_glance <-glance(model1)
+# Not a great model 
+```
+
+### Multivariate regression
+
+```{r}
+# To add more variables we need to add + and it's a good practice to specify when it's a factor or continuos
+model2 <- lm(
+  length_stay_var ~ as.factor(tipo_instituicao) + as.factor(year)+ as.factor(tipo_de_especialidade), 
+  data= inpatient_hospital_model
+  )
+
+model3 <- lm(
+  length_stay_var ~ as.factor(tipo_instituicao) + as.factor(year), 
+  data= inpatient_hospital_model
+  )
+
+# We can with the Broom package make the model object in a tidy model 
+model2_tidy <- tidy(model2, conf.int = TRUE)
+
+# Inspect the model 
+# The glance function provides the most model diagnostics indicators
+model2_glance <-glance(model2)
+model3_glance <-glance(model3)
+# The model has improved but it's not great
+
+# We can use this simple comand of row bind to compare the models 
+model_compare <- rbind(model1_glance, model2_glance, model3_glance) 
+model_compare
+```
+
+```{r}
+# Lets visualize our model 
+
+model2_augment <- augment(model2)
+```
+
+### Model diagnostics
+
+```{r}
+model2_plot <- ggplot(
+  data = model2_augment, 
+  mapping = aes(
+    x=.fitted, 
+    y=.std.resid)
+  ) + 
+  geom_point() +
+    labs(
+      title = "Model 2 diagnostics",
+      x = "Fitted values", 
+      y = "Residual") +
+  ylim(-5, 5)
+
+model2_plot
+
+plot(model2)
+```
+
+### Ploting the results of the model
+
+```{r}
+model2_tidy <- model2_tidy %>%
+    mutate(
+    term = case_when(
+      term =="(Intercept)" ~ "Intercept",
+      term =="as.factor(tipo_instituicao)Cancer hospital" ~ "Cancer hospital",
+      term =="as.factor(tipo_instituicao)University" ~ "University",
+      term =="as.factor(year)2016" ~ "2016",
+      term =="as.factor(year)2017" ~ "2017",
+      term =="as.factor(year)2018" ~ "2018",
+      term =="as.factor(year)2019" ~ "2019",
+      term =="as.factor(year)2020" ~ "2020",
+      term =="as.factor(year)2021" ~ "2021",
+      term =="as.factor(year)2022" ~ "2022",
+      term =="as.factor(tipo_de_especialidade)Especialidade Médica" ~ "Especialidade Médica",
+    )
+  )
+```
+
+```{r}
+# Now plot them
+p1<- ggplot(
+  data=model2_tidy, 
+  mapping = aes(x=reorder(term, estimate), y=estimate)
+  ) +
+  geom_point() + 
+  geom_errorbar(
+    mapping = aes(ymin=conf.low, ymax=conf.high), 
+    width = 0.2,size  = 1,
+    position = "dodge", 
+    color="gray"
+  ) +
+  geom_hline(yintercept = 0, color = "red", size = 1) +
+  labs(
+    title = "Diference in length of stay in Portuguese Hospitals",
+    x = "", 
+    y = "Diference in length of stay") +  
+  coord_flip()
+
+p1
+```
+
+## Logistic regression
+
+```{r}
+hd <- MLDataR::heartdisease
+hd<- clean_names(hd)
+```
+
+### Logit model
+
+```{r}
+model3_logit <- glm(
+  heart_disease ~ age + as.factor(sex) + relevel(factor(resting_ecg), ref = "Normal") +resting_bp, 
+  family="binomial", 
+  data=hd
+)
+
+model3_tidy <- tidy(model3_logit, exponentiate = TRUE, conf.int = TRUE)
+
+model3_tidy1 <- tidy(model3_logit, exponentiate = FALSE, conf.int = TRUE)
+```
+
+```{r}
+model3_tidy <- model3_tidy %>%
+  select(term, estimate, p.value, conf.low, conf.high) %>%
+    mutate(
+    term = case_when(
+      term =="(Intercept)" ~ "Intercept",
+      term =="age" ~ "Age",
+      term =="as.factor(sex)M" ~ "Male",
+      term =="resting_bp" ~ "Blood preassure",
+      term =='relevel(factor(resting_ecg), ref = "Normal")ST' ~ "ST ECG, ref. Normal",
+      term =='relevel(factor(resting_ecg), ref = "Normal")LVH' ~ "LVH ECG, ref. Normal",
+    )
+  ) %>% rename(
+    variable=term,
+    Odds_Ratio=estimate
+  ) 
+```
+
+```{r}
+table_model3 <- model3_tidy %>%
+  rename(
+    "Odds Ratio" = "Odds_Ratio",
+    "p value" = "p.value"
+  )|>
+  kbl(
+    digits = 3,
+    caption = "Odds ratio of having Heart Failure"
+  ) %>%
+  kable_classic(
+    full_width = F, 
+    html_font = "Calibri"
+  ) %>%
+  footnote(
+    general = "Here is a general comments of the table. ",
+    number = c("Footnote 1; ", "Footnote 2; ")
+  ) 
+
+table_model3
+```
+
+```{r}
+table_hd <- hd %>%
+  group_by(resting_ecg) %>%
+  summarise(mean_age=mean(age)) %>%
+  rename(
+    "Resting ECG"=resting_ecg,
+    "Mean age"=mean_age
+  ) 
+
+table_hd_kbl <- table_hd %>%
+  kbl(
+    digits = 2,
+    caption = "Mean age by resting ECG") %>%
+  kable_classic(
+    full_width = F,
+    html_font = "Calibri"
+  )
+
+table_hd_kbl
+```
+
+```{r}
+# https://gt.rstudio.com/articles/intro-creating-gt-tables.html
+#install.packages("gt")
+library(gt)
+
+# Make a display table with the `islands_tbl`
+# table; put a heading just above the column labels
+gt_tbl <- 
+  gt(table_hd) |>
+  tab_header(
+    title = "Idade de doentes com IC",
+    subtitle = "Por tipo de IC"
+  )
+
+
+# Show the gt Table
+gt_tbl
+```
+
+
+## Non-linear models
+
+```{r}
+gp <- gapminder
+gp <-clean_names(gp)
+```
+
+```{r}
+gp <- gp %>%
+  mutate(
+    decade = (year - 1990)/10,
+    log_gdp=log(gdp_percap)
+  )
+```
+
+```{r}
+ggplot(
+  data = gp, 
+  mapping = aes(x=log_gdp, y=life_exp)) + 
+  geom_point(alpha=0.5) +    
+  labs(
+    title = "Relationship between GDP per capita (Log) and life expectancy",
+    x = "Log of GDP per capita", 
+    y = "Life expectancy"
+  )  
+```
+
+We will use a OLS model
+
+
+```{r}
+model4 <- lm(life_exp ~ log_gdp, data= gp)
+
+model4_tidy <- tidy(model4, conf.int = TRUE)
+
+model4_augment <- augment(model4, se_fit = TRUE)
+```
+
+```{r}
+ggplot(
+  data = model4_augment, 
+  mapping = aes(x=log_gdp, y=life_exp)) + 
+  geom_point(alpha=0.5) +  
+  geom_line(
+    mapping = aes(x=log_gdp, y=.fitted ),
+    color="red"
+  ) +
+  geom_ribbon(
+    mapping = aes(
+      ymin=.fitted-1.96*.se.fit,
+      ymax=.fitted+1.96*.se.fit),
+    alpha=0.2
+    ) +
+  labs(
+    title = "Relationship between GDP per capita (Log) and life expectancy",
+    x = "Log of GDP per capita", 
+    y = "Life expectancy",
+    caption = "Source: Gapiminder | UN"
+  )
+
+```
+
+# Exercise
+
+
+# THE END
