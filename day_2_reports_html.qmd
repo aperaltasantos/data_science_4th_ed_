@@ -53,7 +53,7 @@ This is a smart report generated with R on the date `r format(Sys.time(), '%d %B
 
 # Methods
 
-We created a logistic regression model
+We created a logistic regression model $x=y$
 
 $$ E(Y_i) = \beta_0 + \beta_{1}  AGE_i + \beta_{2}  SEX_i +   \beta_{3}  BP_i +   \beta_{4}  CHOL_i + \epsilon_i$$
 
@@ -80,20 +80,25 @@ hd_sim1 <- round(hd_sim1$sum__cases,1)
 
 ## Descriptive Statistics
 
-Our data set as `r hd_sim1` patients with a mean age of `r age_sum`.
+Our data set as `r hd_sim1` patients with a mean age of `r age_sum`. 
+
+teste por sugestao do tiago `r round(hd_sum$mean_age,1)` 
 
 ```{r}
 t1 <- table1(
   ~ factor(sex) + age + factor(resting_ecg) + cholesterol + resting_bp | heart_disease, 
   data = hd,
   # footnote = "Source: MLData R",
-  caption = "Descriptive variables by health disease"
+  caption = "Descriptive variables by heart disease"
 )
 
+
+
 table1 <- as.data.frame(t1)
+
 write.xlsx(
   table1,
-  file = here("outputs", "datasets", paste0("table1_", Sys.Date(),".xlsx")) 
+  file = here("output", "datasets", paste0("table1_", Sys.Date(),".xlsx")) 
 )
 ```
 
@@ -154,7 +159,7 @@ p1<- ggplot(
   )+ 
   geom_point(alpha=0.5) +
   geom_smooth(
-    method = lm,
+    method = loess,
     se= FALSE
     ) +
   scale_colour_discrete(labels=c('No heart disease', 'Heart disease')) +
