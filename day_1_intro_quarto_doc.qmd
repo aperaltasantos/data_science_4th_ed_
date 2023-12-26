@@ -58,6 +58,87 @@ Veja @fig-maps para exemplos. Em particular, @fig-pt.
 
 Use 2 sinais de dolar (\$\$) para inserir uma equação separada do texto. $$ E(log(Y_t)) = \beta_0 + \beta_{1-11} \sum_{m=1}^{m=12} MÊS_t  + \epsilon_t$$
 
+## Criar um quadro
+
+As quadros em quarto podem ser definidas de várias formas mas são divididas entre cabeçalho e conteúdo por um linebreak que é definido pelo caracter "-".
+As colunas são separadas por "|" pelo menos no centro podendo ser omitidos na primeira e úttima posição.
+O RStudio por default assume logo a formatação pedida no formato visual.
+
+Em que o default é "-" mas com as opções de alinhamento semelhantes aos processadores de texto:
+(este alinhamento é definido por coluna)
+- ":----" Alinhamento à esquerda
+- "----:" Alinhamento à direita
+- ":----:" Alinhamento ao centro
+
+
+| Tipo                        | Número | Estadia Média |
+|:----------------------------|:------:|--------------:|
+| Hospitais                   | 5000   | 10            |
+| Cuidados de Saúde Primários | 20000  | 1             |
+| Cuidados de Longa Duração   | 2000   | 100           |
+
+A definição do espaçamento das colunas pode ser definido no Quarto em 3 posições:
+
+1- No YMAL - com o parmetro tbl-colwidths, 
+2- Em código que define a tabela 
+EX:Tabela
+": Isto é um quadro {tbl-colwidths="[75,15,10]"}"
+3- Pelo número relativo de caracteres de "-".
+
+
+| Alunos  | Nota | Total |
+|---------|------|-------|
+| Liliana |      |       |
+|         |      |       |
+|         |      |       |
+
+: Isto é um quadro {tbl-colwidths="[75,15,10]"}
+
+
+| dia    | doentes |
+|--------|---------|
+| `r  c` | 150     |
+| 2      | 160     |
+
+: 4.ª Edição
+
+## Criar Anotações
+
+Existem 4 formas de fazer anotações em R:
+
+1. Notas "{.callout-note}"
+
+:::{.callout-note}
+Os dados estão atualizados até ao dia `r Sys.Date()`
+:::
+
+2. Avisos "{.callout-warning}"
+
+:::{.callout-warning}
+Não foi possível confirmar dados de `r Sys.Date()`
+:::
+
+3. Importante "{.callout-caution}"
+
+:::{.callout-caution}
+Os dados estão atualizados até ao dia `r Sys.Date()`
+:::
+
+É possível melhorar a aparência destas anotações adicionando títulos:
+
+"{.callout-note title="Nota sobre dados"}"
+
+:::{.callout-note title="Nota sobre dados"}
+Os dados estão atualizados até ao dia `r Sys.Date()`
+:::
+
+Também é possível remover o ícone e tornar a nota menos proeminente.
+
+"{.callout-note icon=false apperance="mininal"}"
+
+:::{.callout-note title="Nota sobre dados" icon=false appearance="mininal"}
+Os dados estão atualizados até ao dia `r Sys.Date()`
+:::
 
 # Conclusão
 

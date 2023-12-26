@@ -3457,7 +3457,7 @@ return!"\t\n\x0B\f\r                　\u2028\u2029
   <li><a href="#referências" id="toc-referências" class="nav-link" data-scroll-target="#referências">Referências</a></li>
   <li><a href="#flowcharts" id="toc-flowcharts" class="nav-link" data-scroll-target="#flowcharts">Flowcharts</a></li>
   <li><a href="#equações" id="toc-equações" class="nav-link" data-scroll-target="#equações">Equações</a></li>
-  <li><a href="#código-inline" id="toc-código-inline" class="nav-link" data-scroll-target="#código-inline">Código Inline</a></li>
+  <li><a href="#código-inline-e-code-annotations" id="toc-código-inline-e-code-annotations" class="nav-link" data-scroll-target="#código-inline-e-code-annotations">Código Inline e Code Annotations</a></li>
   </ul></li>
   <li><a href="#formatação-de-texto" id="toc-formatação-de-texto" class="nav-link" data-scroll-target="#formatação-de-texto">Formatação de Texto</a>
   <ul class="collapse">
@@ -3484,16 +3484,23 @@ return!"\t\n\x0B\f\r                　\u2028\u2029
 </div>
 
 
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Autor</div>
+  <div class="quarto-title-meta-heading">Afiliação</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">A. Peralta-Santos </p>
+  </div>
+    <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Escola Nacional de Saúde Pública
+          </p>
+      </div>
+    </div>
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Autor</div>
-    <div class="quarto-title-meta-contents">
-             <p>A. Peralta-Santos </p>
-          </div>
-  </div>
-    
+      
     <div>
     <div class="quarto-title-meta-heading">Data de Publicação</div>
     <div class="quarto-title-meta-contents">
@@ -3657,10 +3664,35 @@ E(log(Y_t))
 <p>equação simples <span class="math inline">\(Y=ax+2\)</span></p>
 <p>usar um símbolo de dólar para equações inline no texto <span class="math inline">\(E(log(Y_t))\)</span></p>
 </section>
-<section id="código-inline" class="level2">
-<h2 class="anchored" data-anchor-id="código-inline">Código Inline</h2>
-<div class="cell">
-<pre><code>## [1] 4</code></pre>
+<section id="código-inline-e-code-annotations" class="level2">
+<h2 class="anchored" data-anchor-id="código-inline-e-code-annotations">Código Inline e Code Annotations</h2>
+<div class="cell" data-code-annotations="hover">
+<div class="sourceCode cell-code" id="annotated-cell-2"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># O resultado de x será mostrado abaixo</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();" href>1</a><span id="annotated-cell-2-2" class="code-annotation-target"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();" href>2</a><span id="annotated-cell-2-3" class="code-annotation-target"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="3" onclick="event.preventDefault();" href>3</a><span id="annotated-cell-2-4" class="code-annotation-target"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> a<span class="sc">+</span>b</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="4" onclick="event.preventDefault();" href>4</a><span id="annotated-cell-2-5" class="code-annotation-target"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>x</span>
+<span id="annotated-cell-2-6"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 4</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-annotation="1" data-code-lines="2" data-code-cell="annotated-cell-2">Definir a,</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-annotation="2" data-code-lines="3" data-code-cell="annotated-cell-2">Definir b,</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-annotation="3" data-code-lines="4" data-code-cell="annotated-cell-2">Definir x como a soma de a mais b.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-annotation="4" data-code-lines="5" data-code-cell="annotated-cell-2">Mostrar x ao utilizador</span>
+</dd>
+</dl>
+</div>
 </div>
 <p>O resultado de X é 4 dias.</p>
 <p>O número total de doente é 20.</p>
@@ -3708,7 +3740,11 @@ E(log(Y_t))
 </tbody>
 </table>
 <p>A definição do espaçamento das colunas pode ser definido no Quarto em 3 posições:</p>
-<p>1- No YMAL - com o parmetro tbl-colwidths, 2- Em código que define a tabela EX:Tabela “: Isto é um quadro {tbl-colwidths=”[75,15,10]“}” 3- Pelo número relativo de caracteres de “-”.</p>
+<ol type="1">
+<li>No YMAL - com o parâmetro tbl-colwidths;</li>
+<li>Em código que define a tabela; EX:Tabela “: Isto é um quadro {tbl-colwidths=”[75,15,10]“}”;</li>
+<li>Pelo número relativo de caracteres de “-”.</li>
+</ol>
 <table class="table">
 <caption>Isto é um quadro</caption>
 <colgroup>
@@ -3816,8 +3852,23 @@ Atenção
 <h2 class="anchored" data-anchor-id="criar-anotações">Criar Anotações</h2>
 <p>Existem 4 formas de fazer anotações em R:</p>
 <ol type="1">
-<li><p>Notas “{.callout-note}” :::{.callout-note} Os dados estão atualizados até ao dia 2023-12-26 :::</p></li>
-<li><p>Avisos “{.callout-warning}”</p></li>
+<li>Notas “{.callout-note}”</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Nota
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Os dados estão atualizados até ao dia 2023-12-26</p>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Avisos “{.callout-warning}”</li>
 </ol>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -3850,7 +3901,34 @@ Cuidado
 </div>
 <p>É possível melhorar a aparência destas anotações adicionando títulos:</p>
 <p>“{.callout-note title=”Nota sobre dados”}”</p>
-<p>:::{.callout-note title= “Nota sobre dados”} Os dados estão atualizados até ao dia 2023-12-26 :::</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Nota sobre dados">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Nota sobre dados
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Os dados estão atualizados até ao dia 2023-12-26</p>
+</div>
+</div>
+<p>Também é possível remover o ícone e tornar a nota menos proeminente.</p>
+<p>“{.callout-note icon=false apperance=”mininal”}”</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Nota sobre dados">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Nota sobre dados
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Os dados estão atualizados até ao dia 2023-12-26</p>
+</div>
+</div>
 </section>
 <section id="criar-referências" class="level2">
 <h2 class="anchored" data-anchor-id="criar-referências">Criar referências</h2>

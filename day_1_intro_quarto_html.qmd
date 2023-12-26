@@ -1,7 +1,10 @@
 ---
 title: "Day 1 | Quarto Basics "
 subtitle: "Introduction to html quarto"
-author: "A. Peralta-Santos"
+author: 
+  name: A. Peralta-Santos
+  affiliation: 
+    - Escola Nacional de Saúde Pública
 date: today
 date-format: long
 format:
@@ -142,13 +145,23 @@ equação simples $Y=ax+2$
 
 usar um símbolo de dólar para equações inline no texto $E(log(Y_t))$
 
-## Código Inline
+## Código Inline e Code Annotations
 
-```{r}
+```{r include=TRUE}
+#| echo: true
+#| code-annotations: hover
+
 # O resultado de x será mostrado abaixo
-x <- 2+2
-x
+a <- 2 #<1>
+b <- 2 #<2>
+x <- a+b #<3>
+x #<4> 
 ```
+
+1. Definir a,
+2. Definir b,
+3. Definir x como a soma de a mais b.
+4. Mostrar x ao utilizador
 
 ```{r}
 # Z e a media de idades
@@ -222,12 +235,11 @@ Em que o default é "-" mas com as opções de alinhamento semelhantes aos proce
 
 A definição do espaçamento das colunas pode ser definido no Quarto em 3 posições:
 
-1- No YMAL - com o parmetro tbl-colwidths, 
-2- Em código que define a tabela 
+1. No YMAL - com o parâmetro tbl-colwidths; 
+2. Em código que define a tabela;
 EX:Tabela
-": Isto é um quadro {tbl-colwidths="[75,15,10]"}"
-3- Pelo número relativo de caracteres de "-".
-
+": Isto é um quadro {tbl-colwidths="[75,15,10]"}";
+3. Pelo número relativo de caracteres de "-".
 
 | Alunos  | Nota | Total |
 |---------|------|-------|
@@ -263,10 +275,12 @@ Desde vídeos a iframe de HTMl permitindo embutir dentro do documento sites web.
 ```{=html}
 <iframe width="780" height="500" src="https://www.ensp.unl.pt/cursos/cursos-de-curta-duracao/data-science-with-r-in-healthcare/" title="this is a Iframe"></iframe>
 ```
+
 ::: {.callout-tip}
 ## Atenção 
 A leitura em iframe é liitada no Firefox por segurança.
 :::
+
 {{< video https://www.youtube.com/watch?v=GmRT0P5axqY&pp=ygUUYW5kcmUgcGVyYWx0YSBzYW50b3M%3D >}}
 
 #### Criar listas
@@ -296,6 +310,7 @@ Vamos tentar fazer knitting a este markdown
 Existem 4 formas de fazer anotações em R:
 
 1. Notas "{.callout-note}"
+
 :::{.callout-note}
 Os dados estão atualizados até ao dia `r Sys.Date()`
 :::
@@ -314,13 +329,19 @@ Os dados estão atualizados até ao dia `r Sys.Date()`
 
 É possível melhorar a aparência destas anotações adicionando títulos:
 
-"{.callout-note title= "Nota sobre dados"}"
+"{.callout-note title="Nota sobre dados"}"
 
-:::{.callout-note  title= "Nota sobre dados"}
+:::{.callout-note title="Nota sobre dados"}
 Os dados estão atualizados até ao dia `r Sys.Date()`
 :::
 
+Também é possível remover o ícone e tornar a nota menos proeminente.
 
+"{.callout-note icon=false apperance="mininal"}"
+
+:::{.callout-note title="Nota sobre dados" icon=false appearance="mininal"}
+Os dados estão atualizados até ao dia `r Sys.Date()`
+:::
 
 ## Criar referências
 
