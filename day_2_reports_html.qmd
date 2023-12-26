@@ -36,6 +36,7 @@ library(table1)
 library(openxlsx)
 library(here)
 library(flextable)
+
 ```
 
 ```{r}

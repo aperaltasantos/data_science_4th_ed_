@@ -1,5 +1,5 @@
 ---
-title: "Day 1 | Quarto Basics "
+title: "Module 2 | Reporting with Quarto "
 subtitle: "Introduction to html quarto"
 author: 
   name: A. Peralta-Santos
@@ -12,6 +12,7 @@ format:
     smooth-scroll: true
     toc: true
     toc-location: left
+    number-sections: true
 theme: cosmo
 smooth-scroll: true
 lang: pt   
@@ -278,7 +279,7 @@ Desde vídeos a iframe de HTMl permitindo embutir dentro do documento sites web.
 
 ::: {.callout-tip}
 ## Atenção 
-A leitura em iframe é liitada no Firefox por segurança.
+A leitura em iframe é limitada no Firefox por segurança.
 :::
 
 {{< video https://www.youtube.com/watch?v=GmRT0P5axqY&pp=ygUUYW5kcmUgcGVyYWx0YSBzYW50b3M%3D >}}
