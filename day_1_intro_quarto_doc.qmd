@@ -58,6 +58,7 @@ Veja @fig-maps para exemplos. Em particular, @fig-pt.
 
 Use 2 sinais de dolar (\$\$) para inserir uma equação separada do texto. $$ E(log(Y_t)) = \beta_0 + \beta_{1-11} \sum_{m=1}^{m=12} MÊS_t  + \epsilon_t$$
 
+
 # Conclusão
 
 Lorem ipsum dolor sit amet [@litaker2005context], consectetur adipiscing elit. Proin eu tempor velit. Fusce accumsan ultrices fringilla [@cowin2005cadherins]. Praesent sed odio mi. Mauris non ligula turpis. Duis posuere lacus nec diam interdum dictum suscipit magna molestie. Vestibulum nibh dolor, interdum eget rhoncus ut, sodales eget justo. Morbi blandit lorem sit amet nulla egestas aliquam. Nunc pharetra est at nibh ullamcorper in commodo erat dignissim. Cras et suscipit enim.
