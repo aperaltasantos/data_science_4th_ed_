@@ -17,7 +17,7 @@ project:
   output-dir: outputs/documents
 ---
 
-# Princípios da Visualização de Dados
+# PRINCIPIOS DE VISUALIZAÇÃO 
 
 por Cédric Scherer
 
@@ -65,45 +65,63 @@ Exempleos de websites onde podemos pesquisar qual o melhor gráfico para cada si
 [Principles of good visuals](https://github.com/GraphicsPrinciples/CheatSheet/blob/master/NVSCheatSheet.pdf)
 
 
+# GGPLOT 
 
-Load library
+o ggplot é uma gramatica de graficos, em que cada elemento é uma instrução para a elaboração do grágico final 
+
+Contem os seguintes elementos 
+
+1. data: O componente de dados.
+
+2. geom: É o tipo de gráfico. p.e. gráfico de barras, histograma, densidades suaves, qqplot e boxplot. 
+
+3. mapping: Posições dos pontos no eixo x e eixo y. Cada ponto representa uma observação diferente, e mapeamos dados sobre essas observações para pistas visuais como escalas x e y. A cor é outra pista visual que mapeamos para a região. Referimo-nos a isso como o componente de mapeamento estético. Como definimos o mapeamento depende da geometria que estamos usando.
+
+4. Facets - semelhante ao agrupar por
+
+5. Theme - Tema do grafico p.e. preto e branco, especifico para mapas
+
+6. Labels: define outros elementos do gráfico como titutlo, legendas
+
+![Anatomia do ggplot](images/ggplot.png)
+
 
 ```{r}
 # install.packages("ggthemes")
 # install.packages("scales")
 # install.packages("patchwork")
 # install.packages("sf")
-# install.packages("rgeos")
 ```
 
 ```{r}
-library(tidyverse)
-library(ggplot2)
-library(ggthemes)
-library(scales)
-library(patchwork)
-library(sf)
-library(rgeos)
+# Packages
+required_packages <- c(
+                       "tidyverse",
+                       "scales",
+                       "here",
+                       "patchwork",
+                       "sf"
+                       )      
+
+for (pkg in required_packages) {
+  # install packages if not already present
+  if (!pkg %in% rownames(installed.packages())) {
+    install.packages(pkg)
+  }
+  
+  # load packages to this current session 
+  library(pkg, character.only = TRUE)
+}
+remove(required_packages)
+remove(pkg)
 ```
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  collapse    = TRUE,
-  warning     = FALSE, # Whether to display warnings
-  message     = FALSE, # Whether to display messages
-  echo        = TRUE,  # In this case we want to see the code 
-  eval        = TRUE   # Whether to evaluate the code and include its results
-  )
-```
-
-### Clean enviorment
 
 ```{r}
 rm(list = ls(all.names = TRUE)) #will clear all objects includes hidden objects.
 
 ```
 
-### Load datasets
 
 ```{r}
 # change outpurs to output
@@ -114,47 +132,58 @@ inpatient_hospital_lite <- read_csv("output/datasets/inpatient_hospital_lite.csv
 inpatient_hospital_lite <- read_csv(here("output", "datasets", "inpatient_hospital_lite.csv"))
 ```
 
-# ggplot basics
+ 
 
-For a plot with ggplot there is a specific grammar 1. Dataframe 2. Aestetics (define x and y axis) 3. Define the geometrics (point, line, etc...) 4. Facets - similar to group by 5. Theme 6. Labels
-
-### Data and aestetics
+## Data and aestetics
 
 ```{r}
-# In ggplot2 we need to specify the data, and the variables for x and y axis
+# 1. Vamos definir só os dados 
+ggplot(data = inpatient_hospital_lite)
+```
 
-p1 <- ggplot(
+```{r}
+# 2. Definir o eixo dos X e Y
+ggplot(
   data = inpatient_hospital_lite, 
   mapping = aes(x = tipo_instituicao, y = doentes_saidos_var)
 )
-
-p1
 ```
-
-### Geometrics
-
-#### Box plot
 
 ```{r}
-# We need another argument to specify the type of plot
-p1<- ggplot(data= inpatient_hospital_lite, 
+# 3. Definir o tipo de gráfico
+ggplot(data= inpatient_hospital_lite, 
             aes(x = tipo_instituicao, y = doentes_saidos_var)) +
   geom_boxplot()
-
-p1
 ```
+
+```{r}
+# 4. Criar um objecto ggplot e invoca-lo
+
+p <- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot()
+p
+```
+
+## Geometrics
+
+### Box plot
+
 
 ```{r}
 # IMPORTANT
 # We can create a generic ggplot argument if we want to combite 2 diferent datasets with the same x and y axis
-p1<- ggplot() +
-    geom_boxplot(data= inpatient_hospital_lite, 
-            aes(x = tipo_instituicao   , y = doentes_saidos_var ),
-            outlier.shape = NA) #NEW to Exclude outliers
+
+p1<- inpatient_hospital_lite |> ggplot() + # Podemos adicionar os dados antes do ggplot 
+    geom_boxplot( aes(x = tipo_instituicao   , 
+                      y = doentes_saidos_var ),
+                  outlier.shape = NA) # Exclui os outliers
 p1
 ```
 
-### Facets
+## Facets
+
+A facetação gera múltiplos pequenos gráficos, cada um exibindo um subconjunto diferente dos dados. Facetas são uma alternativa às estéticas para exibir variáveis discretas adicionais.
 
 ```{r}
 p1<- ggplot(data= inpatient_hospital_lite, 
@@ -165,48 +194,48 @@ p1
 
 ```
 
-```{r}
-p1<- ggplot(data= inpatient_hospital_lite, 
-            aes(x = tipo_de_especialidade, y = doentes_saidos_var)) +
-  geom_boxplot( outlier.shape = NA) +
-  facet_wrap(~tipo_instituicao)
-p1
 
-```
-
-### Labels
+## Labels
 
 ```{r}
-# We can now add the plot title and axis legend
+# Podemos adicionar o titutlo, nomes do eixos e fonte
 
 p1<- ggplot(data= inpatient_hospital_lite, 
             aes(x = tipo_instituicao, y = doentes_saidos_var)) +
   geom_boxplot(outlier.shape = NA) + 
-  labs(title = "Number of inpatients discharged in Hospitals",
-         subtitle = "2015-2022",
-         y = "Number of inpatients discharged",
-         x = "Type of hospital", 
-         caption = "Source: Ministry of Health, Portugal")
+  labs(title = "Number of inpatients discharged in Hospitals", # Titulo
+         subtitle = "2015-2022", # Subtitulo
+         y = "Number of inpatients discharged", # Eirxo dos Y
+         x = "Type of hospital", # Eixo dos X
+         caption = "Source: Ministry of Health, Portugal", # Fonte
+         tag = "A") # Tag da imagem, util em textos com imagens multiplas
 p1
 ```
 
-### Theme
+## Theme
+
+Define a estetica do gráfico, tamanhos de letra, alinhamentos, cores do fundo 
 
 ```{r}
 # Theme classic
+
 p1<- ggplot(data= inpatient_hospital_lite, 
             aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  
   geom_boxplot(outlier.shape = NA) + 
-  theme_classic() + 
+  
   labs(title = "Number of inpatients discharged in Hospitals",
          subtitle = "2015-2022",
          y = "Number of inpatients discharged",
          x = "Type of  hospital", 
-         caption = "Source: Ministry of Health, Portugal")
+         caption = "Source: Ministry of Health, Portugal") +
+  
+  theme_classic() 
   
 
 p1
 ```
+
 
 ```{r}
 # Theme Black and white
@@ -215,21 +244,79 @@ p1
 p1<- ggplot(data= inpatient_hospital_lite, 
             aes(x = tipo_instituicao, y = doentes_saidos_var)) +
   geom_boxplot( outlier.shape = NA) + 
-  theme_bw()  + 
+  
   labs(title = "Number of inpatients discharged in Hospitals",
          subtitle = "2015-2022",
          y = "Number of inpatients discharged",
          x = "Type of  hospital", 
-         caption = "Source: Ministry of Health, Portugal")
+         caption = "Source: Ministry of Health, Portugal") +
+  
+  theme_bw()  
+
+p1
+```
+```{r}
+# Theme The Economist
+# O package ggthemes permite facilmente adoptar estilos pré-definidos de temas
+
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot( outlier.shape = NA) + 
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of  hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  
+  theme_economist()  
+
+p1
+```
+### Criar o proprio tema
+
+Podemos criar o nosso proprio tema como um objecto e depois invocar esse tema para os nossos objectos ggplot 
+
+```{r}
+# Criar o tema 
+theme_r_datascience <- 
+  theme_bw() + 
+  theme(
+    plot.title = element_text(face = "bold", size = 12),
+    legend.background = element_rect(
+      fill = "white", 
+      linewidth = 4, 
+      colour = "white"
+    ),
+    legend.justification = c(0, 1),
+    legend.position = c(0, 1),
+    axis.ticks = element_line(colour = "grey70", linewidth = 0.2),
+    panel.grid.major = element_line(colour = "grey70", linewidth = 0.2),
+    panel.grid.minor = element_blank()
+  )
+
+```
+
+```{r}
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot( outlier.shape = NA) + 
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of  hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  
+  theme_r_datascience  
 
 p1
 ```
 
-### Labels
+## Outros elementos 
 
 ```{r}
-
-
+# Limitar o eixo dos Y a um máximo de 4000
 p1<- ggplot(data= inpatient_hospital_lite, 
             aes(x = tipo_instituicao, y = doentes_saidos_var)) +
   geom_point() +
@@ -246,9 +333,7 @@ p1
 ```
 
 ```{r}
-# Let's change the caracteristics of the box plot
-# Change the colours and theme
-# Dont show the NA in the plot
+# Alterar a cor de preenchimentos do box plot 
 
 p_final_1<- ggplot(data= inpatient_hospital_lite, 
             aes(x = tipo_instituicao, 
@@ -273,12 +358,14 @@ p_final_1<- ggplot(data= inpatient_hospital_lite,
 
 # Save plot
 
+Podemos gravar o nosso gráfico em vários formatos 
+
 ```{r}
-# ggsave | Saves the last plot in the memory 
-# We can use the package here to specify the output directory
-# We can specify the output format 
-# The size
-# The resolution in dpi 
+# ggsave | Salva o último gráfico na memória
+# Podemos usar o pacote aqui para especificar o diretório de saída
+# Podemos especificar o formato de saída
+# O tamanho
+# A resolução em dpi
 
 ggsave(
   p_final_1,
@@ -292,7 +379,7 @@ ggsave(
 ```
 
 ```{r}
-# We can specify the plot to save and change the format to PDF
+# Podemos alterar o formato do grafico para PDF
 
 ggsave( filename = "output/figures/hospital_inpatients.pdf",
         plot= p_final_1,
@@ -303,8 +390,7 @@ ggsave( filename = "output/figures/hospital_inpatients.pdf",
 ```
 
 ```{r}
-# We can specify the plot to save and change the format to jpeg
-# Verificar porque nao esta a correr 
+# Podemos alterar o formato para JPEG 
 
 ggsave( filename = here::here("output_figures", 
                   paste0( "hospital_inpatients", ".jpeg")),
@@ -315,7 +401,446 @@ ggsave( filename = here::here("output_figures",
         dpi = 600 )
 ```
 
-# Types of plots
+# TIPOS DE GRÁFICOS 
+
+## Line plot
+
+Um gráfico de linhas ou gráfico linear exibe a evolução de uma ou várias variáveis numéricas. Os pontos de dados são conectados por segmentos de linha reta. É semelhante a um gráfico de dispersão, exceto que os pontos de medição são ordenados (tipicamente pelo seu valor no eixo x) e unidos com segmentos de linha reta.
+
+Um gráfico de linhas é frequentemente usado para visualizar uma tendência nos dados ao longo de intervalos de tempo – uma série temporal – portanto, a linha é frequentemente desenhada de forma cronológica.
+
+```{r}
+inpatient_hospital_sum <- inpatient_hospital_lite %>%
+  group_by(periodo, tipo_instituicao) %>%
+  summarise(
+    doentes_saidos_var = sum(doentes_saidos_var, na.rm = TRUE)
+  )
+    
+```
+
+### Gráfico de linhas
+
+```{r}
+# Now let's make a similar plot but with a line across time
+
+p1<- ggplot() +
+  
+  geom_line(data= inpatient_hospital_sum,  # definimos que é um grafico de linhas 
+            aes(x = periodo, 
+                y = doentes_saidos_var,
+                colour = tipo_instituicao)) + # queremos que cada tipo de instituição tenha uma cor
+
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  
+  theme_minimal() 
+
+p1
+
+```
+### Alterar o posicionamento da legenda
+
+```{r}
+# Lets change the position of the legend
+
+p1<- ggplot() +
+  geom_line(data= inpatient_hospital_sum, 
+            aes(x = periodo, 
+                y = doentes_saidos_var,
+                colour=tipo_instituicao)) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour = "") +
+  theme_minimal() +
+  theme(legend.position="bottom",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+
+p1
+
+```
+### Alterar a cor e tipo da linha 
+
+```{r}
+# Lets change the position of the legend
+
+p1<- ggplot() +
+  geom_line(data= inpatient_hospital_sum, 
+            aes(x = periodo, 
+                y = doentes_saidos_var,
+                colour=tipo_instituicao), 
+            size=1.15) +
+  
+  scale_color_manual(values = c("#fdb462", "#80b1d3", "#b3de69")) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour = "") +
+  theme_minimal() +
+  theme(legend.position="bottom",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+
+p1
+
+```
+
+### Adicionar outros elementos 
+```{r}
+# Lets change the position of the legend
+
+p1<- ggplot() +
+  geom_line(data= inpatient_hospital_sum, 
+            aes(x = periodo, 
+                y = doentes_saidos_var,
+                colour=tipo_instituicao), 
+            size=1.15) +
+  
+  scale_color_manual(values = c("#fdb462", "#80b1d3", "#b3de69")) +
+  
+  geom_vline(xintercept=as.Date("2020-03-01"), 
+             colour="red") + 
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour = "") +
+  theme_minimal() +
+  theme(legend.position="bottom",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+
+p1
+	geom_textabline
+```
+
+
+## Scatterplot
+
+Um gráfico de dispersão exibe a relação entre 2 variáveis numéricas. Para cada ponto de dados, o valor da primeira variável é representado no eixo X e o da segunda no eixo Y.
+
+
+```{r}
+inpatient_hospital_lite <- inpatient_hospital_lite %>%
+  filter(dias_de_internamento_var<40000)
+```
+
+```{r}
+
+ggplot(data = inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, y=doentes_saidos_var)) + 
+  geom_point(alpha=0.5) +
+  theme_clean()
+
+```
+
+Adicionar mais elementos 
+
+```{r}
+
+p1<- ggplot(data = inpatient_hospital_lite, 
+       mapping = aes(x=dias_de_internamento_var, y=doentes_saidos_var, colour=tipo_de_especialidade))+ 
+  geom_point(alpha=0.2) +
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour="") +
+  ylim(0, 3000) +
+  xlim(0, 25000) +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+```
+
+Podemos adicionar uma condição à cor
+
+```{r}
+
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, 
+           y=doentes_saidos_var, 
+           colour=dias_de_internamento_var > 10000)
+       ) + 
+  geom_point(alpha=0.1
+             ) +
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+```
+
+**ATENÇÃO** Se queremos definir uma cor temos de fedinir fora o aes 
+
+```{r}
+
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, 
+           y=doentes_saidos_var,
+           shape = tipo_de_especialidade)
+       ) + 
+  geom_point(alpha=0.9,
+       color="#0868ac"
+             ) +
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+```
+
+### Adicionar medidas de tendencia 
+
+#### Linear
+
+```{r}
+
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, 
+           y=doentes_saidos_var, 
+           colour=tipo_de_especialidade)) + 
+  geom_point(alpha=0.1) +
+  # NEW
+  geom_smooth(method=lm, 
+              se=FALSE,
+              linetype="dashed") +
+  
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+
+```
+#### Não linear
+
+```{r}
+
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, 
+           y=doentes_saidos_var, 
+           colour=tipo_de_especialidade)) + 
+  geom_point(alpha=0.1
+             ) +
+  # NEW
+  geom_smooth(method=loess, 
+              se=FALSE,
+              linetype="dashed") +
+  
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+
+```
+
+## Bar plots
+
+Um gráfico de barras mostra a relação entre uma variável numérica e uma variável categórica. Cada entidade da variável categórica é representada como uma barra. O tamanho da barra representa seu valor numérico.
+
+O gráfico de barras é às vezes descrito como uma forma monótona de visualizar informações. No entanto, é provavelmente a maneira mais eficiente de mostrar esse tipo de dados. Ordenar as barras e fornecer boas anotações são frequentemente necessários.
+
+```{r}
+inpatient_hospital_year <- inpatient_hospital_lite |>
+  summarise(
+    doentes_saidos_var = sum(doentes_saidos_var, na.rm = TRUE), 
+    .by= c(year, tipo_instituicao)
+    )
+  
+    
+```
+
+### Dodge bar plot
+
+Cria barras paralelas 
+
+```{r}
+p1<- ggplot(data= inpatient_hospital_year, 
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=tipo_instituicao) # ALERT
+            ) +
+  geom_bar(position="dodge", 
+           stat="identity"
+           ) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") 
+
+p1
+
+```
+### Stacked bar plot
+
+Cria barras empilhadas 
+
+```{r}
+p1<-  ggplot( data = inpatient_hospital_year,
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=factor(tipo_instituicao, 
+                            levels = c("Hospital", "University", "Cancer hospital")))
+            ) +
+  geom_bar(position="stack", 
+           stat="identity"
+           ) +
+  
+  scale_y_continuous(labels = comma) +
+  scale_fill_manual(values=c("#00BA38","#619CFF" ,"#F8766D")) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+       fill="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+```
+### Fill 
+
+Cria barras de area relativa (percentagem)
+
+```{r}
+p1<-  ggplot( data = inpatient_hospital_year,
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=factor(tipo_instituicao, 
+                            levels = c("Hospital", "University", "Cancer hospital")))
+            ) +
+  geom_bar(position="fill", 
+           stat="identity"
+           ) +
+  
+  scale_y_continuous(labels = percent) +
+  scale_fill_manual(values=c("#00BA38","#619CFF" ,"#F8766D")) +
+  
+  labs(title = "Percentage of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Percentage  of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+       fill="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+```
+
+Specify the colours of the bar plots and flip the coordinates
+
+```{r}
+
+library(scales)
+#extract hex color codes for a plot with three elements in ggplot2 
+hex <- hue_pal()(3)
+hex 
+
+inpatient_hospital_year <- inpatient_hospital_year %>%
+  mutate(
+    tipo_instituicao = factor(tipo_instituicao, levels = c("Hospital", "University", "Cancer hospital"))
+  ) 
+
+
+p1<-  ggplot( data = inpatient_hospital_year,
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=tipo_instituicao)
+            ) +
+  geom_bar(position="dodge", 
+           stat="identity"
+           ) +
+  coord_flip() +
+  scale_y_continuous(labels = comma) +
+  
+  scale_fill_manual(values=hex) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+       fill="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+
+```
+
+
+## Area chart 
+
+```{r}
+p1<-  ggplot( data = inpatient_hospital_year,
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=factor(tipo_instituicao, 
+                            levels = c("Hospital", "University", "Cancer hospital")))
+            ) +
+  geom_area(position="stack",alpha=0.6 , size=0.1, colour="black"
+           ) +
+  
+  scale_y_continuous(labels = comma) +
+  scale_fill_manual(values=c("#00BA38","#619CFF" ,"#F8766D")) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+       fill="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
+
+p1
+```
+
+
+
 
 ## Jitter plot
 
@@ -417,6 +942,10 @@ p1
 ```
 
 ## Line plot
+
+Um gráfico de linhas ou gráfico linear exibe a evolução de uma ou várias variáveis numéricas. Os pontos de dados são conectados por segmentos de linha reta. É semelhante a um gráfico de dispersão, exceto que os pontos de medição são ordenados (tipicamente pelo seu valor no eixo x) e unidos com segmentos de linha reta.
+
+Um gráfico de linhas é frequentemente usado para visualizar uma tendência nos dados ao longo de intervalos de tempo – uma série temporal – portanto, a linha é frequentemente desenhada de forma cronológica.
 
 ```{r}
 inpatient_hospital_sum <- inpatient_hospital_lite %>%
