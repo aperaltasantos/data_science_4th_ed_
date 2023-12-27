@@ -119,6 +119,7 @@ inpatient_sum <- inpatient_hospital_lite %>%
 ### Doentes saídos
 
 ```{r}
+#install.packages("highcharter")
 library(highcharter)
 
 highchart() %>% 
@@ -239,7 +240,7 @@ gauge(rate, min = 0, max = 960, symbol = '', gaugeSectors(
 ### Mapa COVID-19
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
-#install.packages("leaflet")
+# install.packages("leaflet")
 library(leaflet)
 
 mybins <- c(0,60,120,240,480,Inf)
@@ -280,6 +281,7 @@ leaflet(comm_pt)%>%
 ### Tabela COVID-19
 
 ```{r}
+
 library(reactable)
 #library(htmltools)
 
