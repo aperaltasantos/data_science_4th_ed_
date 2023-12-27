@@ -1,0 +1,385 @@
+---
+title: "Module 1 | Foundations in R "
+subtitle: "Data Wrangling"
+author: "Autor"
+affiliation: 
+    - Escola Nacional de Saúde Pública
+date: today
+date-format: long
+lang: pt  
+format: 
+  html:
+    smooth-scroll: true
+    self-contained: true
+    toc: true
+    toc-location: left
+    embed-resources: true
+    number-sections: true
+    code_download: true
+    code-fold: show
+    fig_caption: true
+    force_captions: true
+    subtitle: ""
+    urlcolor: darkblue
+    linkcolor: darkblue
+    fig_width: 12
+    fig_height: 8
+    always_allow_html: true
+theme:
+  light: flatly
+  dark: darkly
+execute:
+  warning: false
+  echo: true
+  message: false
+---
+
+# Fundamentos do R
+
+Este documento é um guia abrangente sobre os fundamentos da programação em R, com foco em conceitos-chave e suas aplicações, especialmente no campo da saúde.
+
+# ESTRUTURAS DE DADOS
+
+## Objetos e Variáveis (1 dimensão)
+
+Objetos e variáveis em R são a base para armazenar e manipular dados permitindo uma maior abstração dos mesmos e uma manipulação direta por vinculação a um nome. 
+
+Esta ligação é dinâmica, significa que as variáveis podem ser reatribuidas e rescritas sem que disso surja um erro.
+
+No contexto da saúde, eles podem representar desde dados de pacientes até resultados de análises.
+
+```{r}
+# aqui criamos a variavel da paciente_idade com o valor 30
+
+paciente_idade <- 30
+
+# aqui criamos a variavel da paciente_nome com o valor "Anaª
+paciente_nome <- "Ana"
+
+
+```
+
+
+## Vetores (2 dimensões)
+
+Vetores são coleções unidimensionais de elementos. 
+Existem dois tipos principais:
+
+1. Vetores atómico (apenas um tipo de dados - como integer, double, character)
+2. Listas (mais que um tipo de dados)
+
+Em saúde, eles podem ser usados para armazenar uma séries de medições, como temperaturas corporais de um grupo de pacientes ou um conjunto de idades ou níveis de uma representação.
+
+```{r}
+# a variável temperatura tem 3 valores com os valores numéricos 36.5, 37.2,
+temperaturas <- c(36.5, 37.2, 38.0)
+
+```
+
+## Dataframes e Tibbles (3 dimensoes)
+
+Dataframes e tibbles são estruturas de dados tabulares. 
+
+Cada vetor na lista representa uma coluna.
+
+Dataframes são extremamente flexíveis, permitindo colunas de diferentes tipos mas cada coluna é de apenas um tipo.
+
+Eles são essenciais para o manipulação de conjuntos de dados clínicos, permitindo armazenar diferentes tipos de dados em colunas e linhas.
+
+```{r}
+
+dados_pacientes <- data.frame(
+  Idade = c(25, 30, 45),
+  Nome = c("João", "Ana", "Marta"),
+  Temperatura = c(36.6, 37.5, 38.2)
+)
+
+```
+
+:::{.callout-note}
+O formato tabular deve garantir que cada observação linha é única.
+:::
+
+## Listas (4 dimensoes)
+
+Listas em R são coleções que podem conter diferentes tipos de elementos.
+São os mais diferentes de conceptualizar mas cada elemento na listas pode ter 1, 2, 3 ou 4 dimensoes
+
+:::{.callout-note}
+Podem existir listas de listas.
+:::
+
+São úteis para armazenar dados múltiplos com uma estrutura complexa.
+
+```{r}
+
+paciente_info <- list(nome = "Ana", idade = 30, temperatura = 37.5, dados_pacientes,temperaturas)
+
+```
+
+# Notação em R
+
+Existem dois grandes tipos de notação em R para aceder a elementos das estruturas de dados.
+
+## Notação com Sinal de Dólar $ e Parênteses Curvos []
+
+A notação em Dólar tem a seguinte sintaxe:
+
+1. Objeto a referenciar
+2. Estrutura nomeada
+
+:::{.callout-warning}
+A estrutura mínima para o uso da notação de dólar é o dataframe.
+Não pode ser usada em vectores ou elementos (1 e 2 dimensões)
+:::
+
+A notação em Parênteses Curvos [] tem a seguinte sintaxe:
+
+1. Objeto a referenciar
+2. Referir posição da estrutura a referenciar
+
+```{r}
+# este cócigo retira a coluna Idade
+idades_paciente <- dados_pacientes$Idade
+# este cócigo retira a primeira linha
+primeiro_paciente <- dados_pacientes[1,]
+# este cócigo retira a primeira coluna
+primeira_coluna <- dados_pacientes[,1]
+
+# nas listas podem ser usadas notações aninhadas
+# este cócigo retira o 4 elemento da lista paciente_info e a primeira linha deste elemento
+primeiro_paciente_2 <- paciente_info[[4]][1,]
+
+```
+
+:::{.callout-note}
+A notação de parênteses é mais flexível, permitindo selecionar múltiplas linhas e/ou colunas, mas é a menos intuitivas.
+
+Em geral é preferível usar a notação de dólar por ser mais explícita e menos afetada por alterações na ordem dos dados 
+:::
+
+# COMENTÁRIOS
+
+Comentários são cruciais para explicar o propósito de código.
+A forma para introduzir "#" para adicionar comentários. 
+
+Documentar especialmente partes complexas do código e alterações no código.
+Em projetos colaborativos pode ser relevante marcar quem fez alterações
+
+```{r}
+# isto é um comentários
+# autoria: JDionisio
+# data de alterção
+```
+
+
+:::{.callout-note}
+
+Em módulos mais à frente iremos abordar outras opções para gestão de versões com o uso do Git.
+
+:::
+
+# OPERAÇÕES
+
+R é uma linguagem projetada para análise estatística, o que se reflete na sua riqueza de operações matemáticas e na disponibilidade de operadores. 
+
+## Operações Matemáticas e Operadores
+
+Existem vários operadores matemáticos:
+
+1. +
+2. -
+3. *
+4. /
+
+As operações matemáticas em R são geralmente vetorizadas, o que significa que operações como adição, subtração, multiplicação e divisão podem ser aplicadas diretamente a vetores ou matrizes. Por exemplo, ao adicionar dois vetores, a adição é realizada elemento a elemento. 
+
+A vectorização é um dos pontos fortes de R, permitindo um processamento de dados eficiente e expressivo.
+
+```{r}
+# exemplo de adição de elementos
+x <- 2+2
+x
+# exmeplo de adição de vectores
+y <- c(2,2)+c(8,3)
+y
+
+```
+
+## Operadores Condicionais, Relacionais e Lógicos
+
+Para além dos operadores matemáticos temos operadores condicionais, relacionais e lógicos.
+Operadores Condicionais:
+
+1. if (se)
+2. else
+3. ifelse
+4. or (ou)
+5. and (e)
+
+Operadores condicionais, como if e else, são utilizados para controlar o fluxo de execução de programas. 
+
+A função ifelse é um exemplo de uma construção condicional vetorizada, que é particularmente útil para substituir elementos em um vetor com base em uma condição. 
+
+- Será novamente discutido na manipulação de dados ("Data Wrangling")
+
+Operadores Relacionais:
+
+Usados para realizar comparações entre elementos.
+
+1. < e >
+2. >= e <=
+3. == (igualdade)
+4. != diferença
+5. %in% (presente em)
+
+:::{.callout-note}
+
+Função Negate() inverte o resultado
+
+:::
+
+Resultado da comparação é sempre um valor lógico. TRUE (Verdadeiro) ou FALSE (Falso).
+
+```{r}
+
+2==3 
+
+2!=3
+```
+
+# FUNÇÕES
+
+Para evitar a repetição de código que usa as mesmas operações, podemos usar funções.
+
+Cada função em R funciona num ambitente próprio com variáveis locais e àquelas no ambiente onde foi definida.
+
+Cada função tem inputs ou argumentos que definem variáveis internas da função
+Funções em R são usadas para executar tarefas específicas. 
+Por exemplo, saber se um paciente é idoso.
+
+```{r}
+# aqui definimos a função idoso
+idoso <- function(idade){
+  if(idade>=65){
+    print("idoso")
+  }else{
+    print("não é idoso")
+  }
+}
+```
+
+Qual será o output esperado para idoso(35)?
+```{r}
+# qual será o output da função idoso(35)
+
+idoso(35)
+```
+Qual será o output esperado para idoso(66)?
+```{r}
+idoso(66)
+```
+:::{.callout-note}
+
+Poderiamos definir um valor padrão para a função rescrevendo da seguinte forma:
+
+idoso <- function(idade=65){
+  if(idade>=65){
+    print("idoso")
+  }else{
+    print("não é idoso")
+  }
+}
+
+:::
+
+## Funções aninhadas e Pipes
+
+Em R, semelhante a outras linguagens de programação há a possibilidade de aninhar funções.
+
+No entanto, em R temos outra opção que são as pipelines que usam o pipe representado pelo %>% e o |> que indicam que a estratura anterior deve ser continuada a ser alteralada pelas funções em pipe.
+
+A capacidade de construir pipelines de processamento de dados eficientes e legíveis é crucial para a análise de dados em R de forma reprodutivel.
+
+```{r}
+# 3 exemplos de execução de 2 funções
+dados_pacientes <- data.frame(
+  Idade = c(25, 30, 45),
+  Nome = c("João", "Ana", "Marta"),
+  Temperatura = c(36.6, 37.5, 38.2)
+)
+# separate functions
+maiores_30 <- which(dados_pacientes$Idade>=30)
+maiores_30 <- length(maiores_30)
+# nested function
+maiores_30_2 <- length(which(dados_pacientes$Idade>=30))
+# piped function
+maiores_30_3 <- which(dados_pacientes$Idade>=30) |> 
+  length()
+maiores_30
+maiores_30_2
+maiores_30_3
+```
+
+# Bibliotecas e Pacotes
+
+Felizmente, muitas das funções de análise que iremos falar já foram criadas por alguém.
+
+Normalmente, um conjunto de funções é englobado num denominado pacote.
+Exemplos de pacotes em R:
+
+1. tidyr
+2. dplyr
+3. ggplot2
+
+Estes pacotes estão normalmente no CRAN (Comprehensive R Archive Network) mas nós, como utilizadores temos de os instalar e carregar para o nosso projeto.
+
+```{r}
+# para instalar um pacote podemos utilizar a função install.packages
+
+# install.packages("tidyverse")
+
+# para carregar o pacote para o projeto ativo temos de usar o comando library
+
+# library(tidyverse)
+
+```
+
+:::{.callout-warning}
+Muitas das dúvidas que temos das funções dos pacotes podem ser esclarecidas pela documentação do mesmo.
+
+Os pacotes dispoíveis no CRAN têm uma vinheta que inclui todas as funções disponíveis do pacotes
+:::
+
+:::{.callout-warning}
+Quando existem funções com o mesmo nome estão carregadas uma é escondida, sendo essa a mais recente a ser carregada.
+
+Para referenciar uma função específica de uma biblioteca devemos usar a seguinte sintaxe:
+1. pacote::função()
+:::
+# CONCEITOS ADICIONAIS 
+
+## Vetorização de funções
+
+R suporta a vectorização de funções, o que significa que operações podem ser aplicadas a cada elemento de um vetor simultaneamente, sem a necessidade de escrever loops explícitos. 
+
+Isso não apenas simplifica o código, mas muitas vezes resulta em execução mais rápida. Por exemplo, a utilização de funções vetorizadas como sapply, lapply, e vapply permite aplicar uma função a cada elemento de uma lista ou vetor.
+
+## Troubleshooting
+
+Existem vários problemas que podem surgir quando programamos, mas quando algo corre mal é normal que surjam dois tipos de mensagem.
+
+Warning - Aviso - 
+  - Significa que o R encontrou um problema mas foi possível ultrapassar, mas cujo resultado pode não ser o requesitado.
+  - Rever para verificar se é algo que possa ser minimizado
+
+Erro - Erro - 
+  - Significa que existe um erro na execução do código
+  - O erro pode só por si indicar qual é o problema.
+  Ex: Error: Incomplete expression: max(dados_pacientes$Idade
+  Falta um parênteses.
+
+```{r}
+# max(dados_pacientes$Idade
+```
+
