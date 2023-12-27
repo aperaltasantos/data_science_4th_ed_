@@ -29,6 +29,16 @@ por Cédric Scherer
 
 4.  FORMA VISUAL (beleza) Valor do design esteticamente agradável na visualização de dados, que realça a experiência do leitor e pode tornar as informações complexas mais acessíveis e compreensíveis.
 
+5. Dicas úteis Layout Limpo — "menos é mais"
+
+- Use anotações diretas para melhorar a legibilidade e interpretabilidade.
+- Utilize hierarquia para orientar o leitor.
+- Uso consistente de cores, espaçamento, tipos de letra e peso.
+- Use cores sabiamente e certifique-se de que funcionam para pessoas com daltonismo.
+- As informações mais importantes devem receber a principal atenção.
+
+![Exemplo por Cédric Scherer](images/exemplo_viz.png)
+
 ## Exemplos de visualização de dados 
 
 ### Alterações climáticas 
@@ -37,17 +47,24 @@ por Cédric Scherer
 
 Fonte <https://www.nytimes.com/interactive/2015/03/24/science/earth/arctic-ice-low-winter-maximum.html>
 
-## What chart to chose
+### COVID-19 
 
-Cédric Scherer \## Data visualization
+![Excesso de Mortes por COVID-19](images/covid19.png)
+Fonte <https://www.ft.com/content/f1a270c3-3870-46ad-99e8-45b5d8f127e0>
 
-This is a great resource to chose the right visual to each problem
+## Qual o tipo de gráfico que devo escolher?
+
+Exempleos de websites onde podemos pesquisar qual o melhor gráfico para cada situação. 
 
 [Data to viz website](https://www.data-to-viz.com/)
 
-[Principles of good visuals](https://github.com/GraphicsPrinciples/CheatSheet/blob/master/NVSCheatSheet.pdf)
+[Data to viz project](https://datavizproject.com/)
 
 [Extensions of ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
+
+[Principles of good visuals](https://github.com/GraphicsPrinciples/CheatSheet/blob/master/NVSCheatSheet.pdf)
+
+
 
 Load library
 
