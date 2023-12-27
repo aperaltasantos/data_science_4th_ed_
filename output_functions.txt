@@ -1,0 +1,6 @@
+[1] ":) Objeto multiply existe"
+[1] ":) multiply(2,2) é igual a 4"
+[1] ":) multiply(3,2) é igual a 6"
+[1] ":) Objeto BMI existe"
+[1] ":) BMI(80,180) é igual a 24,69"
+[1] ":) BMI(40,150) é igual a 17,78"

@@ -91,6 +91,7 @@ Importar o ficheiro hipoxia disponível na pasta datasets para um objeto chamado
 
 ```{r importation}
 
+hypoxia <- import("datasets/hypoxia.xlsx")
 
 ```
 
@@ -99,6 +100,8 @@ Criar um novo objeto com o nome hypoxia_clean em que se fez a limpeza as variáv
 
 ```{r cleaning}
 
+hypoxia_clean <- hypoxia |> 
+  clean_names()
 
 ```
 
@@ -110,7 +113,19 @@ Criar um novo objeto com o nome hypoxia_adult em que:
 
 ```{r filtering and selecting}
 
-
+hypoxia_adult <- hypoxia_clean |>
+  filter(age>25 & age <65 & female==1) |> 
+  select(
+    age,
+    race,
+    female,
+    bmi,
+    sleeptime,
+    min_sao2,
+    ahi
+  )
+  
+hypoxia_adult
 ```
 
 # Exercício 4
@@ -123,7 +138,18 @@ Criar um novo objeto hypoxia_adult2 com uma nova variável no dataset hypoxia_ad
 5. <79 - Hipóxia Grave
 
 ```{r mutate and case_when}
+hypoxia_adult2 <- hypoxia_adult |> 
+  mutate(
+    min_sao_class=case_when(
+      min_sao2 > 98 & min_sao2 <100 ~ "Normal",
+      min_sao2 > 95 ~ "Insuficiente",
+      min_sao2 > 90 ~ "Hipóxia Ligeira",
+      min_sao2 > 80 ~ "Hipóxia Moderada",
+      .default = "Hipóxia Grave"
+    )
+  )
 
+hypoxia_adult2
 
 ```
 
@@ -135,6 +161,14 @@ Isto deve ser calculada por cada classe de min_sao_class
 
 ```{r summarise and grouping}
 
+hypoxia_final <- hypoxia_adult2 |> 
+  summarise(
+    media = mean(bmi,na.rm = T),
+    desvio_padrao= sd(bmi,na.rm = T),
+    .by = min_sao_class
+  )
+
+hypoxia_final
 ```
 
 

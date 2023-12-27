@@ -1,7 +1,9 @@
 ---
-title: "Day 1 | Quarto Basics | Word"
-subtitle: "Escola Nacional de Saúde Pública"
+title: "Module 2 | Reporting with Quarto "
+subtitle: "Introduction to word in quarto"
 author: "A. Peralta-Santos"
+affiliation: 
+    - Escola Nacional de Saúde Pública
 date: today
 date-format: long
 lang: pt  
