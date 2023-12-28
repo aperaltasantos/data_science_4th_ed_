@@ -495,9 +495,17 @@ Existem 6 hospitiais que reportam valores outliers severos superiores.
 A variação é o comportamento em relação a uma variável.
 A covariação é a tendência dos valores de uma varíavel estarem relacionados
 
+Nesta aula iremos apenas uma forma de o fazer graficamente com um scatterplot com os dados de 2016.
+
 ```{r}
 
+ggplot(data = inpatient_hospital_lite |> filter(periodo<"2016-01-01"), 
+       aes(x=doentes_saidos, y=dias_de_internamento)) + 
+  geom_point(alpha=0.5) +
+  theme_minimal()
+
 ```
+Parece existir uma tendência positiva entre os doentes saidos e os dias de internamentos.
 
 # FERRAMENTAS DE EXPLORAÇÃO RÁPIDA
 
