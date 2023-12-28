@@ -3030,7 +3030,7 @@ vertical-align: -.125em;
   <ul class="collapse">
   <li><a href="#limpar-o-ambiente" id="toc-limpar-o-ambiente" class="nav-link" data-scroll-target="#limpar-o-ambiente"><span class="header-section-number">1.0.1</span> Limpar o ambiente</a></li>
   <li><a href="#definir-seed" id="toc-definir-seed" class="nav-link" data-scroll-target="#definir-seed"><span class="header-section-number">1.0.2</span> Definir seed</a></li>
-  <li><a href="#instalar-e-carregar-biblioteca" id="toc-instalar-e-carregar-biblioteca" class="nav-link" data-scroll-target="#instalar-e-carregar-biblioteca"><span class="header-section-number">1.0.3</span> Instalar e carregar biblioteca</a></li>
+  <li><a href="#instalar-e-carregar-bibliotecas" id="toc-instalar-e-carregar-bibliotecas" class="nav-link" data-scroll-target="#instalar-e-carregar-bibliotecas"><span class="header-section-number">1.0.3</span> Instalar e carregar bibliotecas</a></li>
   </ul></li>
   <li><a href="#importação-de-dados" id="toc-importação-de-dados" class="nav-link" data-scroll-target="#importação-de-dados"><span class="header-section-number">2</span> IMPORTAÇÃO de Dados</a>
   <ul class="collapse">
@@ -3141,8 +3141,8 @@ vertical-align: -.125em;
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="instalar-e-carregar-biblioteca" class="level3" data-number="1.0.3">
-<h3 data-number="1.0.3" class="anchored" data-anchor-id="instalar-e-carregar-biblioteca"><span class="header-section-number">1.0.3</span> Instalar e carregar biblioteca</h3>
+<section id="instalar-e-carregar-bibliotecas" class="level3" data-number="1.0.3">
+<h3 data-number="1.0.3" class="anchored" data-anchor-id="instalar-e-carregar-bibliotecas"><span class="header-section-number">1.0.3</span> Instalar e carregar bibliotecas</h3>
 <p>Sempre que se inicia uma nova sessão, as bibliotecas têm de ser carregadas.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;tidyverse&quot;, repos = &quot;http://cran.us.r-project.org&quot;)</span></span>
@@ -3251,23 +3251,23 @@ Warning
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="1" data-code-annotation="1">Retirar os ficheiros da pasta datasets e dar a informação do mesmo</span>
+<span data-code-annotation="1" data-code-lines="1" data-code-cell="annotated-cell-6">Retirar os ficheiros da pasta datasets e dar a informação do mesmo</span>
 </dd>
 <dt data-target-cell="annotated-cell-6" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="2" data-code-annotation="2">Passar os índices (caminhos dos ficheiros) para uam coluna chamada path</span>
+<span data-code-annotation="2" data-code-lines="2" data-code-cell="annotated-cell-6">Passar os índices (caminhos dos ficheiros) para uam coluna chamada path</span>
 </dd>
 <dt data-target-cell="annotated-cell-6" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="5" data-code-annotation="3">Filtra o ficheiro com o máximo da coluna mtime (data de modificação)</span>
+<span data-code-annotation="3" data-code-lines="5" data-code-cell="annotated-cell-6">Filtra o ficheiro com o máximo da coluna mtime (data de modificação)</span>
 </dd>
 <dt data-target-cell="annotated-cell-6" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="6" data-code-annotation="4">Retira o caminho do ficheiro para a variável ficheiro recente</span>
+<span data-code-annotation="4" data-code-lines="6" data-code-cell="annotated-cell-6">Retira o caminho do ficheiro para a variável ficheiro recente</span>
 </dd>
 <dt data-target-cell="annotated-cell-6" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="8" data-code-annotation="5">O ficheiro é importado</span>
+<span data-code-annotation="5" data-code-lines="8" data-code-cell="annotated-cell-6">O ficheiro é importado</span>
 </dd>
 </dl>
 </div>
@@ -3582,15 +3582,15 @@ Warning
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-14" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-14" data-code-lines="2" data-code-annotation="1">Remover os valores distintos da variavel instituição</span>
+<span data-code-annotation="1" data-code-lines="2" data-code-cell="annotated-cell-14">Remover os valores distintos da variavel instituição</span>
 </dd>
 <dt data-target-cell="annotated-cell-14" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-14" data-code-lines="3" data-code-annotation="2">Retirar um vector com cada</span>
+<span data-code-annotation="2" data-code-lines="3" data-code-cell="annotated-cell-14">Retirar um vector com cada</span>
 </dd>
 <dt data-target-cell="annotated-cell-14" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-14" data-code-lines="5" data-code-annotation="3">Apresentar os dados dos hospitais</span>
+<span data-code-annotation="3" data-code-lines="5" data-code-cell="annotated-cell-14">Apresentar os dados dos hospitais</span>
 </dd>
 </dl>
 </div>
@@ -3754,7 +3754,7 @@ Verbos suportados do .by
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.Date</span>()</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] &quot;2023-12-28&quot;</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] &quot;2023-12-28 11:03:41 GMT&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] &quot;2023-12-28 14:23:50 GMT&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Precisamos de um truque para alterar o conjunto de dados existente nas datas</span></span>

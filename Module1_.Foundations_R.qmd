@@ -1,5 +1,5 @@
 ---
-title: "Module 1 | Foundations in R "
+title: "Module 1 | Foundations in R"
 subtitle: "Data Wrangling"
 author: "Autor"
 affiliation: 
@@ -10,7 +10,6 @@ lang: pt
 format: 
   html:
     smooth-scroll: true
-    self-contained: true
     toc: true
     toc-location: left
     embed-resources: true
@@ -26,6 +25,7 @@ format:
     fig_height: 8
     code-copy: true
     always_allow_html: true
+    output-file: "module1.html"
 theme:
   light: flatly
   dark: darkly
@@ -39,11 +39,271 @@ execute:
 
 Este documento é um guia abrangente sobre os fundamentos da programação em R, com foco em conceitos-chave e suas aplicações, especialmente no campo da saúde.
 
-# BOAS PRÁTICAS 
+# GUIA DE ESTILO - fase de Planeamento de um projeto
+
+## Boas práticas gerais
 
 Um projeto funciona tão melhor quanto a sua organização.
 
-É importante criar um guia de estilos para a execução de projetoa individuais como em equipa para garantir consistência e que quando voltamos atrás 
+É importante criar um guia de estilos para a execução tanto de projetos individuais como em equipa para garantir consistência. Isto tem alguns benefícios:
+
+1. Criar interoperabilidade: Os dados podem ser combinados e comparados através do tempo e em locais diferentes;
+2. Melhoria na interpretação: Manter estruturas de código, nomenclatura e de projetos permite que quando colegas e nós próprios olhamos para um projeto consigamos rapidamente verificar erros e oportunidades de  melhoria;
+3. Reprodutibilidade: Algo que será o foco do Módulo 7 mas que implica que os nomes dos ficheiros, pastas e variáveis sejam coerentes, pois a ausência dos mesmos limita a gestão de dados ou a análise possa ser replicada no futuro;
+
+Em termos individuais, este tipo de guias deve ser criado antes da criação de um projeto.
+
+:::{.callout-note}
+
+O nosso guia pessoal pode mudar ao longo do tempo, mas se seguir princípios claros logo de ínicio ajuda a direcionar a nossa jornada em *Data Science*
+:::
+
+:::{.callout-warning}
+O resto desta explicação será mais aprofundada mas ficam aqui um guia geral:
+
+1. Evitar espaços em tudo - Não lidos pela maior parte dos sistemas de linha de comando
+    - Alternativa: underscore (_) ou hífen (-)
+2. Evitar caracteres especiais ?, ., *, \, /, +, ', &, ".
+    - Alternativa: underscore (_) ou hífen (-) ou mudar o nome a usar
+3. Conveções de nomes usadas em programação
+    - Existem várias opções mas as mais usadas são a Snake case (data_science) e o Camel case (dataScience)
+4. Cuidados com o tamanho dos caracteres. Existem limites no número de caracteres lidos pelo programa.
+    - Não colocar ficheiros muito aninhados em pastas
+    - Não colocar nomes muito longos nos ficheiros/pastas/variaveis
+:::
+
+## Estrutura das pastas/organização de um projeto
+
+Podemos organizar um projeto de 2 grandes formas:
+
+1. Pastas de forma hierárquica (+comum)
+2. Metadados dos ficheiros (Tags nos ficheiros)
+  - Exemplo para consulta: [Cakici 2017](https://enterprise-knowledge.com/folders-v-metadata-sharepoint-document-libraries/)
+
+Por ser mais comum e mais fácil de entender iremos focar na organização em pastas.
+
+Podemos ter uma estratura mais ou menos profunda:
+
+1. Muitos ficheiros numa pasta pode dificultar a procura específica de um documento
+2. Estruturas muito densas dificultam o número de cliques e podem atingir limites de leitura.
+   - Exemplo: One Drive - 400 caracteres; Windows - 260 carateres
+   
+Criar clara divisão de ficheiros editáveis de ficheiros confidenciais.
+
+Decidir se se cria ficheiro de arquivo ou se as versões ficam na pasta original para *tracebility* dos dados.
+
+Exemplos de um projeto com 3 equipas a trabalhar em simultâneo:
+
+```{r }
+#| eval: false
+project/
+├── equipa_A
+|   ├── planeamento
+|   |   └── ...
+|   ├── documentação
+|   |   └── ...
+|   ├── dados
+|   |   └── ...
+|   └── ...
+├── equipa_B
+|   ├── planeamento
+|   |   └── ...
+|   ├── documentação
+|   |   └── ...
+|   ├── dados
+|   |   └── ...
+|   └── ...
+├── arquivo
+└── ...
+```
+
+
+```{r }
+#| eval: false
+project/
+├── planeamento
+|   ├── equipa_A
+|   |   └── ...
+|   ├── equipa_B
+|   |   └── ...
+|   ├── equipa_C
+|   |   └── ...
+|   └── ...
+├── documentação
+|   ├── equipa_A
+|   |   └── ...
+|   ├── equipa_B
+|   |   └── ...
+|   ├── equipa_C
+|   |   └── ...
+|   └── ...
+├── arquivo
+└── ...
+```
+
+:::{.callout-warning}
+Ser EXPLICITO e CLARO nos nomes das pastas e ficheiros
+
+Ser consistente na Nomenclatura de ficheiros
+:::
+
+## Nomes de ficheiros
+
+Questões que devem ser repondido ao ler o nome de um ficheiro:
+
+1. O que são?
+2. Quando foram criados?
+3. Esta é a versão mais recente?
+
+Para isso:
+
+- Nomes descritivos
+- Sem informação pessoal
+- Sem espaços
+- Limitar número de caracteres 
+- Datas devems ser usadas no formato ISO 8601 - YYYY-MM-DD or YYYYMMDD
+- Se forem criadas versões - ser explicito na versão atual "v01" ou "v01.01"
+- Abreviaturas têm de ser claras para TODA a gente
+- A criação de tags/etiquetas é boa prática
+- Manter separação de ficheiros com dados "raw" ou em bruto e dados manipulados
+- Criar pastas de inputs/datasets e outputs
+
+## Nomes de variáveis
+
+Boas práticas:
+
+- Não usar palavras de funções ou operadores (mais à frente iremos ver quais são)
+- Limitar o número de caracteres numa variável
+
+:::{.callout-warning}
+Limites de programa comuns de análise estatística:
+
+1. SPSS is 64
+2. Stata is 32
+3. SAS is 32
+4. R is 10,000
+:::
+
+- Todos os nomes de variáveis devem ser únicos
+- Nomes devem explícitos e claros
+
+::: {.callout-note appearance="simple"}
+Exemplo de matadados nas variáveis
+-   Reporter
+-   Nome ou abreviatura do mesmo
+-   `Escala/Alterações (se relevante)`
+-   `Número/Versão (se relevante)`
+-   Tipo de variável (se relevante)
+:::
+
+- Variáveis só devem mudar de nome se houver uma alteração significativa feita
+- Isto deve ser utilizado mesmo em projetos diferentes para manter interoperabilidade
+- Não usar caracteres especiais, excepto o underscore "_". o - pode ser utilizado mas com cuidado pois confunde-se com a subtração
+- Ser coerente em relação a capitalização e separadores
+- É possível em R intoduzir label em variáveis com nomes corretamente elaborados
+
+:::{.callout-warning}
+Iremos explorar uma função que permite fazer isto em múltiplas estruturas de dados de forma simples
+:::
+
+## Variáveis Nominais
+
+Boas práticas
+
+- Código único
+- Consistente com significado (Homem = "H")
+- Consistente ao longo do tempo e projeto
+- Fatores ordinais devem ser claros na ordem
+
+## Valores em Falta
+
+Boas práticas
+
+- Uniformizar é a palavra-chave
+- Código deve ser claro e impossível de obter de outra forma
+- Pode ser usado código único ou múltiplos para inclusão de razões de falta de dados
+- Se for atribuído um valor deve ser do mesmo tipo que a variável que está em falta (Ex: "NA_character_" ou "NA_real_")
+
+## Estrutura de Código
+
+Exemplo de template de estrutura
+
+```{r}
+#### Overview ####
+# Associated project: 
+# Script purpose:
+# Data cleaning plan followed:
+# Created by: 
+# Date created:
+# Code checked by:
+# Code checked date:
+
+
+#### Workspace setup ####
+
+# Settings, packages, root paths
+
+
+#### Data import ####
+
+
+#### Cleaning code section 1 ####
+
+
+#### Cleaning code section 1 ####
+```
+
+Boas práticas:
+
+- Usar comentários (iremos abordar como mais à frente)
+- Usar espeços, identação e limites de linha
+
+```{r}
+#| eval: false
+# Mau código
+# É o código mais conciso em espaço mas é confuso e não ajuda o leitor a perceber a mensagem
+sum_patients_year_speciality <- inpatient_hospital_lite |> summarise(all_patients = sum(doentes_saidos, na.rm = TRUE),days_patients = sum(dias_de_internamento, na.rm = TRUE), mean_patient_days = mean(dias_de_internamento, na.rm = TRUE), sd_patient_days = sd(dias_de_internamento, na.rm = TRUE), max_patient_days = max(dias_de_internamento, na.rm = TRUE),min_patient_days = min(dias_de_internamento, na.rm = TRUE),.by = c(year, tipo_de_especialidade))
+
+# Mais ou menos
+# apesar de mais claro em termos de espaço a identação não ajuda a compreender o código utilizado
+sum_patients_year_speciality <- inpatient_hospital_lite |> 
+  summarise(all_patients = sum(doentes_saidos, na.rm = TRUE),
+    days_patients = sum(dias_de_internamento, na.rm = TRUE),
+        mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
+            sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
+          max_patient_days = max(dias_de_internamento, na.rm = TRUE),
+      min_patient_days = min(dias_de_internamento, na.rm = TRUE),
+    .by = c(year, tipo_de_especialidade)
+  )
+
+# bom
+# o codigo usa a mesma identação para toda a operação de summarise clarificando que a mesma é toda uma operação
+sum_patients_year_speciality <- inpatient_hospital_lite |> 
+  summarise(
+    all_patients = sum(doentes_saidos, na.rm = TRUE),
+    days_patients = sum(dias_de_internamento, na.rm = TRUE),
+    mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
+    sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
+    max_patient_days = max(dias_de_internamento, na.rm = TRUE),
+    min_patient_days = min(dias_de_internamento, na.rm = TRUE),
+    .by = c(year, tipo_de_especialidade)
+  )
+```
+
+- Usar caminhos relativos: Em R todos os ficheiros são relativos ao local/pasta do nosso projeto. Este deve ser a forma de orientar os nossos ficheiro pois aumenta a reprodutibilidade.
+- Evitar repetição: Se repetirmos um código mais que 2-3 vezes o melhor será o de criar uma função ou loop que faça o queremos de forma mais sucinta
+- Mais à frente iremos abordar como maximizar a reprodutibilidade de execução de ficheiros independentemente de alterações de pacotes que usamos.
+
+::: {.callout-note appearance="simple"}
+Exemplo de estrutura de ficheiros aplicada neste curso:
+
+Pasta datasets - dados em bruto não trabalhados
+Pasta outputs - Onde estão os ficheiros de saída de scripts
+Pasta exercícios - Onde estarão os exercícios
+Pasta cheat_sheets - Onde está alguma documentação utilizada
+Pasta imagens - Onde estão a ser guardados os ficheiros de visualização
+
+:::
 
 # ESTRUTURAS DE DADOS
 
@@ -110,6 +370,7 @@ O formato tabular deve garantir que cada observação linha é única.
 ## Listas (4 dimensoes)
 
 Listas em R são coleções que podem conter diferentes tipos de elementos.
+
 São os mais diferentes de conceptualizar mas cada elemento na listas pode ter 1, 2, 3 ou 4 dimensoes
 
 :::{.callout-note}
@@ -259,21 +520,25 @@ Resultado da comparação é sempre um valor lógico. TRUE (Verdadeiro) ou FALSE
 
 Para evitar a repetição de código que usa as mesmas operações, podemos usar funções.
 
-Cada função em R funciona num ambitente próprio com variáveis locais e àquelas no ambiente onde foi definida.
+Cada função em R funciona num ambitente próprio com variáveis locais e aquelas no ambiente onde foi definida.
 
-Cada função tem inputs ou argumentos que definem variáveis internas da função
+Cada função tem inputs ou argumentos que definem variáveis internas da função.
+
 Funções em R são usadas para executar tarefas específicas. 
+
 Por exemplo, saber se um paciente é idoso.
 
 ```{r}
-# aqui definimos a função idoso
-idoso <- function(idade){
+# aqui definimos a função idoso 
+idoso <- function(idade){ # o que definimos dentro de function são os argumentos da mesma, neste caso será idade o argumento
+  #é boa prática nomear o nosso argumento para algo claro e explícito
   if(idade>=65){
     print("idoso")
   }else{
     print("não é idoso")
   }
 }
+# tudo o que colocamos dentro das chavetas inicais será o que queremos que seja executado na função
 ```
 
 Qual será o output esperado para idoso(35)?

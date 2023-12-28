@@ -1,5 +1,5 @@
 ---
-title: "Module 2 | Reporting with Quarto "
+title: "Module 3 | Data Importation and Data Manipulation "
 subtitle: "Data Wrangling"
 author: "Autor"
 affiliation: 
@@ -37,7 +37,7 @@ execute:
 # Introdução
 
 Esta série de exercios é destinada aos praticantes do curso de DATA SCIENCE WITH R IN HEALTHCARE.
-Estes execícios são relativos ao módulo 2.
+Estes execícios são relativos ao módulo 3.
 
 Os exercícios deste módulo abragem os seguintes temas:
 
@@ -182,8 +182,8 @@ if(exists("hypoxia_adult")) {
   print(":( DataFrame 'hypoxia_adult' não existe")
   hypoxia_adult <- data.frame(
     ID = "A",
-    media = "A",
-    desvio_padrao = "A"
+    age= 1,
+    female = 0
   )
 }
 
@@ -193,8 +193,8 @@ if(exists("hypoxia_adult2")) {
   print(":( DataFrame 'hypoxia_adult2' não existe")
   hypoxia_adult2 <- data.frame(
     ID = "A",
-    media = "A",
-    desvio_padrao = "A"
+    age= 1,
+    female = 0
   )
 }
 
@@ -204,8 +204,8 @@ if(exists("hypoxia_final")) {
   print(":( DataFrame 'hypoxia_final' não existe")
   hypoxia_final <- data.frame(
     ID = "A",
-    media = "A",
-    desvio_padrao = "A"
+    media = 1,
+    desvio_padrao = 1
   )
 }
 ```
@@ -273,18 +273,18 @@ validate(hypoxia_final, name = "Verifying data Hypoxia final") |>
       within_bounds(46.27882,46.27884)(mean(media, na.rm = TRUE))
         ,description = "O valor da média obtido está no esperado")|>
   validate_if(
-      within_bounds(7.778,7.780)(mean(desvio_padrao, na.rm = TRUE))
+      within_bounds(7.778,7.780)(mean(desvio_padrao, na.rm = TRUE)),desvio_padrao
         ,description = "O valor da desvio padrão obtido está no esperado")|>
   add_results(report)
 
 get_results(report)
-save_report(report, output_file ="validation_report2.html")
+save_report(report, output_file ="outputs/validation_report_module2.html")
 
-# rm(list = ls())
+rm(list = ls())
 
 ```
 
 ```{=html}
-<iframe width="100%" height=1000 src="validation_report2.html"></iframe>
+<iframe width="100%" height=1000 src="outputs/validation_report_module2.html"></iframe>
 ```
 
