@@ -991,7 +991,7 @@ p1
 ```{r}
 # Lets change the position of the legend
 
-p1<- ggplot() +
+p2<- ggplot() +
   geom_line(data= inpatient_hospital_sum, 
             aes(x = periodo, 
                 y = doentes_saidos_var,
@@ -1015,8 +1015,8 @@ p1<- ggplot() +
         plot.title = element_text(face = "bold", size = 12)
         )
 
-p1
-	geom_textabline
+p2
+	
 ```
 
 ::: callout-note
@@ -1071,7 +1071,7 @@ inpatient_hospital_year_mean <- inpatient_hospital_lite |>
 
 
 ```{r}
-p1<- ggplot(data= inpatient_hospital_year_mean, 
+p3<- ggplot(data= inpatient_hospital_year_mean, 
             aes(x = year, 
                 y = mean_saidos_var) 
             ) +
@@ -1091,7 +1091,7 @@ p1<- ggplot(data= inpatient_hospital_year_mean,
   
   theme_minimal()
 
-p1
+p3
 
 ```
 ### Confidence intervals
@@ -1198,6 +1198,21 @@ p1
 ```
 
 
+## COMBINAR PLOTS
+
+O pacote patchwork em R é uma biblioteca muito útil para combinar e organizar gráficos criados com ggplot2. Fornece uma forma intuitiva e flexível de dispor múltiplos gráficos em uma única janela gráfica. 
+
+Ver mais aqui https://patchwork.data-imaginist.com/articles/patchwork.html
+
+```{r}
+p2 + p3
+```
+
+```{r}
+p2 / p3
+```
+
+
 # DADOS ESPACIAIS 
 
 ## Tipos de dados espaciais 
@@ -1273,7 +1288,7 @@ healthy_life_expectancy <- get_eurostat("hlth_silc_17") |> filter(TIME_PERIOD=="
 ```
 
 
-### Mapas de áreas 
+### Àreas 
 
 ```{r}
 # Get shapes
@@ -1306,96 +1321,200 @@ ggplot(country_lines) +
   theme_map()
 ```
 
-#### Juntar datasets (Joins) 
+#### Mapas 
+
+Por vezes podemos carregar a shapefile e os dados e juntar os dados, desde que tenhamos um identificador comum
 
 ```{r}
+library(sf)
 
-# Left join data
-country_lines_sf <- country_lines %>%
-  left_join(healthy_life_expectancy, by = c("CNTR_CODE" = "geo"))
+comm_pt <- st_read(
+  "datasets/map_json_portugal/concelhos_portugal_light.json")
 ```
 
 ```{r}
-br <- c(0, 60, 70, 75, 80, 85)
 
-country_lines_sf <- country_lines_sf %>%
-  mutate(values_cut = cut(values, br, dig.lab = 5))
+covid_inc <- read_csv("datasets/covid_inc.csv") 
 
-labs_plot <- prettyNum(br[-1], big.mark = ",")
 
-# Palette
-pal <- hcl.colors(length(br) - 1, "Lajolla")
+covid_inc <- covid_inc |>
+  rename(NAME_2=Concelho) |>
+  mutate( NAME_2=recode(NAME_2,
+                         'Ponte de Sor' = "Ponte de Sôr"
+                         ))
+
+## Erro frequente com Logoa, Calheta, Mealhada, Sátão
+
+
+comm_pt <-left_join(comm_pt,
+                     covid_inc,
+                     by = "NAME_2")
+
+sanity <-anti_join(comm_pt,
+                     covid_inc,
+                     by = "NAME_2")
 
 ```
+
+We need to specify the fill variable and the color variable (boundaries)
+
 ```{r}
-country_lines_sf <- country_lines_sf |> drop_na(values_cut)
+
+p1<- ggplot() + 
+  geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 1,
+              color = "black"
+          ) 
+
+p1
 ```
 
+We can chage the thickness of the boundaries and the color
 
 ```{r}
-# Plot
+library(ggthemes)
 
-ggplot(country_lines_sf) +
-  geom_sf(aes(fill= values_cut), linewidth = 1.5,color="black") +
-  #geom_sf(data = country_lines, col = "black", linewidth = 0.1) +
-  # Center in Europe: EPSG 3035
-  coord_sf(
-    xlim = c(2377294, 7453440),
-    ylim = c(1313597, 5628510)
-  ) +
-  labs(
-    title = "Healthy life expectancy in 2021",
-    subtitle = "",
-    caption = "Source: Eurostat"
-  ) 
+p1<- ggplot() + 
+  geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) 
 
-+
-  scale_fill_manual(
-    name = "Healthy life expectancy",
-    values = pal,
-    labels = labs_plot,
-    drop = FALSE,
-    guide = guide_legend(
-      direction = "horizontal",
-      keyheight = 0.5,
-      keywidth = 2.5,
-      title.position = "top",
-      title.hjust = 0.5,
-      label.hjust = .5,
-      nrow = 1,
-      byrow = TRUE,
-      reverse = FALSE,
-      label.position = "bottom"
-    )
-  ) +
-  theme_void() +
-  # Theme
+p1
+```
+
+We now will add a theme and labels
+
+```{r}
+p <- ggplot() +
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) +
+    # add a theme
+   theme_classic() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022")
+p
+
+
+```
+
+We can change the default specification
+
+```{r}
+theme_map <- function(...) {
+  theme_minimal() +
   theme(
-    plot.title = element_text(
-      size = 12, color = pal[length(pal) - 1],
-      hjust = 0.5, vjust = -6
-    ),
-    plot.subtitle = element_text(
-      size = 14,
-      color = pal[length(pal) - 1],
-      hjust = 0.5, vjust = -10, face = "bold"
-    ),
-    plot.caption = element_text(
-      size = 9, color = "grey60",
-      hjust = 0.5, vjust = 0,
-      margin = margin(t = 5, b = 10)
-    ),
-    legend.text = element_text(
-      size = 10,
-      color = "grey20"
-    ),
-    legend.title = element_text(
-      size = 11,
-      color = "grey20"
-    ),
-    legend.position = "bottom"
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    ...
   )
+}
+```
 
+```{r}
+p <- ggplot() +
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) +
+    # add the theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022")
+p
+
+
+```
+
+We can change the colors now
+
+```{r}
+
+# It's recommended to use a named vector
+# Use this website https://colorbrewer2.org/#type=sequential&scheme=OrRd&n=5 
+
+cols <- c("#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000")
+
+p <- ggplot() +
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "gray"
+          ) +
+    # add the previously defined basic theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022") +
+    # and we use guide_legend instead of guide_colourbar
+  scale_fill_manual(values = cols,
+                    name = "Incidência") +
+  theme(
+    legend.position = "right",
+       legend.direction = "vertical",
+       legend.text = element_text(size = 8, colour = "gray50")
+  )
+        
+        
+p
+```
+#### Operações com shapefiles 
+
+```{r}
+comm_ars<- comm_pt |>
+  group_by(ARS) |> 
+  summarize(geometry = st_union(geometry)
+            )
+```
+
+```{r}
+p <- ggplot() +
+      geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "gray"
+          ) +
+        geom_sf(data = comm_ars, 
+              size = 0.1,
+              color = "black",
+              alpha = 0
+          ) +
+    # add the previously defined basic theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022") +
+    # and we use guide_legend instead of guide_colourbar
+  scale_fill_manual(values = cols,
+                    name = "") +
+  
+  theme(legend.position = "right",
+        legend.direction = "vertical",
+        legend.text = element_text(size = 8, colour = "gray50")) 
+p
 ```
 
 ### Raster data 
@@ -1431,22 +1550,51 @@ g_tmax_map
 
 ### Dados de Localização
 
+```{r}
+comm_lvt<- comm_pt |>
+  filter(ARS=="Lisboa e Vale do Tejo")  
+
+geo_hospitals <-  read_csv("datasets/geo_location_hospitals.csv")
+  
+```
+
+```{r}
+
+p <- ggplot() +
+        geom_sf(data = comm_lvt, 
+              size = 0.2,
+              color = "black",
+              fill="gray",
+              alpha = 0.3
+          ) +
+      geom_point(data = geo_hospitals, 
+                 aes(x = long, 
+                     y = lat), 
+                 size = 2, 
+        shape = 23, 
+        fill = "red") +
+  
+  geom_sf_text(data = geo_hospitals,
+                aes(x = long, 
+                     y = lat,
+                    label = Hospital)
+                ) +
+    # add the previously defined basic theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's Hospital location in Lisbon and Tagus Valey", 
+         subtitle = "January, 2022", 
+         caption = "Data: MoH, 2022") 
+p
+```
+
 **Open Streep maps**
 ```{r}
 library(osmdata)
 
 ```
 
-```{r}
-placebb <- getbb("Barcelona")
-placebb
-```
-
-
-```{r}
-lisboa <- getbb("Portugal")
-lisboa
-```
 
 
 Steps 1. Choose a shapefile 2. Chose the data you want to add to the shapefile 3. Linkage the data
@@ -1602,162 +1750,146 @@ p <- ggplot() +
 p
 ```
 
-#### Advanced mapping operations
+### Interactive maps 
 
 ```{r}
-comm_ars<- comm_pt |>
-  group_by(ARS) |> 
-  summarize(geometry = st_union(geometry)
-            )
+library(leaflet)
+pal <- colorNumeric(palette = "YlOrRd", domain = comm_pt$Incidencia)
+
+l <- leaflet(comm_pt) |>  addTiles() |> 
+  addPolygons(color = "grey", fillColor = ~ pal(Incidencia),
+              fillOpacity = 0.9) %>%
+  addLegend(pal = pal, values = ~Incidencia, opacity = 0.9) |> 
+  addMiniMap()
+l
 ```
 
-```{r}
-p <- ggplot() +
-      geom_sf(data = comm_pt, 
-          aes(fill = Incidencia_categoria),
-              size = 0.1,
-              color = "gray"
-          ) +
-        geom_sf(data = comm_ars, 
-              size = 0.1,
-              color = "black",
-              alpha = 0
-          ) +
-    # add the previously defined basic theme
-   theme_map() +
-    labs(x = NULL, 
-         y = NULL, 
-         title = "Portugal's COVID-19 incidence", 
-         subtitle = "January, 2022", 
-         caption = "Data: DGS, 2022") +
-    # and we use guide_legend instead of guide_colourbar
-  scale_fill_manual(values = cols,
-                    name = "") +
-  theme(legend.position = "right",
-        legend.direction = "vertical",
-        legend.text = element_text(size = 8, colour = "gray50")) 
-p
-```
 
-#### Save plot
 
-```{r}
-ggsave( filename = here::here("output", "figures", 
-                  paste0( "map_covid", ".pdf")),
-                  width = 12.49,
-                  height = 15.3,
-                  units = c("cm"),
-                  dpi = "retina")
-```
 
-```{r}
-comm_lvt<- comm_pt |>
-  filter(ARS=="Lisboa e Vale do Tejo")  
-
-geo_hospitals <-  read_csv("datasets/geo_location_hospitals.csv")
-  
-```
-
-```{r}
-p <- ggplot() +
-        geom_sf(data = comm_lvt, 
-              size = 0.2,
-              color = "black",
-              fill="gray",
-              alpha = 0.3
-          ) +
-      geom_point(data = geo_hospitals, 
-                 aes(x = long, 
-                     y = lat), 
-                 size = 2, 
-        shape = 23, 
-        fill = "red") +
-    # add the previously defined basic theme
-   theme_map() +
-    labs(x = NULL, 
-         y = NULL, 
-         title = "Portugal's Hospital location in Lisbon and Tagus Valey", 
-         subtitle = "January, 2022", 
-         caption = "Data: MoH, 2022") 
-p
-```
-
-```{r}
-mean_inc_ars <- covid_inc  |> 
-  summarise(mean_inc= mean(Incidencia),
-            .by = ARS)
-```
-
-```{r}
-mean_inc_ars$ARS <- factor(mean_inc_ars$ARS,                                    # Factor levels in decreasing order
-                  levels = mean_inc_ars$ARS[order(mean_inc_ars$mean_inc, 
-                                                  decreasing = TRUE)])
-
-p1<- mean_inc_ars |> 
- 
-  ggplot( aes(x=ARS,
-              y = mean_inc) 
-            ) +
-  geom_bar(position="dodge", 
-           stat="identity"
-           )
-p1
-```
-
-#### Save plot
-
-```{r}
-ggsave( filename = here::here("outputs", "figures", 
-                  paste0( "map_covid_lvt", ".pdf")),
-                  width = 20.49,
-                  height = 10.3,
-                  units = c("cm"),
-                  dpi = "retina")
-```
-
-# Extentions
+# EXTENÇÕES
 
 [extensions of ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
 
-## Animate
 
-```{r}
-# library(gganimate)
-# 
-# inpatient_hospital_lite$year <- as.numeric(inpatient_hospital_lite$year)
-# 
-# p1<- ggplot(inpatient_hospital_lite, 
-#        aes(x=dias_de_internamento_var, 
-#            y=doentes_saidos_var, 
-#            colour=tipo_de_especialidade)) + 
-#   geom_point(alpha=0.1
-#              ) +
-#     # Here comes the gganimate specific bits
-#   transition_time(year) +
-#     labs(title = "Number of inpatients discharged and length of stay",
-#          subtitle = 'Year: {frame_time}',
-#          y = "Number of inpatients discharged",
-#          x = "Length of stay ", 
-#          caption = "Source: Ministry of Health, Portugal",
-#        colour="") +
-#   theme_minimal() +
-#   theme(legend.position="bottom")
-# 
-# p1
-```
-
-# Adiccional Resources
+# Adicional Resources
 
 <https://www.cedricscherer.com/slides/useR-2021_ggplot-wizardry-extended.pdf>
 
-# Excercise
-
-Create the best plot to show the median and IRQ for "trabalhadores_por_grupo_profissional" dataset
-
+# Exercicio 
+Para os exercicios 6 e 7 deve utilizar o dataset hypoxia
 ```{r}
-library(readr)
-trabalhadores_por_grupo_profissional <- read_delim("datasets/trabalhadores_por_grupo_profissional.csv", 
-    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+hypoxia <- read_csv("datasets/hypoxia.csv")
 ```
 
-# THE END
+
+
+## Exercicio 6
+1. Compara a distribuição de idades entre homens e mulheres
+2. O gráfico deve ter um título, caption, legenda. A distribuição estar preenchido por cor "#91bfdb" e "#ef8a62". Utiliza o tema classic  
+
+
+## Exercicio 7
+1. Explora a relaçao entre MinSao2 e o BMI
+2. O gráfico deve ter um título, caption, legenda. Usa o theme minimal e adiciona uma linha tendencia linear
+
+## Exercicio 9
+1. Cria um mapa usado o shapefile comm_pt, e as caracteristicas da base de dados "mortalidade_coracao_2021.csv"
+2. O mapa deve conter a mortalidade por doenças cardiovasculares com uma escala de 5 cores 
+3. O gráfico deve ter um título, caption, legenda.
+
+# NOT WORKING 
+
+
+#### Juntar datasets (Joins) 
+
+```{r}
+
+# Left join data
+country_lines_sf <- country_lines %>%
+  left_join(healthy_life_expectancy, by = c("CNTR_CODE" = "geo"))
+```
+
+```{r}
+br <- c(0, 60, 70, 75, 80, 85)
+
+country_lines_sf <- country_lines_sf %>%
+  mutate(values_cut = cut(values, br, dig.lab = 5))
+
+labs_plot <- prettyNum(br[-1], big.mark = ",")
+
+# Palette
+pal <- hcl.colors(length(br) - 1, "Lajolla")
+
+```
+```{r}
+country_lines_sf <- country_lines_sf |> drop_na(values_cut)
+```
+
+
+```{r}
+# Plot
+
+ggplot(country_lines_sf) +
+  geom_sf(aes(fill= values_cut), linewidth = 1.5,color="black") +
+  #geom_sf(data = country_lines, col = "black", linewidth = 0.1) +
+  # Center in Europe: EPSG 3035
+  coord_sf(
+    xlim = c(2377294, 7453440),
+    ylim = c(1313597, 5628510)
+  ) +
+  labs(
+    title = "Healthy life expectancy in 2021",
+    subtitle = "",
+    caption = "Source: Eurostat"
+  ) 
+
++
+  scale_fill_manual(
+    name = "Healthy life expectancy",
+    values = pal,
+    labels = labs_plot,
+    drop = FALSE,
+    guide = guide_legend(
+      direction = "horizontal",
+      keyheight = 0.5,
+      keywidth = 2.5,
+      title.position = "top",
+      title.hjust = 0.5,
+      label.hjust = .5,
+      nrow = 1,
+      byrow = TRUE,
+      reverse = FALSE,
+      label.position = "bottom"
+    )
+  ) +
+  theme_void() +
+  # Theme
+  theme(
+    plot.title = element_text(
+      size = 12, color = pal[length(pal) - 1],
+      hjust = 0.5, vjust = -6
+    ),
+    plot.subtitle = element_text(
+      size = 14,
+      color = pal[length(pal) - 1],
+      hjust = 0.5, vjust = -10, face = "bold"
+    ),
+    plot.caption = element_text(
+      size = 9, color = "grey60",
+      hjust = 0.5, vjust = 0,
+      margin = margin(t = 5, b = 10)
+    ),
+    legend.text = element_text(
+      size = 10,
+      color = "grey20"
+    ),
+    legend.title = element_text(
+      size = 11,
+      color = "grey20"
+    ),
+    legend.position = "bottom"
+  )
+
+```
+
