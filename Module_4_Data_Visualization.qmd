@@ -7,6 +7,8 @@ format:
   html:
     smooth-scroll: true
     self-contained: true
+    code-copy: true
+    code_download: true
     toc: true
     toc-location: left
 theme: cosmo
@@ -97,6 +99,7 @@ Contem os seguintes elementos
 # Packages
 required_packages <- c(
                        "tidyverse",
+                       "rio"
                        "scales",
                        "here",
                        "patchwork",
@@ -125,11 +128,11 @@ rm(list = ls(all.names = TRUE)) #will clear all objects includes hidden objects.
 
 ```{r}
 # change outpurs to output
-inpatient_hospital_lite <- read_csv("output/datasets/inpatient_hospital_lite.csv")
+inpatient_hospital_lite <- import("output/datasets/inpatient_hospital_lite.csv")
 
 ## são equivalentes
 
-inpatient_hospital_lite <- read_csv(here("output", "datasets", "inpatient_hospital_lite.csv"))
+inpatient_hospital_lite <- import(here("output", "datasets", "inpatient_hospital_lite.csv"))
 ```
 
  
@@ -410,11 +413,10 @@ Um gráfico de linhas ou gráfico linear exibe a evolução de uma ou várias va
 Um gráfico de linhas é frequentemente usado para visualizar uma tendência nos dados ao longo de intervalos de tempo – uma série temporal – portanto, a linha é frequentemente desenhada de forma cronológica.
 
 ```{r}
-inpatient_hospital_sum <- inpatient_hospital_lite %>%
-  group_by(periodo, tipo_instituicao) %>%
+inpatient_hospital_sum <- inpatient_hospital_lite |>
   summarise(
     doentes_saidos_var = sum(doentes_saidos_var, na.rm = TRUE)
-  )
+    ,.by = c(periodo, tipo_instituicao))
     
 ```
 
@@ -477,7 +479,7 @@ p1<- ggplot() +
             aes(x = periodo, 
                 y = doentes_saidos_var,
                 colour=tipo_instituicao), 
-            size=1.15) +
+                linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
   
   scale_color_manual(values = c("#fdb462", "#80b1d3", "#b3de69")) +
   
@@ -506,7 +508,7 @@ p1<- ggplot() +
             aes(x = periodo, 
                 y = doentes_saidos_var,
                 colour=tipo_instituicao), 
-            size=1.15) +
+                linewidth=1.15) +
   
   scale_color_manual(values = c("#fdb462", "#80b1d3", "#b3de69")) +
   
@@ -529,6 +531,15 @@ p1
 	geom_textabline
 ```
 
+:::{.callout-note}
+Embora não seja necessário, existe um espaço entre o gráfico e os eixos.
+Para eliminar esse espaço podemos adicionarpo seguinte código:
+
+coord_cartesian(
+  expand = FALSE
+  )
+:::
+
 
 ## Scatterplot
 
@@ -536,7 +547,7 @@ Um gráfico de dispersão exibe a relação entre 2 variáveis numéricas. Para 
 
 
 ```{r}
-inpatient_hospital_lite <- inpatient_hospital_lite %>%
+inpatient_hospital_lite <- inpatient_hospital_lite |>
   filter(dias_de_internamento_var<40000)
 ```
 
@@ -592,7 +603,10 @@ p1<- ggplot(inpatient_hospital_lite,
 p1
 ```
 
-**ATENÇÃO** Se queremos definir uma cor temos de fedinir fora o aes 
+:::{.callout-warning}
+**ATENÇÃO** Se queremos definir uma cor temos de fedinir fora o aes.
+:::
+
 
 ```{r}
 
@@ -602,14 +616,14 @@ p1<- ggplot(inpatient_hospital_lite,
            shape = tipo_de_especialidade)
        ) + 
   geom_point(alpha=0.9,
-       color="#0868ac"
+             color="#0868ac"
              ) +
     labs(title = "Number of inpatients discharged and length of stay",
          subtitle = "2015-2022",
          y = "Number of inpatients discharged",
          x = "Length of stay ", 
          caption = "Source: Ministry of Health, Portugal",
-       colour="") +
+         colour="") +
   theme_minimal() +
   theme(legend.position="bottom")
 
@@ -734,7 +748,7 @@ p1<-  ggplot( data = inpatient_hospital_year,
          y = "Number of inpatients discharged",
          x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal",
-       fill="") +
+         fill="") +
   theme_minimal() +
   theme(legend.position="bottom")
 
@@ -763,7 +777,7 @@ p1<-  ggplot( data = inpatient_hospital_year,
          y = "Percentage  of inpatients discharged",
          x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal",
-       fill="") +
+         fill="") +
   theme_minimal() +
   theme(legend.position="bottom")
 
@@ -779,7 +793,7 @@ library(scales)
 hex <- hue_pal()(3)
 hex 
 
-inpatient_hospital_year <- inpatient_hospital_year %>%
+inpatient_hospital_year <- inpatient_hospital_year |>
   mutate(
     tipo_instituicao = factor(tipo_instituicao, levels = c("Hospital", "University", "Cancer hospital"))
   ) 
@@ -803,7 +817,7 @@ p1<-  ggplot( data = inpatient_hospital_year,
          y = "Number of inpatients discharged",
          x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal",
-       fill="") +
+         fill="") +
   theme_minimal() +
   theme(legend.position="bottom")
 
@@ -819,7 +833,7 @@ p1<-  ggplot( data = inpatient_hospital_year,
             aes(x = year, 
                 y = doentes_saidos_var,
                 fill=factor(tipo_instituicao, 
-                            levels = c("Hospital", "University", "Cancer hospital")))
+                levels = c("Hospital", "University", "Cancer hospital")))
             ) +
   geom_area(position="stack",alpha=0.6 , size=0.1, colour="black"
            ) +
@@ -832,7 +846,7 @@ p1<-  ggplot( data = inpatient_hospital_year,
          y = "Number of inpatients discharged",
          x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal",
-       fill="") +
+         fill="") +
   theme_minimal() +
   theme(legend.position="bottom")
 
@@ -948,8 +962,8 @@ Um gráfico de linhas ou gráfico linear exibe a evolução de uma ou várias va
 Um gráfico de linhas é frequentemente usado para visualizar uma tendência nos dados ao longo de intervalos de tempo – uma série temporal – portanto, a linha é frequentemente desenhada de forma cronológica.
 
 ```{r}
-inpatient_hospital_sum <- inpatient_hospital_lite %>%
-  group_by(periodo, tipo_instituicao) %>%
+inpatient_hospital_sum <- inpatient_hospital_lite |>
+  group_by(periodo, tipo_instituicao) |>
   summarise(
     doentes_saidos_var = sum(doentes_saidos_var, na.rm = TRUE)
   )
@@ -1094,7 +1108,7 @@ p_final_2<- ggplot() +
          y = "Number of inpatients discharged",
          x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal",
-       colour = "") +
+         colour = "") +
   theme_minimal() +
   theme(legend.position="bottom",
         plot.background = element_rect("white"))
@@ -1131,11 +1145,10 @@ Use stat="identity", the default is stat="bin" and will count the number of obse
 Position is also very important when we want to specify groups of bar. position="dodge" will group them by each other
 
 ```{r}
-inpatient_hospital_year <- inpatient_hospital_lite %>%
-  group_by(year, tipo_instituicao) %>%
+inpatient_hospital_year <- inpatient_hospital_lite |>
   summarise(
     doentes_saidos_var = sum(doentes_saidos_var, na.rm = TRUE)
-  )
+  ,.by=c(year, tipo_instituicao))
     
 ```
 
@@ -1173,7 +1186,7 @@ library(scales)
 hex <- hue_pal()(3)
 hex 
 
-inpatient_hospital_year <- inpatient_hospital_year %>%
+inpatient_hospital_year <- inpatient_hospital_year |>
   mutate(
     tipo_instituicao = factor(tipo_instituicao, levels = c("Hospital", "University", "Cancer hospital"))
   ) 
@@ -1197,7 +1210,7 @@ p1<-  ggplot( data = inpatient_hospital_year,
          y = "Number of inpatients discharged",
          x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal",
-       fill="") +
+         fill="") +
   theme_minimal() +
   theme(legend.position="bottom")
 
@@ -1247,10 +1260,10 @@ p_final_3<-  ggplot( data = inpatient_hospital_year,
   scale_fill_manual(values=c("#00BA38","#619CFF" ,"#F8766D")) +
   
   labs(title = "Number of inpatients discharged in Hospitals",
-         subtitle = "2015-2022",
-         y = "Number of inpatients discharged",
-         x = "", 
-         caption = "Source: Ministry of Health, Portugal",
+       subtitle = "2015-2022",
+       y = "Number of inpatients discharged",
+       x = "", 
+       caption = "Source: Ministry of Health, Portugal",
        fill="") +
   theme_minimal() +
   theme(legend.position="bottom",
@@ -1289,7 +1302,7 @@ p1<-  ggplot( data = inpatient_hospital_year,
          y = "Number of inpatients discharged",
          x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal",
-       fill="") +
+         fill="") +
   theme_minimal() +
   theme(legend.position="bottom")
 
@@ -1301,7 +1314,7 @@ p1
 Scatter plots are used to visualize two continuous variables
 
 ```{r}
-inpatient_hospital_lite <- inpatient_hospital_lite %>%
+inpatient_hospital_lite <- inpatient_hospital_lite |>
   filter(dias_de_internamento_var<40000)
 ```
 
@@ -1386,7 +1399,7 @@ p1<- ggplot(inpatient_hospital_lite,
          y = "Number of inpatients discharged",
          x = "Length of stay ", 
          caption = "Source: Ministry of Health, Portugal",
-       colour="") +
+         colour="") +
   theme_minimal() +
   theme(legend.position="bottom")
 
@@ -1412,7 +1425,7 @@ p1<- ggplot(inpatient_hospital_lite,
          y = "Number of inpatients discharged",
          x = "Length of stay ", 
          caption = "Source: Ministry of Health, Portugal",
-       colour="") +
+         colour="") +
   theme_minimal() +
   theme(legend.position="bottom")
 
@@ -1438,7 +1451,7 @@ p1<- ggplot(inpatient_hospital_lite,
          y = "Number of inpatients discharged",
          x = "Length of stay ", 
          caption = "Source: Ministry of Health, Portugal",
-       colour="") +
+         colour="") +
   theme_minimal() +
   theme(legend.position="bottom")
 
@@ -1523,8 +1536,8 @@ comm_pt <- st_read(
 covid_inc <- read_csv("datasets/covid_inc.csv") 
 
 
-covid_inc <- covid_inc %>%
-  rename(NAME_2=Concelho) %>%
+covid_inc <- covid_inc |>
+  rename(NAME_2=Concelho) |>
   mutate( NAME_2=recode(NAME_2,
                          'Ponte de Sor' = "Ponte de Sôr"
                          ))
@@ -1664,8 +1677,8 @@ p
 #### Advanced mapping operations
 
 ```{r}
-comm_ars<- comm_pt %>%
-  group_by(ARS) %>% 
+comm_ars<- comm_pt |>
+  group_by(ARS) |> 
   summarize(geometry = st_union(geometry)
             )
 ```
@@ -1710,7 +1723,7 @@ ggsave( filename = here::here("output", "figures",
 ```
 
 ```{r}
-comm_lvt<- comm_pt %>%
+comm_lvt<- comm_pt |>
   filter(ARS=="Lisboa e Vale do Tejo")  
 
 geo_hospitals <-  read_csv("datasets/geo_location_hospitals.csv")
@@ -1742,10 +1755,9 @@ p
 ```
 
 ```{r}
-mean_inc_ars <- covid_inc  %>% 
-  group_by(ARS) %>% 
-  summarise(mean_inc= mean(Incidencia)
-            )
+mean_inc_ars <- covid_inc  |> 
+  summarise(mean_inc= mean(Incidencia),
+            .by = ARS)
 ```
 
 ```{r}
@@ -1753,7 +1765,7 @@ mean_inc_ars$ARS <- factor(mean_inc_ars$ARS,                                    
                   levels = mean_inc_ars$ARS[order(mean_inc_ars$mean_inc, 
                                                   decreasing = TRUE)])
 
-p1<- mean_inc_ars %>% 
+p1<- mean_inc_ars |> 
  
   ggplot( aes(x=ARS,
               y = mean_inc) 

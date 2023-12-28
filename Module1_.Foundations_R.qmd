@@ -24,6 +24,7 @@ format:
     linkcolor: darkblue
     fig_width: 12
     fig_height: 8
+    code-copy: true
     always_allow_html: true
 theme:
   light: flatly

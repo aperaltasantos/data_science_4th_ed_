@@ -20,19 +20,6 @@ Isto permite reutilizar código de outros documentos sem precisar de copiar e co
 
 Params definition in Quarto and Run.r fro multiple reports
 
-# Exercício 1
-
-- No dataset covid_inc, calcule a média e desvio padrao da incidencia por ARS.
-
-```{r}
-mean_covid <-covid_inc %>%
-  group_by(ARS) %>% 
-  summarise(
-    mean_Incidencia=mean(Incidencia, na.rm=TRUE),
-    SD_Incidencia=sd(Incidencia, na.rm=TRUE)
-  )
-```
-
 Exercicio
 1. Dataset inpatient_hospital_lite
 2. So queremos metricas de hospitais universitários 

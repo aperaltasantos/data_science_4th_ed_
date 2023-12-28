@@ -5,10 +5,14 @@ date: today
 date-format: long
 format:
   html:
+    smooth-scroll: true
+    self-contained: true
     toc: true
     toc-location: left
     number-sections: true
     number-depth: 3
+    code_download: true
+    code-copy: true
 execute:
   warning: false
 title-block-style: default

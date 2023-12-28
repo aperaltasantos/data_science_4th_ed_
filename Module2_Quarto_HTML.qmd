@@ -9,10 +9,12 @@ date: today
 date-format: long
 format:
   html:
+    self-contained: true
     smooth-scroll: true
     toc: true
     toc-location: left
     number-sections: true
+    code-copy: true
 theme: cosmo
 smooth-scroll: true
 lang: pt   
