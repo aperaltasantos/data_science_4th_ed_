@@ -1,5 +1,5 @@
 ---
-title: "Module 2 | Reporting with Quarto "
+title: "Module 3 | Data Importation and Data Manipulation "
 subtitle: "Data Wrangling"
 author: "Autor"
 affiliation: 
@@ -37,7 +37,7 @@ execute:
 # Introdução
 
 Esta série de exercios é destinada aos praticantes do curso de DATA SCIENCE WITH R IN HEALTHCARE.
-Estes execícios são relativos ao módulo 2.
+Estes execícios são relativos ao módulo 3.
 
 Os exercícios deste módulo abragem os seguintes temas:
 
@@ -278,13 +278,13 @@ validate(hypoxia_final, name = "Verifying data Hypoxia final") |>
   add_results(report)
 
 get_results(report)
-save_report(report, output_file ="validation_report2.html")
+save_report(report, output_file ="outputs/validation_report_module2.html")
 
 rm(list = ls())
 
 ```
 
 ```{=html}
-<iframe width="100%" height=1000 src="validation_report2.html"></iframe>
+<iframe width="100%" height=1000 src="outputs/validation_report_module2.html"></iframe>
 ```
 
