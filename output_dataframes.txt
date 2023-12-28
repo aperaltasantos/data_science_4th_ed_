@@ -1,6 +1,0 @@
-[1] ":) DataFrame 'data' criado com sucesso"
-[1] ":) DataFrame 'data' tem as primeiras 5 colunas do tipo adequado"
-[1] ":) Média de idade calculada: 55"
-[1] ":) DataFrame 'data_anonimizada' criado com sucesso"
-[1] ":) DataFrame 'data_anonimizada' criado com colunas pedidas"
-[1] ":) Coluna Genero criada e na dataframe"
