@@ -1,5 +1,5 @@
 ---
-title: "Module 3 | Data importation and manipulation with tidyverse"
+title: "Module 3 | Exploratory Data Analysis and Tables"
 author: "A. Peralta-Santos"
 date: today
 date-format: long
@@ -16,6 +16,10 @@ format:
     code-copy: true
 execute:
   warning: false
+  collapse: true
+  message: false
+  eval: true
+  echo: true
 title-block-style: default
 editor: 
   markdown: 
@@ -23,20 +27,6 @@ editor:
 ---
 
 # SETUP
-
-Esta parte garante que tem as configurações padrão para todos os blocos de código R.
-
-Pode ser definido num chunk ou no YAML com o parâmetro execute.
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  collapse    = TRUE,
-  warning     = FALSE, # Mostrar ou não avisos
-  message     = FALSE, # Mostrar ou não mensagens
-  echo        = TRUE,  # Queremos ver o código neste caso
-  eval        = TRUE   # Se o código deve ser avaliado e os resultados incluídos
-  )
-```
 
 ### Limpar o ambiente
 
@@ -47,42 +37,11 @@ rm(list = ls(all.names = TRUE))
 # melhoria da performance
 ```
 
-### Definir seed
-
-É importante definir a seed sempre que o R precisa realizar cálculos aleatórios, para que os resultados permaneçam constantes.
-
-Exemplo: 
-*Bootstrapping* e Inferência Bayesiana;
-Algoritmos de *Machine Learning*;
-Legendas móveis em gráficos;
-
-```{r}
-set.seed(123)
-```
-
 ### Instalar e carregar bibliotecas
 
 Sempre que se inicia uma nova sessão, as bibliotecas têm de ser carregadas.
 
 ```{r}
-# install.packages("tidyverse", repos = "http://cran.us.r-project.org")
-# install.packages("readxl", repos = "http://cran.us.r-project.org")
-# install.packages("lubridate", repos = "http://cran.us.r-project.org")
-# install.packages("janitor")
-# install.packages("data.table", repos = "http://cran.us.r-project.org")
-# install.packages("here")
-# install.packages("haven")
-# install.packages("rio")
-
-library(janitor)
-library(tidyverse)
-library(readxl)
-library(lubridate)
-library(data.table)
-library(here)
-library(haven)
-library(rio)
-
 # Forma alternativa de instalar vários pacotes e carregá-los
 
 # SOURCE: https://cedricscherer.netlify.app/2019/05/17/the-evolution-of-a-ggplot-ep
@@ -90,11 +49,12 @@ library(rio)
 required_packages <- c("janitor",
                        "tidyverse",
                        "rio",
-                       "here",
-                       "haven",
                        "data.table",
                        "lubridate",
-                       "readxl"
+                       "ggplot2",
+                       "gt",
+                       "skimr",
+                       "DataExplorer"
                        )      
 
 for (pkg in required_packages) {
@@ -111,1000 +71,503 @@ remove(pkg)
 
 ```
 
-# IMPORTAÇÃO de Dados
+# IMPORTAÇÃO de Dados e DATA CLEANING and WRANGLING 
 
-## Carregar e Exportar os dados
+Para esta parte da aula não será tão importante alguns passos de data cleaning e data wrangling.
 
-Em cursos anteriores usávamos pacotes específicos de importação e exportação.
+## Carregar e Limpar os dados
 
-```{r}
-# Nome do novo conjunto de dados <- read_excel("caminho")
-# Use um caminho genérico para garantir a reprodutibilidade
-
-inpatient_hospital <- read_excel("datasets/atividade_internamento_hospitalar.xlsx")
-
-```
-
-## Pacote RIO
-Foi criado um pacote "rio" para flexibilixar a importação e a exportação de dados.
-
-Este pacote lida com múltiplos formatos:
-1. Excel
-2. GoogleSheets (colocar URL no lugar do ficheiro)
-3. CSV
-4. SAS
-5. SPSS
-6. STATA
-7. JSON
-
-### Lista Completa dos formatos suportados
-
-```{=html}
-<iframe width="780" height="500" src="https://cran.r-project.org/web/packages/rio/vignettes/rio.html" title="Rio Package"></iframe>
-```
-
-Exemplo do uso do pacote RIO num *worflow* de Data Science
-
-:::{.callout-warning}
-Relembrar: a referência dos ficheiros é o *working directory* que por default é o local do projeto R.
-:::
+Continuamos a trabalhar os dados hospitalares.
 
 ```{r}
-covid_inc <- import("datasets/covid_inc.csv")
-hypoxia <- import("datasets/hypoxia.xlsx")
-# é possível definir folhas de Excel com o argumento which
-# é possível remover linhas supérfulas com o argumento skip
-# é possível transformar valores em na na importação com o argumento na - Ex: na= c("na", "NA", "9","99",Missing", "", " ")
 
-#exportar tudo como um único ficheiro Excel
-export(list(hypoxia,covid_inc) ,"datasets/all_data.xlsx")
+inpatient_hospital <- import("datasets/atividade_internamento_hospitalar.xlsx") |> 
+  clean_names()
 
-# exportar os dados de hypoxia para um csv
-export(hypoxia,"datasets/hypoxia.csv")
-```
-
-Em algumas situações em que temos múltiplos ficheiros e queremos importar o mais recente podemos fazê-lo utilizando a função file.info() e list.files()
-
-```{r}
-#| code-annotations: hover
-ficheiros <- file.info(list.files("datasets", full.names = TRUE))|> #<1>
-    rownames_to_column(var = "path") #<2>
-
-ficheiro_recente <- ficheiros |> 
-  filter(mtime== max(mtime)) |> #<3>
-  pull(path)#<4>
-
-importar_recente <- import(ficheiro_recente) #<5>
-```
-
-1. Retirar os ficheiros da pasta datasets e dar a informação do mesmo
-2. Passar os índices (caminhos dos ficheiros) para uam coluna chamada path
-3. Filtra o ficheiro com o máximo da coluna mtime (data de modificação)
-4. Retira o caminho do ficheiro para a variável ficheiro recente
-5. O ficheiro é importado
-
-# DATA CLEANING and WRANGLING
-
-## Limpeza de nomes de colunas
-
-No R, os nomes das colunas servem como uma referência às dados e são a referência para a legenda de figuras.
-Por isso estas devem estar estruturadas de forma simples e claro para minimizar erros na escrita de código.
-Boas práticas:
-
-1. Nomes Curtos
-2. Sem espaços
-3. Evitar letras maiúsculas (R é sensível a estas)
-3. Sem caracteres especiais (&, #, <, >, …)
-4. Coerência entre colunas (datas terem sufixo ou prefixo de data, idade_meses)
-
-
-```{r}
-# Vamos inspecionar o conjunto de dados
-View(inpatient_hospital)
-# Como saber nomes das colunas
-names(inpatient_hospital) # mais genérico
-
-# Limpar nomes
-# Este comando garante que todos os nomes das variáveis estão em minúsculas e sem espaços
-inpatient_hospital <- clean_names(inpatient_hospital)
-
-covid_inc_limp <- clean_names(covid_inc)
-
-colnames(inpatient_hospital) # ver nomes alterados
-```
-
-## Rename
-
-- Esta função permite renomear variáveis
-
-:::{.callout-warning}
-A Sintaxe desta função deve ser novo_nome = nome_anterior.
-A variável nome_anterior deve existir nos dados senão temos um erro
-:::
-
-```{r}
-hypoxia_clean <- hypoxia |> 
-  clean_names() |> 
-  rename(
-    sex = female
-  )
-
-```
-
-Renomeámos a variável female para a mais comum sex.
-
-## Select
-
-- Este argumento permite selecionar variáveis; temos 7 variáveis em nosso conjunto de dados. Vamos verificar se precisamos de todas elas.
-
-```{r}
-# 1. Nome do conjunto de dados final
-# 2. Nome do conjunto de dados original
-# 3. tubo %>%  ou |> (ambos funcionam)
-# 4. argumento, neste caso, é select
-
-inpatient_hospital_lite <- inpatient_hospital |> 
+inpatient_hospital_lite2 <- inpatient_hospital |> 
   select(
     periodo, 
     instituicao, 
     tipo_de_especialidade,
     doentes_saidos,
     dias_de_internamento
-  ) 
-
-test <- inpatient_hospital |> 
-  select(periodo, instituicao)
-
-# Também podemos não selecionar algumas variáveis
-# PASSOS:
-# 1. Crie um vetor com as variáveis alvo
-# 2. use o argumento lógico ! ou para excluir as variáveis alvo
-
-target <- c("regiao", "localizacao_geografica")
-
-inpatient_hospital_exclude <- inpatient_hospital |> 
-  select(
-    !target
-  )
-
-# a mesma versão pode ser efetuada com o operador -
-inpatient_hospital_exclude1 <- inpatient_hospital |> 
-  select(
-    -regiao,
-    -localizacao_geografica,
-    -dias_de_internamento
-  )
-```
-
-## Filter
-
--    Este argumento permite filtrar valores ou strings dentro das variáveis
-
-```{r}
-# 1. Nome do conjunto de dados final
-# 2. Nome do conjunto de dados original
-# 3. pipe %>%  ou | >
-# 4. argumento, neste caso, é filter
-# 5. use um argumento lógico <, >, <=, ==
-
-inpatient_hospital_less_1000 <- inpatient_hospital_lite  |> 
-  filter(dias_de_internamento <= 1000)
-
-# Vamos inspecionar o conjunto de dados
-View(inpatient_hospital_less_1000)
-
-# Podemos usar filter para strings
-inpatient_hospital_surgery <- inpatient_hospital_lite |>
-  filter(tipo_de_especialidade == "Especialidade Cirurgica")
-
-inpatient_hospital_medicine <- inpatient_hospital_lite |>
-  filter(tipo_de_especialidade == "Especialidade Médica")
-  
-# Também podemos combinar vários filtros com argumentos lógicos & (e), | (ou)
-# Podemos usar filter para strings
-inpatient_hospital_surgery_less_500 <- inpatient_hospital_lite |>
-  filter(tipo_de_especialidade=="Especialidade Cirurgica" & 
-           dias_de_internamento<=500)
-
-head(inpatient_hospital_less_1000)
-```
-
-
-## Mutate
-
--   Este argumento cria uma nova variável
-
-```{r}
-# 1. Nome do conjunto de dados final
-# 2. Nome do conjunto de dados original
-# 3. pipe %>% ou |>
-# 4. argumento, neste caso, é mutate
-# 5. especifique o nome da nova variável
-# 6. adicione a função
-
-inpatient_hospital_lite <- inpatient_hospital_lite |>
+  ) |>
   mutate(
     length_patient =
-      round((dias_de_internamento/doentes_saidos), digits = 1)
-    )
-
-# Vamos inspecionar o conjunto de dados
-View(inpatient_hospital_lite)
-
-# Também podemos criar uma nova variável com valores fixos
-
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(
+      round((dias_de_internamento/doentes_saidos), digits = 1),
     new_var = 2,
     fonte = "transparencia_sns",
-    multiplicacao = dias_de_internamento*doentes_saidos
-  )
-
-# Vamos inspecionar o conjunto de dados
-View(inpatient_hospital_lite)
-
-head(inpatient_hospital_lite)
-```
-
-## Slice (Cortar dados)
-
-As operações de cortar elementos são úteis para retirar linhas específicas, particularmente em dados ordenados.
-Existem várias versões:
-1. slice (selecionar por posição)
-2. slice_head ou slice_tail (selecionar por posição no ínicio ou final dos dados)
-2. slice_sample (remover amostra de linhas - por número [n] ou proporção [prop])
-3. slice_min slice (remover amostra de linhas - por número [n] ou proporção [prop])
-
-```{r}
-#retirar 2a linha
-linha_2 <- inpatient_hospital_lite |> 
-  slice(2)
-#retirar os dois primeiros elementos
-primeiros_2<- inpatient_hospital_lite |> 
-  slice_head(n=2)
-
-#remover 50% das amostras
-
-amostra_50 <- inpatient_hospital_lite |> 
-  slice_sample(prop=0.5)
-
-#retirar os 50% maiores registos de estadia dos pacientes
-
-quartil1_estadia <- inpatient_hospital_lite |> 
-  slice_max(length_patient,prop=0.5)
-
-```
-
-
-## Distinct
-
-- Por vezes queremos extrair os valores únicos de uma ou mais variáveis
-- Suponhamos que queremos selcionar doentes para reavaliar no nosso estudos de pacientes de hipóxia (dataset hypoxia)
-  - Só queremos 1 doente com a combinação sexo, race, AHI score e Smoking
-
-```{r}
-# limpar as variáveis do dataset
-
-hypoxia_clean <- hypoxia_clean |> 
-  distinct(age, sex, race, ahi, smoking)
-
-original_n <- length(hypoxia)
-final_n <- length(hypoxia_clean)
-
-```
-
-- Passámos de `r original_n` doentes para `r final_n` doentes para o follow-up.
-
-## Pull
-
-- O comando Pull permite retirar um vector dos dados de uma coluna.
-- Pode ser útil para loops em que iteramos por vários elementos de um vector.
-
-Vamos retirar os nomes dos hospitais dos nossos dados
-
-```{r}
-#| code-annotations: hover
-
-hospitais <- inpatient_hospital_lite |> 
-  distinct(instituicao) |> #<1>
-  pull(instituicao) #<2>
-
-hospitais #<3>
-```
-
-1. Remover os valores distintos da variavel instituição
-2. Retirar um vector com cada 
-3. Apresentar os dados dos hospitais
-
-## Quartis
-
-```{r}
-# este código cria uma nova variável quartis estadia que divide as observações de cada hospital em quartis
-# os dois comandos finais sao apenas para visualização
-quartis_estadia <- inpatient_hospital_lite |> 
-  mutate(
-    quartis_estadia= ntile(length_patient, 4),.by = instituicao) |> 
-  filter(instituicao=="Centro Hospitalar de Setúbal, EPE") |> 
-  select(instituicao, length_patient, quartis_estadia) |> 
-  arrange(length_patient)
-
-
-quartis_estadia
-```
-## Summarise
-
--   Este argumento permite resumir as variáveis
-
-```{r}
-# Crie uma variável com o número de todos os doentes que tiveram alta do hospital
-# PASSOS
-# 1. Confirme que uma variável data válida e definida como as.Date
-# 2.
-
-sum_patients <- inpatient_hospital_lite |>
-  summarise(
-    all_patients = sum(doentes_saidos) 
-  )
-
-anyNA(inpatient_hospital_lite$doentes_saidos)
-
-# ALERT
-# We did not get a valid result because there are NA in the dataset, we need to specify to ignore the NA values
-# To do that we use na.rm = TRUE
-
-sum_patients <- inpatient_hospital_lite |> 
-  summarise(
-    all_patients=sum(doentes_saidos, na.rm = TRUE)
-  )
-
-# Now let's sum all the days as well 
-sum_patients <- inpatient_hospital_lite |> 
-  summarise(
-    all_patients = sum(doentes_saidos, na.rm = TRUE),
-    days_patients = sum(dias_de_internamento, na.rm = TRUE),
-    mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
-    sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
-    max_patient_days = max(dias_de_internamento, na.rm = TRUE),
-    min_patient_days = min(dias_de_internamento, na.rm = TRUE)
-  )
-```
-
-### Group by (para código antigo)
-
--   Por vezes é necessário agregar ou criar novas variáveis agregadas por outras
-    variáveis. Vamos repetir o exercício anterior, mas com dados agregados por ano
-
-
-```{r}
-
-# Este código extrai a data- será explorado de seguida
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(
+    multiplicacao = dias_de_internamento*doentes_saidos,
     periodo=paste0(periodo, "-01"),
-    eriodo=as.Date(periodo, format = "%Y-%m-%d"),
+    periodo=as.Date(periodo, format = "%Y-%m-%d"),
     year = year(periodo),
     month=lubridate::month(periodo, label = FALSE),
     week=week(periodo),
-    weekday=lubridate::wday(periodo, label=TRUE)
-  )
-
-#sumarizar por ano os dados
-sum_patients_year <- inpatient_hospital_lite |>
-  group_by(year) |>
-  summarise(
-    all_patients = sum(doentes_saidos, na.rm = TRUE),
-    days_patients = sum(dias_de_internamento, na.rm = TRUE),
-    mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
-    sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
-    max_patient_days = max(dias_de_internamento, na.rm = TRUE),
-    min_patient_days = min(dias_de_internamento, na.rm = TRUE)
-  )
-
-# Podemos agregar por mais que uma variável 
-
-sum_patients_year_speciality <- inpatient_hospital_lite |>
-  group_by(year, tipo_de_especialidade) |>
-  summarise(
-    all_patients = sum(doentes_saidos, na.rm = TRUE),
-    days_patients = sum(dias_de_internamento, na.rm = TRUE),
-    mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
-    sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
-    max_patient_days = max(dias_de_internamento, na.rm = TRUE),
-    min_patient_days = min(dias_de_internamento, na.rm = TRUE)
-  )
-```
-
-É boa prática fazer o ungroup após terminadas as operações em que necessitamos de variáveis agrupadas
-
-### Argumento .by ou by
-
-A operação group_by está a ser subtituída pelo argumento .by nas operações do tidyverse.
-
-::: {.callout-note appearance="simple"}
-## Verbos suportados do .by
-
--   `mutate(.by = )`
-
--   `summarise(.by = )`
-
--   `reframe(.by = )`
-
--   `filter(.by = )`
-
--   `slice(.by = )`
-
--   `slice_head(by = ) and slice_tail(by = )`
-
--   `slice_min(by = ) and slice_max(by = )`
-
--   `slice_sample(by = )`
-:::
-
-O mesmo código anterior com a nova sintaxe.
-
-```{r echo=FALSE}
-
-sum_patients_year <- inpatient_hospital_lite |> 
-  summarise(
-    all_patients = sum(doentes_saidos, na.rm = TRUE),
-    days_patients = sum(dias_de_internamento, na.rm = TRUE),
-    mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
-    sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
-    max_patient_days = max(dias_de_internamento, na.rm = TRUE),
-    min_patient_days = min(dias_de_internamento, na.rm = TRUE),
-    .by = year
-  )
-
-# Podemos agregar por mais que uma variável 
-
-sum_patients_year_speciality <- inpatient_hospital_lite |> 
-  summarise(
-    all_patients = sum(doentes_saidos, na.rm = TRUE),
-    days_patients = sum(dias_de_internamento, na.rm = TRUE),
-    mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
-    sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
-    max_patient_days = max(dias_de_internamento, na.rm = TRUE),
-    min_patient_days = min(dias_de_internamento, na.rm = TRUE),
-    .by = c(year, tipo_de_especialidade)
-  )
-```
-
-# DATAS / DATETIME OBJECTS
-
-- Lidar com datas pode ser complicado, mas é uma competência importante de dominar
-  - O tipo de dados em formato de data são muitas vezes interpretados como caracteres quando são importados
-  - Globalmente são objetos datetime mas podem ser POSIXt, POSIXct, and/or POSIXlt classes
-- Existem alguns pacotes relevantes para lidade com dados em formato de data, mas o mais relevante será o "lubridate".
-
-```{r}
-# Como obter o dia e o dia e hora, relevante na criação de relatórios e de diferenças de dados e o presente
-Sys.Date()
-Sys.time()
-```
-
-```{r}
-# Precisamos de um truque para alterar o conjunto de dados existente nas datas
-# Vamos usar paste0, que permite colar valores em uma variável
-
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(
-    periodo=paste0(periodo, "-01")
-  )
-
-# Agora precisamos definir a variável periodo como uma data
-
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(
-    periodo=as.Date(periodo, format = "%Y-%m-%d")
-  )
-
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(
-    year = year(periodo),
-    month=lubridate::month(periodo, label = FALSE),
-    week=week(periodo),
-    weekday=lubridate::wday(periodo, label=TRUE)
-  )
-  
-# Vamos inspecionar o conjunto de dados
-View(inpatient_hospital_lite)
-
-# É possível desagrupar por dia, semana, mês e ano.
-```
-
-- Existem muitas abreviaturas relativas aos formatos de tempo,       - As mesmas podem ser consultadas utilizando o código ?strptime na consola.
-- Podem ser utilizadas no argumento format da função as.Date()
-
-:::{.callout-note}
-Existem funções úteis neste pacote como make_date() que junta várias colunas numa única em formato data
-:::
-
-:::{.callout-warning}
-Por vezes os progrmas guardam datas em formato numérico e é necessário informar o R sobre a origem, ou o valor 0 dos dados.
-1. Excel  - as.Date(date_onset, origin = "1899-12-30")
-2. Mac - as.Date(date_onset, origin = "1904-01-01")
-3. R/Outros - as.Date(date_onset, origin = "1970-01-01")
-:::
-
-## Ordenar Dados
-
--   A função arrange permite ordenar valores dentro de uma variável
-
-```{r}
-# Ordenar os doentes por ano e especialidade, em ordem crescente do número total de pacientes
-sum_patients_year_speciality <- sum_patients_year_speciality |>
-  arrange(all_patients)
-
-# Visualizar o dataframe ordenado
-view(sum_patients_year_speciality)
-
-# Ordenar em ordem descendente pelo número total de pacientes
-# Pode também ser usado o sintaxe arrange(desc(variável))
-sum_patients_year_speciality <- sum_patients_year_speciality |>
-  arrange(-all_patients)
-
-
-```
-
--   Misturar funções
-
-```{r}
-sum_patients_hospital <- inpatient_hospital_lite |>
-  filter(
-    tipo_de_especialidade == "Especialidade Cirurgica" &
-    month == "12"
-  ) |>
-  summarise(
-    mean_patients = mean(doentes_saidos, na.rm = TRUE),
-    sd_patients = sd(doentes_saidos, na.rm = TRUE),
-    median_patients = median(doentes_saidos, na.rm = TRUE), 
-    iqr_patients = IQR(doentes_saidos, na.rm = TRUE),
-  .by = instituicao)
-```
-
-
-# INTERMIDIATE/ADVANCED DATA WRANGLING
-
--   Variáveis lag e lead
-
-Podemos criar variáveis que representam o atraso ou avanço em relação a outras variaveis.
-
-```{r}
-# O nosso objetivo é criar uma variação mensal das nossas variáveis de resultado
-# O nosso dataset está organizado por tipo_de_especialidade e instituição
-# E também com resultados acumulados por ano
-# Precisamos de definir a unidade de atraso (lag)
-
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(
-    doentes_saidos_lag = 
-      lag(doentes_saidos, n = 1, order_by = periodo),
-    dias_de_internamento_lag = 
-      lag(dias_de_internamento, n = 1, order_by = periodo)
-     ,.by= c(instituicao,tipo_de_especialidade,year)
-  )
-
-sanity <- inpatient_hospital_lite |> 
-  select(
-    periodo,
-    instituicao,
-    tipo_de_especialidade,
-    year,
-    doentes_saidos,
-    doentes_saidos_lag
-  )
-```
-
-```{r}
-hospital<-inpatient_hospital_lite |>
-  filter(
-    instituicao=="Centro Hospitalar de Setúbal, EPE",
-    tipo_de_especialidade=="Especialidade Cirurgica",
-    year=="2015"
-  ) |>
-  select(
-    periodo,
-    year,
-    instituicao,
-    doentes_saidos
-  ) |>
-  mutate(
-    doentes_saidos_lag = 
-      lag(doentes_saidos, n = 1, order_by = periodo ),
-    doentes_saidos_var = doentes_saidos-doentes_saidos_lag,
-    doentes_saidos_var1 =
-      ifelse(is.na(doentes_saidos_var), doentes_saidos, doentes_saidos_var)
-  )
-```
-
-USO: Criar Variáveis de Diferença no tempo.
-- Exemplo: Diferença mensal das diferenças
-
-```{r}
-# Calcular a diferença mensal para pacientes e dias de internamento
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(doentes_saidos_var = doentes_saidos - doentes_saidos_lag,
-         dias_de_internamento_var = dias_de_internamento - dias_de_internamento_lag)
-```
-
-## Condições if_else 
-
-Os fluxos if_else são úteis para ir definindo níveis para determinda condição 
-
-:::{.callout-note title="Utilizadores de Excel"}
-No Excel será semelhante à utilização da fórmula IF ou SE
-:::
-
-```{r}
-# ifelse é um argumento muito útil
-# PASSOS
-# ifelse(define condição, valor quando a condição é VERDADEIRA, valor quando a condição é FALSA)
-
-inpatient_hospital_lite <- inpatient_hospital_lite |> 
-  mutate(
-    doentes_saidos_var =
-      ifelse(is.na(doentes_saidos_var), doentes_saidos, doentes_saidos_var),
-    dias_de_internamento_var = 
-      ifelse(is.na(dias_de_internamento_var), dias_de_internamento, dias_de_internamento_var)
-  )
-
-inpatient_hospital_lite <- inpatient_hospital_lite |> 
-  mutate(
-    cat1 = ifelse(doentes_saidos >= 1000, "Muitos doentes", "Poucos doentes"),
-    cat2 = ifelse(cat1 == "Poucos doentes", "Pouquissímos doentes", cat1)
-  )
-
-
-sanaty <- inpatient_hospital_lite |> 
-  select(periodo, instituicao, tipo_de_especialidade, year, doentes_saidos, doentes_saidos_lag, doentes_saidos_var)
-```
-
-### Case_when - Opção Tidyverse para apresentação de condições if_else
-
-Esta veriação permite a definição de múltiplas condições de escape.
-
-:::{.callout-note title="Utilizadores de Excel"}
-No Excel será semelhante à utilização da fórmula IFS ou SE.S
-:::
-
-Este tipo de fluxo pode terminar numa condição final que pode ser definida com o argumento .default ou com a condição TRUE
-
-```{r}
-# Por vezes, precisamos de alterar as categorias dentro de uma variável
-# Podemos usar case_when para fazer isso
-# Podemos ver que o Hospital de Vila Franca de Xira e o Hospital de Braga têm duas designações diferentes que precisam de ser unificadas
-
-# Corrigir designações inconsistentes na variável 'instituicao'
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(
-    instituicao1 = case_when(
-      instituicao =="Hospital de Vila Franca de Xira, PPP"  ~ "Hospital de Vila Franca de Xira, EPE",
-      instituicao =="Hospital de Braga, PPP" ~ "Hospital de Braga, EPE",
-
-    )
-  )
-
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(
-    instituicao2 = recode(
-      instituicao,
-      "Hospital de Vila Franca de Xira, PPP"  = "Hospital de Vila Franca de Xira, EPE",
-      "Hospital de Braga, PPP" = "Hospital de Braga, EPE"
-    )
-  )
-
-
-
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(
-    instituicao1 = case_when(
-      instituicao =="Hospital de Vila Franca de Xira, PPP"  ~ "Hospital de Vila Franca de Xira, EPE",
-      instituicao =="Hospital de Braga, PPP" ~ "Hospital de Braga, EPE"
-    ),
-    instituicao1 = ifelse(is.na(instituicao1), instituicao, instituicao1)
-  )
-
-inpatient_hospital_lite1 <- inpatient_hospital_lite |>
-  mutate(
-    instituicao = case_when(
-      instituicao =="Hospital de Vila Franca de Xira, PPP"  ~ "Hospital de Vila Franca de Xira, EPE",
-      instituicao =="Hospital de Braga, PPP" ~ "Hospital de Braga, EPE",
-      .default = instituicao
-      #TRUE = instituicao - tem o mesmo resultado que a expressão anterior
-      )
-  )
-```
-
-## Mutate (versão mais avançada)
-
-```{r}
-# Criar variável de duração da estadia
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-  mutate(
-    length_stay_var = dias_de_internamento_var / doentes_saidos_var, 
-    length_stay_var = as.numeric(length_stay_var)
-  ) |>
-  drop_na(length_stay_var) |>
-  filter(length_stay_var!="Inf")
-
-# Filtrar apenas duração de estadia positiva
-inpatient_hospital_lite_apenas_pos <- inpatient_hospital_lite |>
-  filter(length_stay_var >= 0)
-```
-
-Agora vamos criar um data wrangling mais complexo. 
-Se a variável contiver uma expressão, podemos usar grepl para capturá-la e criar uma nova variável.
-
-:::{.callout-note title="Utilizadores de Excel/Outras linguas de programação"}
-O grepl é uma função que permite deteção de padrões de texto dentro de expressões.
-
-Exemplo: grepl("Universitário", instituicao, ignore.case = TRUE) daria verdade para a expressão "Centro Hospitalar e Universitário de Coimbra, EPE"
-
-:::
-
-```{r}
-# Os valores de length_stay_var tem valores impossiveis
-# Decidi eliminar valores abaixo de zero e acima de 150 porque me pareceu razoavel 
-
-inpatient_hospital_lite <- inpatient_hospital_lite |>
-    mutate(
-      tipo_instituicao = 
+    weekday=lubridate::wday(periodo, label=TRUE),
+    tipo_instituicao = 
         case_when(
           grepl("Universitário", instituicao, ignore.case = TRUE) ~ "University",
           grepl("Oncologia", instituicao, ignore.case = TRUE) ~ "Cancer hospital"
         ),
     tipo_instituicao = 
-      replace_na(tipo_instituicao, "Hospital"),
-    length_stay_var = 
-      ifelse(length_stay_var<=0 | length_stay_var>150, NA, length_stay_var),
-    doentes_saidos_var = 
-      ifelse(doentes_saidos_var<=0 , NA, doentes_saidos_var)
-  ) 
+      replace_na(tipo_instituicao, "Hospital")
+    )
 
+inpatient_hospital_surgery_less_500 <- inpatient_hospital_lite |>
+  filter(tipo_de_especialidade=="Especialidade Cirurgica" & 
+           dias_de_internamento<=500)
+
+covid_inc <- import("datasets/covid_inc.csv")|> 
+  clean_names()
+
+hypoxia <- import("datasets/hypoxia.xlsx")|> 
+  clean_names()
 
 ```
 
-### Wide e Long tables
+# EXPLORATORY DATA ANALYSIS
+
+O passo da Exploração dos Dados (EDA em inglês), por si, não é um processo formal com regras de execução.
+
+> “There are no routine statistical questions, only questionable statistical routines.” — Sir David Cox
+
+É um processo de exploração da curiosidade despoletado pelos dados que temos à nossa frente.
+
+É um passo necessário na investigação da qualidade dos dados.
+
+É um processo iterativo no qual:
+
+1. Geramos questões sobre os dados;
+2. Procuramos responder às questões que temos através de simples:
+- Visualizações
+- Transformações
+- Modelação
+3. Assimilamos o que aprendemos e refinamos/geramos novas questões
+
+## FORMULAR QUESTÕES
+
+Pré-requisitos:
+
+- Conhecer os dados que temos
+- Se não conhecemos, ver os metadados
+- Começar uma análise já com questões com resposta nos dados que temos
+- Colocar hipóteses, garante que expomos os nossos presupostos na análise
+- Colocar múltiplas questões é melhor que uma questão
+
+## VER OS CONTEÚDOS
+
+Estas primeiras funções não dirão muito mas permitem ter uma melhor compreensão ds dados que temos á frente.
+
+Números de linhas
+```{r}
+nrow(inpatient_hospital)
+```
+
+Temos `r nrow(inpatient_hospital)` observações.
+
+Número de Colunas
 
 ```{r}
-# Agrupar dados por período e tipo de instituição
-inpatient_hospital_sum <- inpatient_hospital_lite |>
+ncol(inpatient_hospital)
+```
+Temos `r ncol(inpatient_hospital)` observações.
+
+```{r}
+# esta função resume as duas questões anteriores
+dim(inpatient_hospital)
+```
+Para além do número de registos, podemos querer saber o nome e o tipo de variável importados.
+
+Nome das colunas
+```{r}
+
+colnames(inpatient_hospital)
+
+length(inpatient_hospital)
+```
+Nos dados originais temos 7 variáveis:
+- periodo
+- regiao
+- instituicao
+- tipo de especialidade
+- localização geográfica
+- dias de internamento
+- doentes saidos
+
+Tipo de Variável
+
+```{r}
+
+str(inpatient_hospital)
+
+```
+
+Com os dados do str sabemos que:
+
+Temos 4 variáveis nominais:
+
+- periodo
+- regiao
+- instituicao
+- localização geográfica
+- tipo de especialidade
+
+Temos duas variáveis numéricas:
+
+- doentes saidos
+- dias de internamentos
+
+Embora as variáveis numéricas façam sentido, nas nominais podemos querer alterar algumas coisas:
+
+- Mudar periodo para data
+- Mudar a regiao, instituicao e tipo de especialidade para fatores para análises estatísticas subsequentes
+- Para já não temos questões relativas à localização geográfica, por isso podemos remover esta variável
+
+```{r}
+inpatient_hospital_lite <- inpatient_hospital |> 
+  select(
+    -localizacao_geografica # remover localização
+  ) |>
+  mutate(
+    periodo=paste0(periodo, "-01"), # modificar periodo para que possa ser lido como data
+    periodo=as.Date(periodo, format = "%Y-%m-%d"), #informar que periodo é data
+    regiao= as_factor(regiao), # existe uma função para fatores ordinais que é ordered() mas que neste caso não é útil
+    instituicao= as_factor(instituicao),
+    tipo_de_especialidade=as_factor(tipo_de_especialidade))
+```
+
+Vamos confirmar as alterações com o str
+
+```{r}
+
+str(inpatient_hospital_lite)
+
+```
+Agora já temos um melhor conhecimento sobre os dados:
+
+- Uma variável de Data
+- 3 variáveis são fatores
+  - Regiao com 5 valores possíveis
+  - Intituicão com 51 valores possíveis
+  - Tipo de especialidade com 2 valores posssíveis
+
+## PREVISUALIZAR OS DADOS
+
+Uma boa prática numa primeira fase é visualizar pequenas porções dos dados para ver possíveis problemas imediatamente.
+
+### Função HEAD() e TAIL()
+
+Estas funções expõe n linhas dos dados. 
+
+Por default, são 5 linhas
+
+```{r}
+
+head(inpatient_hospital_lite)
+
+```
+```{r}
+
+tail(inpatient_hospital_lite)
+
+```
+Pelos dados do Head e do Tail verificamos que os dados:
+
+- Estão orientados de forma ascendente pelo período
+- Parecem ir das Especialidade Cirúrgicas para as Médicas
+- Os valores da variável dias de internamento parecem ser maiores 
+
+### GT (preview)
+
+Um dos maiores pacotes para geração de tabelas permite de forma simples fazer o mesmo que as funções head e tail numa tabela.
+
+```{r}
+
+inpatient_hospital_lite |> 
+  gt_preview(top_n=5, bottom_n = 5)
+
+```
+
+### Summary
+
+A função mais conhecia para a estatística descritiva no R, é o summary(), que dá a amplitude dos dados, a média e mediana dos dados, porém não mede o tamanho amostral total, o tipo de distribição nem disperção dos dados. 
+
+```{r}
+
+summary(inpatient_hospital_lite)
+
+```
+
+Com mais esta função aprofundamos mais o nosso conhecimento dos dados:
+
+- A data vai de janeiro de 2015 a janeiro de 2022 e parece ser mensal que o ponto médio é julho de 2018
+- Existem mais registos de LVT e Norte (possivel razão?)
+- Parecem haver 170 registos por hospital
+- Existem mais registos de Especialidades Médicas do que de Cirúrgicas
+- Os doentes saídos têm 2 valores em falta
+- As distribuições das variáveis dos doentes saidos e dos dias de internamento têm uma variabilidade
+
+### Ver os números por hospital
+
+```{r}
+
+inp_hosp_lite_count <- inpatient_hospital_lite |> 
   summarise(
-    doentes_saidos_var = sum(doentes_saidos_var, na.rm = TRUE), 
-    .by = c(periodo, tipo_instituicao)
-    )
+            count= n(),
+            total_patients= sum(doentes_saidos, na.rm = TRUE),
+            mean_patients = mean(doentes_saidos, na.rm = TRUE),
+            sd_patients = sd(doentes_saidos, na.rm = TRUE),
+            median_patients = median(doentes_saidos, na.rm = TRUE), 
+            iqr_patients = IQR(doentes_saidos, na.rm = TRUE),
+  .by = instituicao) |> 
+   arrange(count)
+
+inp_hosp_lite_count
+```
+Quais são algumas considerações que podemos fazer sobre estes dados?
+
+
+## VARIATION
+
+A variação é a tendência dos dados variarem por medições consecutivas ou por sujeitos ou tempos.
+
+Vamos explorar questões iniciais:
+
+- Qual é a variação de doentes saídos por hospital
+- Qual a diferença da distribuição de dados entre 2015 e 2022
+- Qual é a variação dos dados por Tipo de Especialidade.
+
+Como a variável doentes de doentes saidos é numérica podemos explorar a sua distribuição através do uso de histogramas.
+Em módulos futuros iremos explorar como fazer código e como melhorar gráficos apresentados.
+
+O objetivo desta fase é explorar os valores mais típicos e procurar valores inesperados. 
+
+Perguntas desta fase podem ser:
+
+- Quais são os valores mais comuns? Razões para isso?
+- Quais valores são mais raros? Porquê serão? 
+- É possível observar algum padrão incomum?
+
+Qual é a variação de doentes saídos por hospital
+
+```{r}
+
+p1 <- inpatient_hospital_lite |> 
+  ggplot(aes(x=doentes_saidos))+
+    geom_histogram(binwidth = 500)#isto cria um histograma com intervalos de 500 doentes
+  
+p1
+```
+Qual a diferença da distribuição de dados entre 2015 e 2022
+
+```{r}
+
+
+p1 <- ggplot()+
+    geom_histogram(data=inpatient_hospital_lite |> filter(periodo<"2016-01-01"),aes(x=doentes_saidos), binwidth = 500, fill="blue", alpha=0.9)+#isto cria um histograma com intervalos de 500 doentes
+    geom_histogram(data=inpatient_hospital_lite |> filter(periodo>"2021-01-01"),aes(x=doentes_saidos), binwidth = 500, fill="red", alpha=0.5)
+
+p1
+
+```
+
+Os dados de 2021 aparentem ter uma maior frequência de valores mais baixos que 2015.
+
+Qual é a variação dos dados por Tipo de Especialidade
+
+```{r}
+p1 <- ggplot()+
+    geom_histogram(data=inpatient_hospital_lite |> filter(tipo_de_especialidade=="Especialidade Médica"),aes(x=doentes_saidos), binwidth = 500, fill="blue", alpha=0.9)+#isto cria um histograma com intervalos de 500 doentes
+    geom_histogram(data=inpatient_hospital_lite |> filter(tipo_de_especialidade=="Especialidade Cirurgica"),aes(x=doentes_saidos), binwidth = 500, fill="red", alpha=0.5)
+
+p1
+
+```
+
+As Especialidades Médicas aparentem ter uma distribuição mais equilibrada de valores e os valores mais elevados parecem advir de valores de Especialidades Cirúrgicas.
+
+Outras questões?
+
+- Existem padrões diferentes nos hospitais centrais e periféricos?
+
+- Existem diferenças entre os dados de Dezembro e de Junho?
+
+## VALORES INCOMUNS ou IMPOSSÍVEIS
+
+Pelos dados do summary sabemos que existem dados em falta e existem valores muito elevados que poderão ser outliers.
+
+Estes dados podem ajudar a fazer novas inferências sobre os dados que temos.
+
+### Valores Omissos
+
+Para filtrarmos os dados em falta iremos utilizar a função is.na().
+
+```{r}
+
+inpatient_hospital_na <- inpatient_hospital_lite |> 
+  filter(is.na(doentes_saidos))
+
+inpatient_hospital_na 
+```
+
+Pela tabela podemos ver que a Unidade Local de Saúde da Guarda, EPE não reportou dados de doentes saidos. 
+
+Será porque foram 0?
+Sera porque não reportaram dados?
+
+```{r}
+inpatient_hospital_zero <- inpatient_hospital_lite |> 
+  filter(doentes_saidos<10)
+
+inpatient_hospital_zero
+```
+
+Não existem valore codificados para 0, sendo que o valor mínimo é de 3.
+
+### Valores extremos OUTLIERS
+
+Para efeitos de deteção de outliers foram consideradas todas as observações fora da equação abaixo.
+
+$$ I=[q0.25−1.5⋅IQR;q0.75+1.5⋅IQR] $$
+
+Tendo em conta os dados dos histogramas acima, vamo-nos focar nos dados de Especialidade Cirúrgica.
+
+```{r}
+
+inpatient_hospital_outliers <- inpatient_hospital_lite |> 
+  filter(tipo_de_especialidade=="Especialidade Cirurgica")
+
+summary(inpatient_hospital_outliers)
 ```
 
 ```{r}
-# We can convert long and wide tables very easily 
-# STEPS
-# 1. Specify the category variable
-# 2. Specify the numeric variable 
+q25 <- 1578
+q75 <- 6184
+median <- 3333
+iqr <- q75-q25
+  
+inpatient_hospital_outliers <- inpatient_hospital_lite |> 
+  filter(doentes_saidos>median+1.5*iqr|doentes_saidos<median-1.5*iqr)
 
-inpatient_hospital_wide <- inpatient_hospital_sum |>
-  pivot_wider(
-    names_from = tipo_instituicao, 
-    values_from = doentes_saidos_var
-    )
-
-# Now back to long format
-# STEPS
-# 1. Specify the  variable that wont be changed
-# 2. Specify the categorical variable name
-# 3. Specify the numerical variable name 
-inpatient_hospital_long <- inpatient_hospital_wide |>
-  pivot_longer(!periodo, 
-               names_to = "tipo_instituicao", 
-               values_to = "doentes_saidos_var")
-
+nrow(inpatient_hospital_outliers)
 ```
-
-## Juntar datasets ou JOINS
+Existem 627 valores que são outliers.
 
 ```{r}
-inpatient <- inpatient_hospital_lite |>
-  summarise(all_patients=sum(doentes_saidos, na.rm = TRUE) ,.by = c(periodo, instituicao) )
+q25 <- 1578
+q75 <- 6184
+median <- 3333
+iqr <- q75-q25
+  
+inpatient_hospital_outliers <- inpatient_hospital_lite |> 
+  filter(doentes_saidos>median+3*iqr|doentes_saidos<median-3*iqr)
+
+nrow(inpatient_hospital_outliers)
 ```
+Existem 158 valores que são outliers.
+
+Vamos olhar para os valores superiores e ver que hospitais reportam estes valores.
+
+```{r}
+q25 <- 1578
+q75 <- 6184
+median <- 3333
+iqr <- q75-q25
+  
+inpatient_hospital_outliers_nome <- inpatient_hospital_lite |> 
+  filter(doentes_saidos>median+3*iqr) |>
+  distinct(instituicao) |> 
+  pull(instituicao)
+
+inpatient_hospital_outliers_nome
+```
+Existem 6 hospitiais que reportam valores outliers severos superiores.
+
+1. Centro Hospitalar Universitário do Porto, EPE
+2. Centro Hospitalar Universitário Lisboa Central, EPE 
+3. Centro Hospitalar e Universitário de Coimbra, EPE
+4. Centro Hospitalar Universitário de São João, EPE 
+5. Hospital de Braga, EPE
+6. Centro Hospitalar Universitário de Lisboa Norte, EPE
+
+## Covariação
+
+A variação é o comportamento em relação a uma variável.
+A covariação é a tendência dos valores de uma varíavel estarem relacionados
 
 ```{r}
 
-workers <- import("datasets/trabalhadores_por_grupo_profissional.csv", 
-    delim = ";", escape_double = FALSE, trim_ws = TRUE)
-
-workers <- janitor::clean_names(workers)
 ```
+
+# FERRAMENTAS DE EXPLORAÇÃO RÁPIDA
+
+## SkimR
+
+Para um EDA mais eficiente existem já pacotes criados como o Skimr.
+
+Este pacote calcula logo:
+
+- Número de dados em falta
+- Média
+- Mediana
+- Desvio-Padrão
+- Q0, Q25, Q50, Q75 e Q100
+
+```{r}
+
+skim(inpatient_hospital_lite)
+
+```
+
+Por Especialidade
+
+```{r}
+
+inpatient_hospital_lite |> 
+  group_by(tipo_de_especialidade) |> 
+  select(-dias_de_internamento, -periodo) |>
+  skim()
+```
+
+Por instituição
+
+```{r}
+
+inpatient_hospital_lite |> 
+  group_by(instituicao) |>
+  select(-dias_de_internamento, -periodo) |> 
+  skim()
+```
+
+## DataExplorer
+
+O pacote Data Explorer tem uma função entitulada create_report que cria uma html baseado num dataset.
+
+É possível definir uma variável de reposta, como um outcome que estejamos a procura de modelar.
+
+```{r}
+
+create_report(
+  data=inpatient_hospital_lite,
+  y = "doentes_saidos",
+  output_file = "reportDataExplorer.html",
+  output_dir = paste0(getwd(),"/outputs"),
+  report_title = "Relatório de Exploração dos Dados",
+              )
+```
+
+Exemplo de relatório do Data Explorer
 
 ```{=html}
-<iframe width="780" height="500" src="https://data-lessons.github.io/gapminder-R/12-joins.html" title="Joins"></iframe>
+<iframe width="780" height="500" src="outputs/reportDataExplorer.html" title="Report do Pacote Data Explorer"></iframe>
 ```
 
-```{r}
-# https://data-lessons.github.io/gapminder-R/12-joins.html
+Reforçar que estas ferramentas apenas automatizam algum código, dependo do utilizador para a interpretação dos dados.
 
-# Ler dados sobre trabalhadores
-workers <- workers |>
-  select(periodo, instituicao, total_geral) |>
-  mutate(
-    periodo=paste0(periodo, "-01"),
-    periodo=as.Date(periodo)
-  )
+Outras opções:
+
+```{=html}
+<iframe width="780" height="500" src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*swq8dNmFywVKrYJHoZT44Q.png" title="Comparação de Múltiplos pacotes de EDA, De Putatunda et al.(2019)"></iframe>
 ```
-
-```{r}
-# left_join(a, b, by = "x1") Join matching rows from b to a.
-
-# right_join(a, b, by = "x1") Join matching rows from a to b.
-
-# inner_join(a, b, by = "x1") Join data. Retain only rows in both sets.
-
-# full_join(a, b, by = "x1") Join data. Retain all values, all rows.
-
-# anti_join(a, b, by = "x1") All rows in a that do not have a match in b.
-
-inpatient_workers <- left_join(
-  inpatient,
-  workers,
-  by= c("periodo", "instituicao")
-)
-
-inpatient_workers_inner <- inner_join(
-  inpatient,
-  workers,
-  by = c("periodo", "instituicao")
-) |> ## |>
-  mutate(
-    inpatient_worker_ratio = round(all_patients/ total_geral, digits = 4)
-  )
-
-
-anti_inpatient_workers <- anti_join(
-  inpatient,
-  workers,
-  by=c("periodo", "instituicao")
-)
-```
-## Join by (Atualização)
-
-Em vez de definir o by numa acção join com um vector = " string do nome da coluna do outro dataframe" fica o argumento join_by que é mais intuitivo.
-
-### Codigo antigo
-
-```{r}
-#| code-fold: true
-#| code-summary: "Mostrar Código"
-
-df <- data.frame (ano  = c(1, 2,3,4,5, 6),
-                  nome_ano = c("Pré-clinico1", "Pré-clinico2","Clínico1", "Clínico2","Clínico3", "Clínico4"))
-
-ment_h1 <- import("datasets/ment_health.csv")
-
-ment_h <- ment_h1 %>%
-  filter(sex!=3)%>%
-  mutate(sex = sex-1)%>%
-  select(-id)%>%
-  mutate(across(.cols = c( sex
-                          , psyt
-                          , glang
-                          , job
-                          ), .fns = as.factor))%>%
-  mutate(across(.cols = c(year
-                          ,health
-                          ), .fns = as.ordered))
-```
-
-```{r join_by_old}
-ment_hj1 <- ment_h1 %>%
-  inner_join(df, by=c(year= "ano"))%>%
-  select(year, nome_ano)
-
-head(ment_hj1)
-```
-
-### Codigo Novo
-
-```{r join_by}
-
-ment_hj2 <- ment_h1 %>%
-  inner_join(df, join_by(year == ano))%>%
-  select(year, nome_ano)
-
-head(ment_hj1)
-```
-
-Pequena alteração de sintaxe mas que torna mais clara a linguagem. Para além disso permite mudanças de nome de denominaçao com o tempo.
-
-Exemplos da utilidade:
-
-1. Mudança da designação de uma unidade/medicamento/doença ao longo do tempo
-2. Criação de eventos cardíacos baseado na definição de valores de frequência cardiaca
-
-A função closest vai fazer um rolling join em que vai andar para baixo e vai procurar o mais próximo em que é verdade o age\<= idade.
-
-Isto é útil pois age \<= idade vai ser verdade para ambas as condições se age for inferior que ambos os limites levando a duplicações
-
-Outros exemplos de joins com desigualdade.
-
-![Joins_by Inequalities Variants](images/image-2000523169.png){fig-align="center"}
-
-## Operações de grupos/sets
-
-Por vezes queremos confirmar se os dados esperados se encontram num dataset para validação do mesmo.
-
-- Saber todos os hospitais estão a reportar dados para o portal da transparência
-
-```{r}
-# para este exemplo vamos remover os dados dos seguitnes hospti
-inpatient_hospital_lite_diff <- inpatient_hospital_lite |> 
-  filter(instituicao!=c("Centro Hospitalar e Universitário de Coimbra, EPE"))
-
-#Vamos ficar com apenas os dados que estao no lite e não no lite diff
-dplyr::setdiff(inpatient_hospital_lite, inpatient_hospital_lite_diff)
-# Ficamos apenas com os dados de Coimbra
-
-# podemos adidionar apenas novos dados com o union
-
-```
-
-### Outras funções
-
-Algumas funções são úteis em determinadas circunstâncias específicas que se colocam aqui:
-
-1. complete - Função utilizada para completar dados em falta
-  - Uso: Útil em dados em série temporal
-2. Funções genéricas de transformação (as.numeric, as.double, as.character, as.factor, as.Date)
-  - Uso: tranformação entre classes de variáveis
-3. across - Manipulação de múltplas variáveis ao mesmo tempo
-  - Uso: Usar a mesma função em várias colunas ao mesmo tempo
-  - Sintaxe: summarise(dataframe, across(selection, function without parenthesis))
-4. Bind rows e Bind Colums - Combinar datasets em relação a colunas iguais ou id iguais
-  - Uso: Juntar dados 
-  
-:::{.callout-warning}
-
-No bind rows temos de ter colunas com nomes em comum.
-No bind cols temos de ter o mesmo número de linhas.
-
-:::
-
-## Extras de Exportação Específica
-
-Exemplos da expostação com outros pacotes sem o RIO.
-
-```{r}
-# A função fwrite utilizada pelo rio permite guardar ficheiros csv muito grandes 
-
-fwrite(
-  inpatient_hospital_lite,
-  file = here::here("output", "datasets", paste0("inpatient_hospital_lite", ".csv")) 
-)
-
-
-```
-
-```{r}
-
-# SPSS
-
-write_sav(
-  inpatient_hospital_lite,
-  path = "output/datasets/inpatient_hospital_lite.sav"
-)
-
-## gerar ficheiros com nome dinâmicos
-
-write_sav(
-  inpatient_hospital_lite,
-  path = here::here("output", "datasets", paste0("inpatient_hospital_lite_", Sys.Date(), ".sav"))
-)
-
-# STATA
-write_dta(
-  inpatient_hospital_lite,
-  path = here::here("output", "datasets", paste0("inpatient_hospital_lite", ".dta"))
-)
-
-
-
-```
-
-## FIM
+ 
+# FIM
