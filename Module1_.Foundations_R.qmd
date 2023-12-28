@@ -1,5 +1,5 @@
 ---
-title: "Module 1 | Foundations in R "
+title: "Module 1 | Foundations in R"
 subtitle: "Data Wrangling"
 author: "Autor"
 affiliation: 
@@ -10,7 +10,6 @@ lang: pt
 format: 
   html:
     smooth-scroll: true
-    self-contained: true
     toc: true
     toc-location: left
     embed-resources: true
@@ -26,6 +25,7 @@ format:
     fig_height: 8
     code-copy: true
     always_allow_html: true
+    output-file: "module1.html"
 theme:
   light: flatly
   dark: darkly

@@ -6,7 +6,7 @@ date-format: long
 format:
   html:
     smooth-scroll: true
-    self-contained: true
+    embed-resources: true
     code-copy: true
     code_download: true
     toc: true
