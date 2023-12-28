@@ -1059,8 +1059,10 @@ Algumas funções são úteis em determinadas circunstâncias específicas que s
   - Uso: Juntar dados 
   
 :::{.callout-warning}
+
 No bind rows temos de ter colunas com nomes em comum.
 No bind cols temos de ter o mesmo número de linhas.
+
 :::
 
 ## Extras de Exportação Específica
@@ -1074,6 +1076,8 @@ fwrite(
   inpatient_hospital_lite,
   file = here::here("output", "datasets", paste0("inpatient_hospital_lite", ".csv")) 
 )
+
+
 ```
 
 ```{r}
@@ -1097,6 +1101,9 @@ write_dta(
   inpatient_hospital_lite,
   path = here::here("output", "datasets", paste0("inpatient_hospital_lite", ".dta"))
 )
+
+
+
 ```
 
 ## FIM

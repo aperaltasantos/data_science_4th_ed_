@@ -99,7 +99,7 @@ Contem os seguintes elementos
 # Packages
 required_packages <- c(
                        "tidyverse",
-                       "rio"
+                       "rio",
                        "scales",
                        "here",
                        "patchwork",
@@ -258,6 +258,7 @@ p1<- ggplot(data= inpatient_hospital_lite,
 
 p1
 ```
+
 ```{r}
 # Theme The Economist
 # O package ggthemes permite facilmente adoptar estilos pré-definidos de temas
@@ -299,6 +300,11 @@ theme_r_datascience <-
   )
 
 ```
+
+```{=html}
+<iframe width="780" height="500" src="https://www.rdocumentation.org/packages/ggplot2/versions/3.4.4/topics/theme" title="Rio Package"></iframe>
+```
+
 
 ```{r}
 p1<- ggplot(data= inpatient_hospital_lite, 

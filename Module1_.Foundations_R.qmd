@@ -39,6 +39,12 @@ execute:
 
 Este documento é um guia abrangente sobre os fundamentos da programação em R, com foco em conceitos-chave e suas aplicações, especialmente no campo da saúde.
 
+# BOAS PRÁTICAS 
+
+Um projeto funciona tão melhor quanto a sua organização.
+
+É importante criar um guia de estilos para a execução de projetoa individuais como em equipa para garantir consistência e que quando voltamos atrás 
+
 # ESTRUTURAS DE DADOS
 
 ## Objetos e Variáveis (1 dimensão)
@@ -188,10 +194,10 @@ R é uma linguagem projetada para análise estatística, o que se reflete na sua
 
 Existem vários operadores matemáticos:
 
-1. +
-2. -
-3. *
-4. /
+1. "+"
+2. "-"
+3. "*"
+4. "/"
 
 As operações matemáticas em R são geralmente vetorizadas, o que significa que operações como adição, subtração, multiplicação e divisão podem ser aplicadas diretamente a vetores ou matrizes. Por exemplo, ao adicionar dois vetores, a adição é realizada elemento a elemento. 
 
@@ -228,11 +234,11 @@ Operadores Relacionais:
 
 Usados para realizar comparações entre elementos.
 
-1. < e >
-2. >= e <=
-3. == (igualdade)
-4. != diferença
-5. %in% (presente em)
+1. "< e >"
+2. ">= e <="
+3. "== (igualdade)"
+4. "!= diferença"
+5. "%in% (presente em)"
 
 :::{.callout-note}
 

@@ -33,6 +33,7 @@ data_anonimizada <- data[,c("ID","Idade")]
 
 data$Genero <- c("M","F","M","F","M")
 
+
 #Não introduzir código abaixo - Validação
 
 sink("output_dataframes.txt",split = T)
@@ -82,5 +83,6 @@ if(length(colnames(data)==6)
   print(":( Coluna Genero não criada ou não na dataframe")
 }
 
+sink()
 
 rm(list = ls())

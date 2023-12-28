@@ -87,7 +87,7 @@ remove(pkg)
 
 # Exercicio 1
 
-Importar o ficheiro hipoxia disponível na pasta datasets para um objeto chamado hypoxia.
+Importar o ficheiro hypoxia disponível na pasta datasets para um objeto chamado hypoxia.
 
 ```{r importation}
 
@@ -177,7 +177,7 @@ hypoxia_final
 ```{r validation for objects}
 #| code-fold: true
 #| echo: false
-if(exists("hypoxia") & class(hypoxia)=="data.frame") {
+if(exists("hypoxia")) {
   print(":) DataFrame 'hypoxia' criado com sucesso")
 } else {
   print(":( DataFrame 'hypoxia' não existe")
@@ -186,7 +186,7 @@ if(exists("hypoxia") & class(hypoxia)=="data.frame") {
   )
 }
 
-if(exists("hypoxia_clean")& class(hypoxia)=="data.frame") {
+if(exists("hypoxia_clean")) {
   print(":) DataFrame 'hypoxia' criado com sucesso")
 } else {
   print(":( DataFrame 'hypoxia' não existe")
