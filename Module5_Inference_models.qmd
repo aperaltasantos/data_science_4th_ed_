@@ -67,6 +67,7 @@ required_packages <- c("janitor",
                        "broom",
                        "ggplot2",
                        "gt",
+                       "gtsummary",
                        "skimr"
                        )      
 
@@ -83,21 +84,148 @@ remove(required_packages)
 remove(pkg)
 ```
 
+# TABELAS
+
+Dataset de 918 doentes e com 10 variaveis:
+
+Age: age of the patient presenting with heart disease Sex: gender of the
+patient RestingBP: blood pressure for resting heart beat Cholesterol:
+Cholesterol reading FastingBS: blood sample of glucose after a patient
+fasts RestingECG: Resting echocardiography is an indicator of previous
+myocardial infarction e.g. heart attack MaxHR: Maximum heart rate
+Angina: chest pain caused by decreased flood flow
+https://www.nhs.uk/conditions/angina/ HeartPeakReading: reading at the
+peak of the heart rate HeartDisease: the classification label of whether
+patient has heart disease or not
+
+```{r}
+hd <- MLDataR::heartdisease
+hd<- clean_names(hd)
+```
+
+Frequentemente os relatórios pedem tabelas descritivas pela variável de
+exposição o "gtsummary" ajuda a criar essas tabelas e pode ser
+complementado pelo package GT
+
+ver mais aqui <https://gt.rstudio.com/articles/gt.html>
+
+![](images/table_gt.png)
+
+```{r}
+table1 <-
+  tbl_summary(
+    hd,
+    include = c(age, sex, resting_bp, cholesterol, angina),
+    by = heart_disease, # split table by group
+    missing = "no" # don't list missing data separately
+  ) %>%
+  add_n() %>% # add column with total number of non-missing observations
+  add_p() %>% # test for a difference between groups
+  modify_header(label = "**Variable**") %>% # update the column header
+  bold_labels()
+
+table1
+```
+
+
+
+Melhorar a tabela com o GT
+
+```{r}
+table1_f <- table1 |> 
+  as_gt() |>  
+  tab_header(
+    title = md("**Risk model for Heart Failure**") ,
+    subtitle = "By Age and Sex"
+  ) |>
+  tab_source_note(
+    source_note = md("Source: MlR dataset")
+  ) |>
+#  cols_label(
+#    stat_1 = "No",
+#    stat_2 = "Yes"
+#  ) |> 
+  fmt_number( decimals = 3) |>   
+  tab_style(
+    style = cell_fill(color = "grey95"),
+    locations = list(cells_column_labels())
+  ) |> 
+  opt_align_table_header(align = "left") 
+# Show the gt Table
+
+table1_f
+```
+
+#### Gravar a tabela
+
+```{r}
+table1_f |> gtsave("tab_1.png", expand = 10)
+table1_f |> gtsave("tab_1.docx")
+```
+
+# TESTES ESTATISTICOS
+
+## Comparar médias
+
+```{r}
+library(rstatix)
+```
+
+### Test t (comparar médias)
+
+```{r}
+# Two-samples unpaired test
+#:::::::::::::::::::::::::::::::::::::::::
+hd %>% t_test(age ~ sex)
+```
+
+## Comparar proporções
+
+### Teste Chi-Quadrado
+
+```{r}
+# Example contingency table
+hd_gender <- matrix(c(458, 50, 267, 143), nrow = 2,
+                         dimnames = list(Gender = c("Male", "Female"),
+                                         Smoking = c("hd", "no_hd")))
+
+```
+
+```{r}
+# Perform chi-square test
+chisq.test(hd_gender)
+
+```
+
 # MODELOS DE REGRESSÃO
 
-## MODELOS LINEARES 
+## MODELOS LINEARES
 
-A regressão linear é um método estatístico utilizado para explorar a relação entre duas variáveis contínuas. Em termos simples, é como encontrar a melhor linha reta que pode ser traçada através de um conjunto de pontos de dados em um gráfico. Esta linha representa a relação média entre as duas variáveis.
+A regressão linear é um método estatístico utilizado para explorar a
+relação entre duas variáveis contínuas. Em termos simples, é como
+encontrar a melhor linha reta que pode ser traçada através de um
+conjunto de pontos de dados em um gráfico. Esta linha representa a
+relação média entre as duas variáveis.
 
-Por exemplo, vamos considerar a relação entre idade e pressão arterial. Neste caso, a idade é a variável independente (aquela que pensamos que pode estar causar mudanças), e a pressão arterial é a variável dependente (aquela em que estamos a observar mudanças).
+Por exemplo, vamos considerar a relação entre idade e pressão arterial.
+Neste caso, a idade é a variável independente (aquela que pensamos que
+pode estar causar mudanças), e a pressão arterial é a variável
+dependente (aquela em que estamos a observar mudanças).
 
-A regressão linear ajuda a entender, em média, quanto a pressão arterial muda para cada ano de idade (coeficiente da regressão para a idade). Isso não significa que a pressão arterial de cada indivíduo seguirá exatamente este padrão, mas em média, podemos esperar uma certa tendência.
+A regressão linear ajuda a entender, em média, quanto a pressão arterial
+muda para cada ano de idade (coeficiente da regressão para a idade).
+Isso não significa que a pressão arterial de cada indivíduo seguirá
+exatamente este padrão, mas em média, podemos esperar uma certa
+tendência.
 
-O erro entre a previsão do modelo e o valor observado é o erro ou residuo do modelo. 
+O erro entre a previsão do modelo e o valor observado é o erro ou
+residuo do modelo.
 
-### Criar intuição 
+### Criar intuição
 
-1. Criar um dataset de 100 observações onde somos nos que definimos os componentes. 
+1.  Criar um dataset de 100 observações onde somos nos que definimos os
+    componentes.
+
 ```{r}
 
 # Gerar 100 observações random de 25 a 75 anos com replacement 
@@ -123,8 +251,7 @@ data |> ggplot(aes(Age, BloodPressure)) +
   geom_point(alpha = 0.5)
 ```
 
-2. Criar um modelo de regressão linear
-
+2.  Criar um modelo de regressão linear
 
 ```{r}
 # lm(formula, data)
@@ -142,16 +269,21 @@ model1_tidy <- tidy(model1, conf.int = TRUE)
 model1_tidy
 ```
 
-Podemos ver que a estimativa para o coefeciente da idade é de 0.51, um valor muito proximo do que establecemos de 0.5. Pode ser interpretado como que por cada ano de vida a mais a pressão arterial aumenta em méda 0,51 mmHg. Observamos também que o verdadeiro valor pode variar entre 0.44 e 0.58, e nos sabemos este intervalo contem o verdadeiro valor de 0.5. 
+Podemos ver que a estimativa para o coefeciente da idade é de 0.51, um
+valor muito proximo do que establecemos de 0.5. Pode ser interpretado
+como que por cada ano de vida a mais a pressão arterial aumenta em méda
+0,51 mmHg. Observamos também que o verdadeiro valor pode variar entre
+0.44 e 0.58, e nos sabemos este intervalo contem o verdadeiro valor de
+0.5.
 
-Vamos agora colocar a previsão do modelo no grafico 
+Vamos agora colocar a previsão do modelo no grafico
 
 ```{r}
 # Criar um dataset que incliu as previsões do modelo  
 model1_augment <- augment(model1)
 ```
 
-### Visualizar a previsão do modelo 
+### Visualizar a previsão do modelo
 
 ```{r}
 
@@ -177,32 +309,35 @@ model1_plot
 
 ```
 
-### Dataset Real 
+### Dataset Real
 
 Dataset de 918 doentes e com 10 variaveis:
 
-Age: age of the patient presenting with heart disease
-Sex: gender of the patient
-RestingBP: blood pressure for resting heart beat
-Cholesterol: Cholesterol reading
-FastingBS: blood sample of glucose after a patient fasts 
-RestingECG: Resting echocardiography is an indicator of previous myocardial infarction e.g. heart attack
-MaxHR: Maximum heart rate
-Angina: chest pain caused by decreased flood flow https://www.nhs.uk/conditions/angina/
-HeartPeakReading: reading at the peak of the heart rate
-HeartDisease: the classification label of whether patient has heart disease or not
+Age: age of the patient presenting with heart disease Sex: gender of the
+patient RestingBP: blood pressure for resting heart beat Cholesterol:
+Cholesterol reading FastingBS: blood sample of glucose after a patient
+fasts RestingECG: Resting echocardiography is an indicator of previous
+myocardial infarction e.g. heart attack MaxHR: Maximum heart rate
+Angina: chest pain caused by decreased flood flow
+https://www.nhs.uk/conditions/angina/ HeartPeakReading: reading at the
+peak of the heart rate HeartDisease: the classification label of whether
+patient has heart disease or not
 
 ```{r}
 hd <- MLDataR::heartdisease
 hd<- clean_names(hd)
 ```
-Será que a idade está associada à pressão arterial? Podemos explorar esta possível associação 
 
-1. Podemos fazer uma primeira exploração visual
+Será que a idade está associada à pressão arterial? Podemos explorar
+esta possível associação
+
+1.  Podemos fazer uma primeira exploração visual
+
 ```{r}
 hd |> ggplot(aes(age, resting_bp)) + 
   geom_point(alpha = 0.5)
 ```
+
 ### Regressão Univariada
 
 $$ BP = \text{Intercept} + (\text{Slope}_1 \times \text{Age}) + \text{Error}$$
@@ -225,7 +360,7 @@ model2_tidy <- tidy(model2, conf.int = TRUE)
 model2_tidy
 ```
 
-Vamos agora colocar a previsão do modelo no grafico 
+Vamos agora colocar a previsão do modelo no grafico
 
 ```{r}
 # Criar um dataset que incliu as previsões do modelo  
@@ -256,13 +391,21 @@ model2_plot
 
 ```
 
-### Regressão Multivariada 
+### Regressão Multivariada
 
-Permite a previsão de uma variável dependente (Pressão Arterial) com base em múltiplas variáveis independentes. Em termos simples, é como ajustar um plano (ou hiperplano, em dimensões superiores) mais adequado aos pontos de dados num espaço multidimensional, onde cada dimensão representa uma das variáveis independentes.
+Permite a previsão de uma variável dependente (Pressão Arterial) com
+base em múltiplas variáveis independentes. Em termos simples, é como
+ajustar um plano (ou hiperplano, em dimensões superiores) mais adequado
+aos pontos de dados num espaço multidimensional, onde cada dimensão
+representa uma das variáveis independentes.
 
-Adicionar o Sexo ao Modelo: 
+Adicionar o Sexo ao Modelo:
 
-Vamos adicionar o sexo como outra variável independente, juntamente com a idade, para prever a pressão arterial. O sexo é uma variável categórica (tipicamente masculino ou feminino), por isso é tratado de forma ligeiramente diferente na análise de regressão em comparação com variáveis contínuas como a idade.
+Vamos adicionar o sexo como outra variável independente, juntamente com
+a idade, para prever a pressão arterial. O sexo é uma variável
+categórica (tipicamente masculino ou feminino), por isso é tratado de
+forma ligeiramente diferente na análise de regressão em comparação com
+variáveis contínuas como a idade.
 
 $$ BP = \text{Intercept} + (\text{Slope}_1 \times \text{Age}) + (\text{Slope}_2 \times \text{Sex}) + \text{Error}$$
 
@@ -273,7 +416,8 @@ hd |> ggplot(aes(age, resting_bp, color=sex)) +
   geom_point(alpha = 0.7)
 ```
 
-Regressão 
+Regressão
+
 ```{r}
 # lm(formula, data)
 # formula = var_dependente ~ var_independente + var_independente
@@ -289,9 +433,11 @@ model3_tidy <- tidy(model3, conf.int = TRUE)
 model3_tidy
 ```
 
-Mantendo a idade constante o sexo masculino tem em média um valor de pressão arterior 0.4mmHg inferir ao das mulheres. No entanto o verdadeiro valor pode variar entre -3.2 e +2.4mmHg. 
+Mantendo a idade constante o sexo masculino tem em média um valor de
+pressão arterior 0.4mmHg inferir ao das mulheres. No entanto o
+verdadeiro valor pode variar entre -3.2 e +2.4mmHg.
 
-### Diagnostico de modelos 
+### Diagnostico de modelos
 
 ```{r}
 library(performance)
@@ -310,8 +456,7 @@ model_performance(model3)
 compare_performance(model2, model3, verbose = FALSE)
 ```
 
-
-### Visualização dos efeitos do modelo 
+### Visualização dos efeitos do modelo
 
 ```{r}
 library(ggstatsplot)
@@ -348,18 +493,25 @@ p<- ggcoefstats(
 p
 ```
 
-## MODELOS NÃO LINEARES 
-Neste website temos acesso a uma tabela com os tipos de modelos que podemos usar de acordo com a nossa variavel dependente. 
-https://strengejacke.github.io/regressionmodels/ 
+## MODELOS NÃO LINEARES
+
+Neste website temos acesso a uma tabela com os tipos de modelos que
+podemos usar de acordo com a nossa variavel dependente.
+https://strengejacke.github.io/regressionmodels/
 
 ### Logit model
 
-Um modelo de regressão logística, frequentemente referido como modelo logit, é usado quando a variável dependente é binária (ou seja, tem apenas dois possíveis resultados). Neste caso estamos interessados em prever as odds (probabilidade) de insuficiencia cardiaca(um resultado binário: sim 1 ou não 0) com base em duas variáveis independentes: idade e sexo.
+Um modelo de regressão logística, frequentemente referido como modelo
+logit, é usado quando a variável dependente é binária (ou seja, tem
+apenas dois possíveis resultados). Neste caso estamos interessados em
+prever as odds (probabilidade) de insuficiencia cardiaca(um resultado
+binário: sim 1 ou não 0) com base em duas variáveis independentes: idade
+e sexo.
 
-**Interpretação**:
-   - Os coeficientes $\beta $ num modelo de regressão logística representam a alteração das log odds (logit) para cada alteração de uma unidade na variável preditora (idade ou sexo).
-   - O exponencial do logit é um odds ratio (OR).
-
+**Interpretação**: - Os coeficientes $\beta$ num modelo de regressão
+logística representam a alteração das log odds (logit) para cada
+alteração de uma unidade na variável preditora (idade ou sexo). - O
+exponencial do logit é um odds ratio (OR).
 
 ```{r}
 model4_logit <- glm(
@@ -392,7 +544,6 @@ model4_tidy <- model4_tidy %>%
   ) 
 ```
 
-
 ```{r}
 # https://gt.rstudio.com/articles/intro-creating-gt-tables.html
 #install.packages("gt")
@@ -401,11 +552,11 @@ library(gt)
 tbl_m4 <- 
   gt(model4_tidy) |>
   tab_header(
-    title = md("**Modelo do risco de desenvolver Insuficiencia Cardiaca**") ,
-    subtitle = "Por Idade (anos) e sexo"
+    title = md("**Risk model for Heart Failure**") ,
+    subtitle = "By Age and Sex"
   ) |>
   tab_source_note(
-    source_note = md("Sorce: MlR dataset")
+    source_note = md("Source: MlR dataset")
   ) |>
   cols_label(
     variable = "Predictor",
@@ -414,243 +565,122 @@ tbl_m4 <-
     conf.low = "Low CI",
     conf.high = "High CI",
   ) |> 
-  fmt_number( decimals = 3) |> 
+  fmt_number( decimals = 3) |>   
+  tab_style(
+    style = cell_fill(color = "grey95"),
+    locations = list(cells_column_labels())
+  ) |> 
   opt_align_table_header(align = "left") 
 # Show the gt Table
 tbl_m4
 ```
 
-# REVER 
-### Model diagnostics
+##### Exportar tabela
 
 ```{r}
-model2_plot <- ggplot(
-  data = model2_augment, 
-  mapping = aes(
-    x=.fitted, 
-    y=.std.resid)
-  ) + 
-  geom_point() +
-    labs(
-      title = "Model 2 diagnostics",
-      x = "Fitted values", 
-      y = "Residual") +
-  ylim(-5, 5)
-
-model2_plot
-
-plot(model2)
+tbl_m4 |> gtsave("output/documents/tbl_m4.docx")
 ```
 
-### Ploting the results of the model
+## SURVIVAL ANALYSIS
+
+A análise de sobrevivência lida com dados de tempo até a ocorrência de um evento. Este tipo de análise é usado para estudar o tempo até a ocorrência de um evento de interesse, frequentemente referido como "falha" ou "morte", embora o evento possa ser qualquer ponto final, como recorrência de doença, alta hospitalar ou falha de uma máquina. As principais características da análise de sobrevivência incluem:
+
+Evento de Interesse: Este é um evento específico que o estudo foi desenhado para observar, como morte, recaída de uma doença, etc. Em contextos não médicos, isso pode ser a falha de um sistema mecânico, mudança de emprego, etc.
+
+Censura: Um aspecto único da análise de sobrevivência é lidar com dados censurados. A censura ocorre quando temos informações incompletas sobre o tempo de sobrevivência de alguns indivíduos. Por exemplo, se um estudo termina e um participante ainda não experimentou o evento de interesse, seus dados são considerados censurados à direita. A censura também pode ocorrer se um participante abandonar o estudo.
+
+![](images/event.png) 
+
+Nota: a função Surv() no pacote {survival} aceita por padrão
+VERDADEIRO/FALSO, onde VERDADEIRO é evento e FALSO é censurado; 1/0 onde
+1 é evento e 0 é censurado; ou 2/1 onde 2 é evento e 1 é censurado.
+
+Os dados de evento devem ser formatados adequadamente.
+
+::: callout-important
+Os dados muitas vezes vêm com datas de início e término em vez de tempos
+de sobrevivência pré-calculados. O primeiro passo é garantir que esses
+estejam formatados como datas no R. E depois calcular o tempo até ao
+evento
+:::
 
 ```{r}
-model2_tidy <- model2_tidy %>%
-    mutate(
-    term = case_when(
-      term =="(Intercept)" ~ "Intercept",
-      term =="as.factor(tipo_instituicao)Cancer hospital" ~ "Cancer hospital",
-      term =="as.factor(tipo_instituicao)University" ~ "University",
-      term =="as.factor(year)2016" ~ "2016",
-      term =="as.factor(year)2017" ~ "2017",
-      term =="as.factor(year)2018" ~ "2018",
-      term =="as.factor(year)2019" ~ "2019",
-      term =="as.factor(year)2020" ~ "2020",
-      term =="as.factor(year)2021" ~ "2021",
-      term =="as.factor(year)2022" ~ "2022",
-      term =="as.factor(tipo_de_especialidade)Especialidade Médica" ~ "Especialidade Médica",
-    )
-  )
-```
+library(survival)
 
-```{r}
-# Now plot them
-p1<- ggplot(
-  data=model2_tidy, 
-  mapping = aes(x=reorder(term, estimate), y=estimate)
-  ) +
-  geom_point() + 
-  geom_errorbar(
-    mapping = aes(ymin=conf.low, ymax=conf.high), 
-    width = 0.2,size  = 1,
-    position = "dodge", 
-    color="gray"
-  ) +
-  geom_hline(yintercept = 0, color = "red", size = 1) +
-  labs(
-    title = "Diference in length of stay in Portuguese Hospitals",
-    x = "", 
-    y = "Diference in length of stay") +  
-  coord_flip()
+data(cancer, package="survival")
 
-p1
-```
-
-## Logistic regression
-
-```{r}
-hd <- MLDataR::heartdisease
-hd<- clean_names(hd)
-```
-
-### Logit model
-
-```{r}
-model3_logit <- glm(
-  heart_disease ~ age + as.factor(sex) + relevel(factor(resting_ecg), ref = "Normal") +resting_bp, 
-  family="binomial", 
-  data=hd
-)
-
-model3_tidy <- tidy(model3_logit, exponentiate = TRUE, conf.int = TRUE)
-
-model3_tidy1 <- tidy(model3_logit, exponentiate = FALSE, conf.int = TRUE)
-```
-
-```{r}
-model3_tidy <- model3_tidy %>%
-  select(term, estimate, p.value, conf.low, conf.high) %>%
-    mutate(
-    term = case_when(
-      term =="(Intercept)" ~ "Intercept",
-      term =="age" ~ "Age",
-      term =="as.factor(sex)M" ~ "Male",
-      term =="resting_bp" ~ "Blood preassure",
-      term =='relevel(factor(resting_ecg), ref = "Normal")ST' ~ "ST ECG, ref. Normal",
-      term =='relevel(factor(resting_ecg), ref = "Normal")LVH' ~ "LVH ECG, ref. Normal",
-    )
-  ) %>% rename(
-    variable=term,
-    Odds_Ratio=estimate
-  ) 
-```
-
-```{r}
-table_model3 <- model3_tidy %>%
-  rename(
-    "Odds Ratio" = "Odds_Ratio",
-    "p value" = "p.value"
-  )|>
-  kbl(
-    digits = 3,
-    caption = "Odds ratio of having Heart Failure"
-  ) %>%
-  kable_classic(
-    full_width = F, 
-    html_font = "Calibri"
-  ) %>%
-  footnote(
-    general = "Here is a general comments of the table. ",
-    number = c("Footnote 1; ", "Footnote 2; ")
-  ) 
-
-table_model3
-```
-
-```{r}
-table_hd <- hd %>%
-  group_by(resting_ecg) %>%
-  summarise(mean_age=mean(age)) %>%
-  rename(
-    "Resting ECG"=resting_ecg,
-    "Mean age"=mean_age
-  ) 
-
-table_hd_kbl <- table_hd %>%
-  kbl(
-    digits = 2,
-    caption = "Mean age by resting ECG") %>%
-  kable_classic(
-    full_width = F,
-    html_font = "Calibri"
-  )
-
-table_hd_kbl
-```
-
-```{r}
-# https://gt.rstudio.com/articles/intro-creating-gt-tables.html
-#install.packages("gt")
-library(gt)
-
-# Make a display table with the `islands_tbl`
-# table; put a heading just above the column labels
-gt_tbl <- 
-  gt(table_hd) |>
-  tab_header(
-    title = "Idade de doentes com IC",
-    subtitle = "Por tipo de IC"
-  )
-
-
-# Show the gt Table
-gt_tbl
-```
-
-
-## Non-linear models
-
-```{r}
-gp <- gapminder
-gp <-clean_names(gp)
-```
-
-```{r}
-gp <- gp %>%
+lung <- 
+  lung %>% 
   mutate(
-    decade = (year - 1990)/10,
-    log_gdp=log(gdp_percap)
+    status = recode(status, `1` = 0, `2` = 1)
+  )
+
+head(lung)
+```
+
+### Kaplan-Meiyer plots
+
+O método Kaplan-Meier é a maneira mais comum de estimar tempos de sobrevivência e probabilidades. Resulta em uma função degrau, onde há uma descida a cada vez que um evento ocorre. 
+
+A função Surv() do pacote {survival} cria um objeto de sobrevivência para uso como resposta em uma fórmula de modelo. O ~ na função funciona como um by, se for definido como 1 não há desagregação. 
+
+```{r}
+library(ggsurvfit)
+
+survfit2(Surv(time, status) ~ 1, data = lung) %>% 
+  ggsurvfit() +
+  labs(
+    x = "Days",
+    y = "Overall survival probability", 
+    title = "Survival probability for Lung Cancer"
+  ) + 
+  add_confidence_interval() +
+  add_risktable()
+```
+
+
+Podemos calcular as curvas de sobrevivencia por sexo. 
+
+```{r}
+library(ggsurvfit)
+
+survfit2(Surv(time, status) ~ sex, data = lung) %>% 
+  ggsurvfit() +
+  labs(
+    x = "Days",
+    y = "Overall survival probability", 
+    title = "Survival probability for Lung Cancer"
+  ) + 
+  add_confidence_interval() 
+```
+
+## Survival times
+
+Podemos calcular qual é a probabilidade de sobrevivencia ao ano (365.25 dias). 
+```{r}
+summary(survfit(Surv(time, status) ~ 1, data = lung), times = 365.25)
+```
+
+Ou podemos calcular qual é a mediana de sobrevivencia (quanto tempo é que 50% dos doentes tiveram o evento)
+```{r}
+survfit(Surv(time, status) ~ 1, data = lung) %>% 
+  tbl_survfit(
+    probs = 0.5,
+    label_header = "**Median survival (95% CI)**"
   )
 ```
 
-```{r}
-ggplot(
-  data = gp, 
-  mapping = aes(x=log_gdp, y=life_exp)) + 
-  geom_point(alpha=0.5) +    
-  labs(
-    title = "Relationship between GDP per capita (Log) and life expectancy",
-    x = "Log of GDP per capita", 
-    y = "Life expectancy"
-  )  
-```
+## Cox regression
 
-We will use a OLS model
+Podemos querer quantificar o tamanho do efeito de uma única variável, ou incluir mais de uma variável em um modelo de regressão para levar em conta os efeitos de múltiplas variáveis.
 
+O modelo de regressão de Cox é um modelo semi-paramétrico que pode ser usado para ajustar modelos de regressão univariada e multivariada que têm resultados de sobrevivência.
+
+Podemos ajustar modelos de regressão para dados de sobrevivência usando a função coxph() do pacote {survival}, que leva um objeto Surv() no lado esquerdo e tem uma sintaxe padrão para fórmulas de regressão em R no lado direito.
 
 ```{r}
-model4 <- lm(life_exp ~ log_gdp, data= gp)
-
-model4_tidy <- tidy(model4, conf.int = TRUE)
-
-model4_augment <- augment(model4, se_fit = TRUE)
+coxph(Surv(time, status) ~ sex, data = lung) |>  
+  tbl_regression(exp = TRUE)  
 ```
-
-```{r}
-ggplot(
-  data = model4_augment, 
-  mapping = aes(x=log_gdp, y=life_exp)) + 
-  geom_point(alpha=0.5) +  
-  geom_line(
-    mapping = aes(x=log_gdp, y=.fitted ),
-    color="red"
-  ) +
-  geom_ribbon(
-    mapping = aes(
-      ymin=.fitted-1.96*.se.fit,
-      ymax=.fitted+1.96*.se.fit),
-    alpha=0.2
-    ) +
-  labs(
-    title = "Relationship between GDP per capita (Log) and life expectancy",
-    x = "Log of GDP per capita", 
-    y = "Life expectancy",
-    caption = "Source: Gapiminder | UN"
-  )
-
-```
-
-# Exercise
-
 
 # THE END
