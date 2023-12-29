@@ -654,7 +654,7 @@ survfit2(Surv(time, status) ~ sex, data = lung) %>%
   add_confidence_interval() 
 ```
 
-## Survival times
+### Survival times
 
 Podemos calcular qual é a probabilidade de sobrevivencia ao ano (365.25 dias). 
 ```{r}
@@ -670,7 +670,7 @@ survfit(Surv(time, status) ~ 1, data = lung) %>%
   )
 ```
 
-## Cox regression
+### Cox regression
 
 Podemos querer quantificar o tamanho do efeito de uma única variável, ou incluir mais de uma variável em um modelo de regressão para levar em conta os efeitos de múltiplas variáveis.
 
