@@ -1,0 +1,656 @@
+---
+title: "Module 5 | Inference and statistical models"
+author: "A. Peralta-Santos"
+date: today
+date-format: long
+format:
+  html:
+    preview: false
+    smooth-scroll: true
+    embed-resources: true
+    toc: true
+    toc-location: left
+    number-sections: true
+    number-depth: 3
+    code_download: true
+    code-copy: true
+execute:
+  warning: false
+  collapse: true
+  message: false
+  eval: true
+  echo: true
+title-block-style: default
+editor: 
+  markdown: 
+    wrap: 72
+project:
+  output-dir: outputs/documents
+---
+
+# SETUP
+
+Clean enviorment
+
+```{r}
+rm(list = ls(all.names = TRUE)) # limpa todos os objetos, incluindo os ocultos
+```
+
+Set seed
+
+```{r}
+set.seed(123)
+```
+
+Load library
+
+```{r}
+# install.packages("kableExtra")
+# install.packages("gapminder")
+
+library(broom)
+library(MLDataR)
+library(tidyverse)
+library(readr)
+library(broom)
+library(janitor)
+library(kableExtra)
+library(gapminder)
+library(gt)
+```
+
+```{r}
+required_packages <- c("janitor",
+                       "tidyverse",
+                       "rio",
+                       "data.table",
+                       "broom",
+                       "ggplot2",
+                       "gt",
+                       "skimr"
+                       )      
+
+for (pkg in required_packages) {
+  # install packages if not already present
+  if (!pkg %in% rownames(installed.packages())) {
+    install.packages(pkg)
+  }
+  
+  # load packages to this current session 
+  library(pkg, character.only = TRUE)
+}
+remove(required_packages)
+remove(pkg)
+```
+
+# MODELOS DE REGRESSÃO
+
+## MODELOS LINEARES 
+
+A regressão linear é um método estatístico utilizado para explorar a relação entre duas variáveis contínuas. Em termos simples, é como encontrar a melhor linha reta que pode ser traçada através de um conjunto de pontos de dados em um gráfico. Esta linha representa a relação média entre as duas variáveis.
+
+Por exemplo, vamos considerar a relação entre idade e pressão arterial. Neste caso, a idade é a variável independente (aquela que pensamos que pode estar causar mudanças), e a pressão arterial é a variável dependente (aquela em que estamos a observar mudanças).
+
+A regressão linear ajuda a entender, em média, quanto a pressão arterial muda para cada ano de idade (coeficiente da regressão para a idade). Isso não significa que a pressão arterial de cada indivíduo seguirá exatamente este padrão, mas em média, podemos esperar uma certa tendência.
+
+O erro entre a previsão do modelo e o valor observado é o erro ou residuo do modelo. 
+
+### Criar intuição 
+
+1. Criar um dataset de 100 observações onde somos nos que definimos os componentes. 
+```{r}
+
+# Gerar 100 observações random de 25 a 75 anos com replacement 
+age <- sample(25:75, 100, replace = TRUE)
+
+# Criar ruido (normal distribution)
+noise <- rnorm(100, mean = 0, sd = 5) # Adjust sd (standard deviation) as needed
+
+
+# calcular a pressão alterial aumentando 0.5 por cada ano de idade 
+blood_pressure <- 100 + 0.5 * age + noise
+
+# Combine into a data frame
+data <- data.frame(Age = age, BloodPressure = blood_pressure)
+
+# View the first few rows of the data frame
+head(data)
+
+```
+
+```{r}
+data |> ggplot(aes(Age, BloodPressure)) + 
+  geom_point(alpha = 0.5)
+```
+
+2. Criar um modelo de regressão linear
+
+
+```{r}
+# lm(formula, data)
+# formula = var_dependente ~ var_independente 
+# data = dataset onde o modelo vai buscar a informação.
+
+model1 <- lm(BloodPressure ~ Age, data= data)
+
+summary(model1)
+```
+
+```{r}
+# Podemos utilizar a função tidy para criar um dataframe com o modelo
+model1_tidy <- tidy(model1, conf.int = TRUE)
+model1_tidy
+```
+
+Podemos ver que a estimativa para o coefeciente da idade é de 0.51, um valor muito proximo do que establecemos de 0.5. Pode ser interpretado como que por cada ano de vida a mais a pressão arterial aumenta em méda 0,51 mmHg. Observamos também que o verdadeiro valor pode variar entre 0.44 e 0.58, e nos sabemos este intervalo contem o verdadeiro valor de 0.5. 
+
+Vamos agora colocar a previsão do modelo no grafico 
+
+```{r}
+# Criar um dataset que incliu as previsões do modelo  
+model1_augment <- augment(model1)
+```
+
+### Visualizar a previsão do modelo 
+
+```{r}
+
+model1_plot <- ggplot() + 
+    geom_point( data = model1_augment, 
+  mapping = aes(
+    x=Age, 
+    y=BloodPressure)
+  ) +
+  geom_line(
+    data = model1_augment, 
+  mapping = aes(
+    x=Age, 
+    y=.fitted)
+  ) +
+    labs(
+      title = "Model 1 diagnostics",
+      x = "Age", 
+      y = "Blood Pressure") 
+
+model1_plot
+
+
+```
+
+### Dataset Real 
+
+Dataset de 918 doentes e com 10 variaveis:
+
+Age: age of the patient presenting with heart disease
+Sex: gender of the patient
+RestingBP: blood pressure for resting heart beat
+Cholesterol: Cholesterol reading
+FastingBS: blood sample of glucose after a patient fasts 
+RestingECG: Resting echocardiography is an indicator of previous myocardial infarction e.g. heart attack
+MaxHR: Maximum heart rate
+Angina: chest pain caused by decreased flood flow https://www.nhs.uk/conditions/angina/
+HeartPeakReading: reading at the peak of the heart rate
+HeartDisease: the classification label of whether patient has heart disease or not
+
+```{r}
+hd <- MLDataR::heartdisease
+hd<- clean_names(hd)
+```
+Será que a idade está associada à pressão arterial? Podemos explorar esta possível associação 
+
+1. Podemos fazer uma primeira exploração visual
+```{r}
+hd |> ggplot(aes(age, resting_bp)) + 
+  geom_point(alpha = 0.5)
+```
+### Regressão Univariada
+
+$$ BP = \text{Intercept} + (\text{Slope}_1 \times \text{Age}) + \text{Error}$$
+
+Criar um modelo de regressão linear
+
+```{r}
+# lm(formula, data)
+# formula = var_dependente ~ var_independente 
+# data = dataset onde o modelo vai buscar a informação.
+
+model2 <- lm(resting_bp ~ age, data= hd)
+
+summary(model2)
+```
+
+```{r}
+# Podemos utilizar a função tidy para criar um dataframe com o modelo
+model2_tidy <- tidy(model2, conf.int = TRUE)
+model2_tidy
+```
+
+Vamos agora colocar a previsão do modelo no grafico 
+
+```{r}
+# Criar um dataset que incliu as previsões do modelo  
+model2_augment <- augment(model2)
+```
+
+```{r}
+
+model2_plot <- ggplot() + 
+    geom_point( data = model2_augment, 
+  mapping = aes(
+    x=age, 
+    y=resting_bp), alpha=0.3
+  ) +
+  geom_line(
+    data = model2_augment, 
+  mapping = aes(
+    x=age, 
+    y=.fitted)
+  ) +
+    labs(
+      title = "Model 2 diagnostics",
+      x = "Age", 
+      y = "Resting Blood Pressure") 
+
+model2_plot
+
+
+```
+
+### Regressão Multivariada 
+
+Permite a previsão de uma variável dependente (Pressão Arterial) com base em múltiplas variáveis independentes. Em termos simples, é como ajustar um plano (ou hiperplano, em dimensões superiores) mais adequado aos pontos de dados num espaço multidimensional, onde cada dimensão representa uma das variáveis independentes.
+
+Adicionar o Sexo ao Modelo: 
+
+Vamos adicionar o sexo como outra variável independente, juntamente com a idade, para prever a pressão arterial. O sexo é uma variável categórica (tipicamente masculino ou feminino), por isso é tratado de forma ligeiramente diferente na análise de regressão em comparação com variáveis contínuas como a idade.
+
+$$ BP = \text{Intercept} + (\text{Slope}_1 \times \text{Age}) + (\text{Slope}_2 \times \text{Sex}) + \text{Error}$$
+
+Podemos fazer uma primeira exploração visual
+
+```{r}
+hd |> ggplot(aes(age, resting_bp, color=sex)) + 
+  geom_point(alpha = 0.7)
+```
+
+Regressão 
+```{r}
+# lm(formula, data)
+# formula = var_dependente ~ var_independente + var_independente
+# data = dataset onde o modelo vai buscar a informação.
+
+model3 <- lm(resting_bp ~ age + as.factor(sex), data= hd)
+
+```
+
+```{r}
+# Podemos utilizar a função tidy para criar um dataframe com o modelo
+model3_tidy <- tidy(model3, conf.int = TRUE)
+model3_tidy
+```
+
+Mantendo a idade constante o sexo masculino tem em média um valor de pressão arterior 0.4mmHg inferir ao das mulheres. No entanto o verdadeiro valor pode variar entre -3.2 e +2.4mmHg. 
+
+### Diagnostico de modelos 
+
+```{r}
+library(performance)
+```
+
+```{r}
+# checking model assumptions
+check_model(model3)
+```
+
+```{r}
+model_performance(model3)
+```
+
+```{r}
+compare_performance(model2, model3, verbose = FALSE)
+```
+
+
+### Visualização dos efeitos do modelo 
+
+```{r}
+library(ggstatsplot)
+
+p<- ggcoefstats(
+  model3,
+  conf.int = TRUE,
+  conf.level = 0.95,
+#  k = 2L,
+  exclude.intercept = TRUE,
+#  meta.analytic.effect = FALSE,
+  meta.type = "parametric",
+#  bf.message = TRUE,
+#  sort = "none",
+  xlab = "Effect size in mmHg",
+  ylab = "Variables",
+  title = "Effect of Age and Sex on Blood Pressure",
+  subtitle = "Patients with Heart Failure",
+  caption = "MlR dataset",
+#  only.significant = FALSE,
+  point.args = list(size = 3, color = "grey", na.rm = TRUE),
+  errorbar.args = list(height = 0, na.rm = TRUE),
+  vline = TRUE,
+  vline.args = list(linewidth = 1, linetype = "dashed"),
+#  stats.labels = TRUE,
+ # stats.label.color = NULL,
+#  stats.label.args = list(size = 3, direction = "y", min.segment.length = 0, na.rm =
+#    TRUE),
+  package = "RColorBrewer",
+  palette = "Dark2",
+  ggtheme = ggstatsplot::theme_ggstatsplot(),
+) + xlim(-5,5) + scale_y_discrete(labels=c("Sex", "Age"))
+
+p
+```
+
+## MODELOS NÃO LINEARES 
+Neste website temos acesso a uma tabela com os tipos de modelos que podemos usar de acordo com a nossa variavel dependente. 
+https://strengejacke.github.io/regressionmodels/ 
+
+### Logit model
+
+Um modelo de regressão logística, frequentemente referido como modelo logit, é usado quando a variável dependente é binária (ou seja, tem apenas dois possíveis resultados). Neste caso estamos interessados em prever as odds (probabilidade) de insuficiencia cardiaca(um resultado binário: sim 1 ou não 0) com base em duas variáveis independentes: idade e sexo.
+
+**Interpretação**:
+   - Os coeficientes $\beta $ num modelo de regressão logística representam a alteração das log odds (logit) para cada alteração de uma unidade na variável preditora (idade ou sexo).
+   - O exponencial do logit é um odds ratio (OR).
+
+
+```{r}
+model4_logit <- glm(
+  heart_disease ~ age + as.factor(sex), 
+  family="binomial", 
+  data=hd
+)
+
+model4_tidy <- tidy(model4_logit, exponentiate = TRUE, conf.int = TRUE)
+
+```
+
+#### Resultados em tabela
+
+```{r}
+model4_tidy <- model4_tidy %>%
+  select(term, estimate, p.value, conf.low, conf.high) %>%
+    mutate(
+    term = case_when(
+      term =="(Intercept)" ~ "Intercept",
+      term =="age" ~ "Age",
+      term =="as.factor(sex)M" ~ "Male",
+      term =="resting_bp" ~ "Blood preassure",
+      term =='relevel(factor(resting_ecg), ref = "Normal")ST' ~ "ST ECG, ref. Normal",
+      term =='relevel(factor(resting_ecg), ref = "Normal")LVH' ~ "LVH ECG, ref. Normal",
+    )
+  ) %>% rename(
+    variable=term,
+    Odds_Ratio=estimate
+  ) 
+```
+
+
+```{r}
+# https://gt.rstudio.com/articles/intro-creating-gt-tables.html
+#install.packages("gt")
+library(gt)
+
+tbl_m4 <- 
+  gt(model4_tidy) |>
+  tab_header(
+    title = md("**Modelo do risco de desenvolver Insuficiencia Cardiaca**") ,
+    subtitle = "Por Idade (anos) e sexo"
+  ) |>
+  tab_source_note(
+    source_note = md("Sorce: MlR dataset")
+  ) |>
+  cols_label(
+    variable = "Predictor",
+    Odds_Ratio = "Odds Ratio",
+    p.value = "p Value",
+    conf.low = "Low CI",
+    conf.high = "High CI",
+  ) |> 
+  fmt_number( decimals = 3) |> 
+  opt_align_table_header(align = "left") 
+# Show the gt Table
+tbl_m4
+```
+
+# REVER 
+### Model diagnostics
+
+```{r}
+model2_plot <- ggplot(
+  data = model2_augment, 
+  mapping = aes(
+    x=.fitted, 
+    y=.std.resid)
+  ) + 
+  geom_point() +
+    labs(
+      title = "Model 2 diagnostics",
+      x = "Fitted values", 
+      y = "Residual") +
+  ylim(-5, 5)
+
+model2_plot
+
+plot(model2)
+```
+
+### Ploting the results of the model
+
+```{r}
+model2_tidy <- model2_tidy %>%
+    mutate(
+    term = case_when(
+      term =="(Intercept)" ~ "Intercept",
+      term =="as.factor(tipo_instituicao)Cancer hospital" ~ "Cancer hospital",
+      term =="as.factor(tipo_instituicao)University" ~ "University",
+      term =="as.factor(year)2016" ~ "2016",
+      term =="as.factor(year)2017" ~ "2017",
+      term =="as.factor(year)2018" ~ "2018",
+      term =="as.factor(year)2019" ~ "2019",
+      term =="as.factor(year)2020" ~ "2020",
+      term =="as.factor(year)2021" ~ "2021",
+      term =="as.factor(year)2022" ~ "2022",
+      term =="as.factor(tipo_de_especialidade)Especialidade Médica" ~ "Especialidade Médica",
+    )
+  )
+```
+
+```{r}
+# Now plot them
+p1<- ggplot(
+  data=model2_tidy, 
+  mapping = aes(x=reorder(term, estimate), y=estimate)
+  ) +
+  geom_point() + 
+  geom_errorbar(
+    mapping = aes(ymin=conf.low, ymax=conf.high), 
+    width = 0.2,size  = 1,
+    position = "dodge", 
+    color="gray"
+  ) +
+  geom_hline(yintercept = 0, color = "red", size = 1) +
+  labs(
+    title = "Diference in length of stay in Portuguese Hospitals",
+    x = "", 
+    y = "Diference in length of stay") +  
+  coord_flip()
+
+p1
+```
+
+## Logistic regression
+
+```{r}
+hd <- MLDataR::heartdisease
+hd<- clean_names(hd)
+```
+
+### Logit model
+
+```{r}
+model3_logit <- glm(
+  heart_disease ~ age + as.factor(sex) + relevel(factor(resting_ecg), ref = "Normal") +resting_bp, 
+  family="binomial", 
+  data=hd
+)
+
+model3_tidy <- tidy(model3_logit, exponentiate = TRUE, conf.int = TRUE)
+
+model3_tidy1 <- tidy(model3_logit, exponentiate = FALSE, conf.int = TRUE)
+```
+
+```{r}
+model3_tidy <- model3_tidy %>%
+  select(term, estimate, p.value, conf.low, conf.high) %>%
+    mutate(
+    term = case_when(
+      term =="(Intercept)" ~ "Intercept",
+      term =="age" ~ "Age",
+      term =="as.factor(sex)M" ~ "Male",
+      term =="resting_bp" ~ "Blood preassure",
+      term =='relevel(factor(resting_ecg), ref = "Normal")ST' ~ "ST ECG, ref. Normal",
+      term =='relevel(factor(resting_ecg), ref = "Normal")LVH' ~ "LVH ECG, ref. Normal",
+    )
+  ) %>% rename(
+    variable=term,
+    Odds_Ratio=estimate
+  ) 
+```
+
+```{r}
+table_model3 <- model3_tidy %>%
+  rename(
+    "Odds Ratio" = "Odds_Ratio",
+    "p value" = "p.value"
+  )|>
+  kbl(
+    digits = 3,
+    caption = "Odds ratio of having Heart Failure"
+  ) %>%
+  kable_classic(
+    full_width = F, 
+    html_font = "Calibri"
+  ) %>%
+  footnote(
+    general = "Here is a general comments of the table. ",
+    number = c("Footnote 1; ", "Footnote 2; ")
+  ) 
+
+table_model3
+```
+
+```{r}
+table_hd <- hd %>%
+  group_by(resting_ecg) %>%
+  summarise(mean_age=mean(age)) %>%
+  rename(
+    "Resting ECG"=resting_ecg,
+    "Mean age"=mean_age
+  ) 
+
+table_hd_kbl <- table_hd %>%
+  kbl(
+    digits = 2,
+    caption = "Mean age by resting ECG") %>%
+  kable_classic(
+    full_width = F,
+    html_font = "Calibri"
+  )
+
+table_hd_kbl
+```
+
+```{r}
+# https://gt.rstudio.com/articles/intro-creating-gt-tables.html
+#install.packages("gt")
+library(gt)
+
+# Make a display table with the `islands_tbl`
+# table; put a heading just above the column labels
+gt_tbl <- 
+  gt(table_hd) |>
+  tab_header(
+    title = "Idade de doentes com IC",
+    subtitle = "Por tipo de IC"
+  )
+
+
+# Show the gt Table
+gt_tbl
+```
+
+
+## Non-linear models
+
+```{r}
+gp <- gapminder
+gp <-clean_names(gp)
+```
+
+```{r}
+gp <- gp %>%
+  mutate(
+    decade = (year - 1990)/10,
+    log_gdp=log(gdp_percap)
+  )
+```
+
+```{r}
+ggplot(
+  data = gp, 
+  mapping = aes(x=log_gdp, y=life_exp)) + 
+  geom_point(alpha=0.5) +    
+  labs(
+    title = "Relationship between GDP per capita (Log) and life expectancy",
+    x = "Log of GDP per capita", 
+    y = "Life expectancy"
+  )  
+```
+
+We will use a OLS model
+
+
+```{r}
+model4 <- lm(life_exp ~ log_gdp, data= gp)
+
+model4_tidy <- tidy(model4, conf.int = TRUE)
+
+model4_augment <- augment(model4, se_fit = TRUE)
+```
+
+```{r}
+ggplot(
+  data = model4_augment, 
+  mapping = aes(x=log_gdp, y=life_exp)) + 
+  geom_point(alpha=0.5) +  
+  geom_line(
+    mapping = aes(x=log_gdp, y=.fitted ),
+    color="red"
+  ) +
+  geom_ribbon(
+    mapping = aes(
+      ymin=.fitted-1.96*.se.fit,
+      ymax=.fitted+1.96*.se.fit),
+    alpha=0.2
+    ) +
+  labs(
+    title = "Relationship between GDP per capita (Log) and life expectancy",
+    x = "Log of GDP per capita", 
+    y = "Life expectancy",
+    caption = "Source: Gapiminder | UN"
+  )
+
+```
+
+# Exercise
+
+
+# THE END

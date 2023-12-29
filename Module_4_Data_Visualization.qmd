@@ -1771,7 +1771,7 @@ l
 
 [extensions of ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
 
-
+https://dreamrs.github.io/esquisse/index.html 
 # Adicional Resources
 
 <https://www.cedricscherer.com/slides/useR-2021_ggplot-wizardry-extended.pdf>
