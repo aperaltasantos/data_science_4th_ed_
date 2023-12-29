@@ -113,7 +113,7 @@ inpatient_hospital_lite2 <- inpatient_hospital |>
       replace_na(tipo_instituicao, "Hospital")
     )
 
-inpatient_hospital_surgery_less_500 <- inpatient_hospital_lite |>
+inpatient_hospital_surgery_less_500 <- inpatient_hospital_lite2 |>
   filter(tipo_de_especialidade=="Especialidade Cirurgica" & 
            dias_de_internamento<=500)
 
