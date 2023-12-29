@@ -46,12 +46,56 @@ remove(pkg)
 
 # Introdução
 
-O objetivo deste módulo não será o de ensinar todas as ferramentas disponíveis em R, mas o de guiar quando quiserem avançar para além dos conceitos dos módulos anteriores e para que possam retirar inspiração
+O objetivo deste módulo não será o de ensinar todas as ferramentas disponíveis em R, mas o de guiar quando quiserem avançar para além dos conceitos dos módulos anteriores e para que possam retirar inspiração dos produtos mais recentes com exemplos disponíveis.
+
+# AMBIENTES REPRODUTÍVEIS
+
+A reprodutibilidade é um dos pilares da investigação.
+Esta deve ser parte de todo o ciclo de data science.
+Para isso é necessário haver *reprodutibilidade computacional*
+
+Isto pode incluir situações como:
+
+- Refazer uma análise
+  - Por um colega com outro sistema
+  - Pelo individuo noutro local ou tempo
+  - Por outros para validação dos nossos resultados
+- Reutilização de código
+- Colocar código em produção
+
+Para estas situações é necessário estabilidade no ambiente computacional que utilizamos.
+
+Para isso temos o RENV.
+
+```{=html}
+<iframe width="780" height="500" src="https://rstudio.github.io/renv/articles/renv.html" title="Introdução ao RENV"></iframe>
+```
+
+## RENV
+
+O RENV ajuda na criação de AMBIENTES REPRODUTÍVEIS ISOLADOS do sistema em que correm.
+
+![Sistema de Produção de um Sistema RENV](images/renv.png)
+
+Vantagens:
+
+- Diminuição dos problemas de correr num computador e não noutro
+- Não existe atualização automática de pacotes e dependências por isso se novas atualizações quebrarem o nosso projeto.
+
+Desvantagens:
+
+- Necessita de muito espaço
+
+### Como criar?
+
+- Ativar com o comando renv::init()
+- Colocar essa opção na 
 
 # INTERMIDIATE QUARTO
 
 ## Includes
 
+Em Quarto, o 
 Reutilizar conteúdo em Quarto é possível usando o código "{{< include >}}". 
 
 Isto permite reutilizar código de outros documentos sem precisar de copiar e colar código.
@@ -71,7 +115,11 @@ Isto permite reutilizar código de outros documentos sem precisar de copiar e co
 
 ## Parameters in Quarto
 
+## HTML e CSS
+
 ## Quarto Websites
+
+## Intro to SHINY
 
 ## Quarto Dashboards
 
@@ -82,6 +130,8 @@ Isto permite reutilizar código de outros documentos sem precisar de copiar e co
 ## Porquê?
 
 # AUTOMATED REPORTING 
+
+## Task Schedualing (Gestão de tarefas automáticas)
 
 # GENERATIVE AI MODELS IN R Programming
 
@@ -108,6 +158,8 @@ Limitações:
   - Ex: Quando a pedir código de Data cleaning e Wrangling o CHAT GPT por vezes escolhe R base que é mais dificil de compreender.
 - Comprensão do Contexto: Quanto tempos documentos mais longos com múltiplas peças (ex: aplicações Shiny, múltiplos documentos Quarto) o ChatGPT dificilmente conseguirá compreder os nossos requisitos no prompt
 - Depedência: O ChatGPT deve ser um ferramenta para impulsionar a nossa aprendizagem da lingua e não ser a única ferramenta que utilizamos
+- Diferentes resultados para as mesmas perguntas.
+- Limitações temporais
 - Questões Éticas e Partilha de dados sensíveis.
 
 Existem múltplas LLM mas o mais conhecido é o CHAT-GPT
@@ -125,9 +177,9 @@ Podemos pedir ao ChatGPT para nos elaborar uma função que calcule o BMI a part
 
 A fase seguinte poderá ser a da integração de LLM nas nossas ferramentas de programação. Ex: RSTUDIO
 
-Existe o Copilot in RSTUDIO
+Existe o Copilot in RSTUDIO mas é pago.
 
-![Localização da Configuração do Copilot](images/copilot.png)\
+![Localização da Configuração do Copilot](images/copilot.png)
 
 ## Como colocar o CHAT GPT no Rstudio - Não funciona
 
@@ -135,14 +187,26 @@ O processo ainda não está muito otimizado mas colocamos os passos para instala
 
 1. Necessário criar conta com a OpenAI
 2. Criar [API com a OPENAI](https://platform.openai.com/api-keys)
-3. coloc
+3. Instalar o pacote usethis e correr o seguinte código  usethis::edit_r_environ()
+4. Criar variável OPENAI_API_KEY="api-key"
+
+:::{.callout-warning}
+Nunca colocar a API num reposirório público.
+:::
+
+5. Reiniciar a sessão
+6. Correr o Add-in do GPTStudio
+
+:::{.callout-warning}
+Para já não recomendamos este uso enquanto as ferramentas não estabilizarem no RSTUDIO.
+:::
 
 ```{r}
 # Criar API da OpenAI
 # https://platform.openai.com/api-keys
 # Copiar a api key
 
-usethis::edit_r_environ()
+# usethis::edit_r_environ()
 # Adicionar e guardar a seguinte linha de código
 #OPENAI_API_KEY="api-key" copiada de cima
 # Sys.getenv("OPENAI_API_KEY")
@@ -150,5 +214,10 @@ usethis::edit_r_environ()
 
 ```
 
+## Ferramentas 
+
+```{=html}
+<iframe width="780" height="500" src="https://analytica.shinyapps.io/codelingo/" title="Tradução de linguas de programação"></iframe>
+```
 
 # Fim
