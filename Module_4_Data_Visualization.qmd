@@ -362,10 +362,12 @@ library(sysfonts)
 library(showtext)
 font_add_google("Open Sans", family = "Open Sans")
 font_add_google("Special Elite", family = "special")
-showtext.auto()
+showtext_auto()
 
 ## change global theme settings (for all following plots)
-theme_set(theme_minimal(base_size = 12, family = "Open Sans"))
+theme_set(theme_minimal())
+theme_replace(text=element_text(family = "Open Sans"))
+# ao definir com o theme set todos os plot estarão com o minimal com Open Sans a não ser que passemos um argumento de tema 
 ```
 
 ```{r}
@@ -377,10 +379,7 @@ p1<- ggplot(data= inpatient_hospital_lite,
          subtitle = "2015-2022",
          y = "Number of inpatients discharged",
          x = "Type of  hospital", 
-         caption = "Source: Ministry of Health, Portugal") +
-  
-  theme_minimal()  
-
+         caption = "Source: Ministry of Health, Portugal")
 p1
 ```
 
@@ -388,7 +387,7 @@ p1
 
 ```{r}
 # Limitar o eixo dos Y a um máximo de 4000
-p1<- ggplot(data= inpatient_hospital_lite, 
+p2<- ggplot(data= inpatient_hospital_lite, 
             aes(x = tipo_instituicao, y = doentes_saidos_var)) +
   geom_point() +
   geom_boxplot(outlier.shape = NA) + 
@@ -397,10 +396,9 @@ p1<- ggplot(data= inpatient_hospital_lite,
          y = "Number of inpatients discharged",
          x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal") +
-  ylim(0,4000) +
-  theme_classic()
+  ylim(0,4000) 
 
-p1
+p2
 ```
 
 ```{r}
@@ -419,8 +417,7 @@ p_final_1<- ggplot(data= inpatient_hospital_lite,
          y = "Number of inpatients discharged",
          x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal") +
-  ylim(0,4000) +
-  theme_minimal()
+  ylim(0,4000)
   #theme(plot.background = element_rect("white")
         #)
 

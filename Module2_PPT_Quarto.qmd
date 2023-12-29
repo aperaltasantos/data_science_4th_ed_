@@ -121,6 +121,10 @@ Pedir feedback aos colegas.
 
 ::::
 
+## Video
+
+{{< video https://www.youtube.com/watch?v=GmRT0P5axqY&pp=ygUUYW5kcmUgcGVyYWx0YSBzYW50b3M%3D >}}
+
 ## Referências
 
 - [@santos2022omicron]

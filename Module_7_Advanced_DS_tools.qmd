@@ -17,26 +17,138 @@ format:
 execute:
   warning: false
 title-block-style: default
-editor: 
-  markdown: 
-    wrap: 72
 ---
+
+```{r pacotes}
+#| echo: false
+#| include: false
+
+# Packages
+required_packages <- c(
+                       "tidyverse",
+                       "rio",
+                       "usethis",
+                       "gptstudio"
+                       )      
+
+for (pkg in required_packages) {
+  # install packages if not already present
+  if (!pkg %in% rownames(installed.packages())) {
+    install.packages(pkg)
+  }
+  
+  # load packages to this current session 
+  library(pkg, character.only = TRUE)
+}
+remove(required_packages)
+remove(pkg)
+```
 
 # Introdução
 
-# INTERMIDIATE QUARTO
+O objetivo deste módulo não será o de ensinar todas as ferramentas disponíveis em R, mas o de guiar quando quiserem avançar para além dos conceitos dos módulos anteriores e para que possam retirar inspiração
 
-```{r}
-```
+# INTERMIDIATE QUARTO
 
 ## Includes
 
-## 
+Reutilizar conteúdo em Quarto é possível usando o código "{{< include >}}". 
+
+Isto permite reutilizar código de outros documentos sem precisar de copiar e colar código.
+
+```{r}
+#| echo: true
+
+# ---
+# title: "Relatórios Conjuntos"
+# ---
+# 
+# {{< include Relatório_hospitalA.qmd >}}
+# {{< include Relatório_hospitalB.qmd >}}
+# 
+# Usar os dados e outputs do documentos atuais...
+```
+
+## Parameters in Quarto
+
+## Quarto Websites
+
+## Quarto Dashboards
 
 # GIT E GITHUB - INTRO
+
+## O quê?
+
+## Porquê?
 
 # AUTOMATED REPORTING 
 
 # GENERATIVE AI MODELS IN R Programming
+
+Desde Novembro de 2022 que se têm falado de modelos de inteligência artificial generativa.
+
+Este modelos, um subconjunto da inteligência artificial, são projetados para gerar novos dados que se assemelham a dados existentes. 
+
+
+### Modelos de Linguagem de Grande Escala (LLMs) na Programação
+
+LLMs como o ChatGPT ganharam atenção significativa pela sua capacidade de compreender e gerar texto semelhante ao humano. 
+
+Na programação e na gestão de dados, estes modelos podem ser aproveitados para escrever código, filtrar código ou explicar pedaços de código complexos. O seu entendimento de linguagem natural e linguagens de programação permite que elevar as capacidades dos utilizadoreses de maneira conversacional, com o potencial de aumentar significativamente a produtividade.
+
+Vantagens:
+
+- Gerar código ou adaptar código de outras linguas para R
+- Apoiar na gestão de erros ou bugs
+- Documentação e Explicação: A leitura da documentação por vezes é dificil numa fase inicial e os modelos permitem baixar a complexidade na leitura e explicar pedaços de código com múltiplos níveis de complexidade.
+
+Limitações:
+
+- Apesar de em códigos simples gerar poucos erros, existe a possibilidade do mesmo não seguir as boas práticas e ser optimizado para um melhor desempenho.
+  - Ex: Quando a pedir código de Data cleaning e Wrangling o CHAT GPT por vezes escolhe R base que é mais dificil de compreender.
+- Comprensão do Contexto: Quanto tempos documentos mais longos com múltiplas peças (ex: aplicações Shiny, múltiplos documentos Quarto) o ChatGPT dificilmente conseguirá compreder os nossos requisitos no prompt
+- Depedência: O ChatGPT deve ser um ferramenta para impulsionar a nossa aprendizagem da lingua e não ser a única ferramenta que utilizamos
+- Questões Éticas e Partilha de dados sensíveis.
+
+Existem múltplas LLM mas o mais conhecido é o CHAT-GPT
+
+```{=html}
+<iframe width="780" height="500" src="https://chat.openai.com/" title="LLM as a part for productive programming"></iframe>
+```
+
+Podemos pedir ao ChatGPT para nos elaborar uma função que calcule o BMI a partir de uma idade e altura.
+
+```{r}
+
+
+```
+
+A fase seguinte poderá ser a da integração de LLM nas nossas ferramentas de programação. Ex: RSTUDIO
+
+Existe o Copilot in RSTUDIO
+
+![Localização da Configuração do Copilot](images/copilot.png)\
+
+## Como colocar o CHAT GPT no Rstudio - Não funciona
+
+O processo ainda não está muito otimizado mas colocamos os passos para instalar o add-in GPTSTUDIO:
+
+1. Necessário criar conta com a OpenAI
+2. Criar [API com a OPENAI](https://platform.openai.com/api-keys)
+3. coloc
+
+```{r}
+# Criar API da OpenAI
+# https://platform.openai.com/api-keys
+# Copiar a api key
+
+usethis::edit_r_environ()
+# Adicionar e guardar a seguinte linha de código
+#OPENAI_API_KEY="api-key" copiada de cima
+# Sys.getenv("OPENAI_API_KEY")
+# Gptstudio deve estar nos add-ins 
+
+```
+
 
 # Fim
