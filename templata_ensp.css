@@ -1,0 +1,8 @@
+.quarto-title-block .quarto-title-banner {
+  background-image: images/logo_ensp.png;
+  background-size: 300px;
+  background-position: left;
+  background-repeat: no-repeat;
+  padding-left: 10px;
+  background-origin: content-box;
+}

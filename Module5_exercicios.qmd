@@ -1,8 +1,9 @@
 ---
-title: "Module 5 | Exercise"
-author: "aluno"
+title: "Modulo 5 | Exercícios"
+author: "A. Peralta-Santos"
 date: today
 date-format: long
+lang: pt 
 format:
   html:
     preview: false
@@ -21,6 +22,7 @@ execute:
   eval: true
   echo: true
 title-block-style: default
+theme: templata_ensp
 editor: 
   markdown: 
     wrap: 72
@@ -28,27 +30,53 @@ project:
   output-dir: outputs/documents
 ---
 
-#Dataset 
+
+# Exercício - Hipotermia Cirúrgica
 
 ## Contexto
-A hipotermia cirúrgica (definida como temperatura central < 36°C) é conhecida por causar coagulopatia , metabolismo de drogas alterado, recuperação prolongada e desconforto térmico. Menos compreendido é se a infeção da ferida cirurgiva(ISCs), também estão associadas à hipotermia intraoperatória. 
 
-Isso é importante, poque as infeções do sítio cirúrgico são uma grande fonte de morbidade, mortalidade, prolongamento da hospitalização e custos de saúde. O risco geral de ISC é de 1–3%, geralmente, mas é substancialmente maior, 10-15%, para pacientes submetidos à cirurgia colorretal. 
+A hipotermia cirúrgica (definida como temperatura central < 36°C) é conhecida por causar coagulopatia, alteração no metabolismo de drogas, recuperação prolongada e desconforto térmico. Menos compreendido é se as infecções do sítio cirúrgico (ISCs) também estão associadas à hipotermia intraoperatória.
 
-Literatura publicada até à data sugerem que a hipotermia moderada causa ISCs e várias outras complicações. No entanto, alguns desses estudos estão desatualizados (os procedimentos cirúrgicos descritos já não são realizados) e muitos não possuem dados suficientes de temperatura intraoperatória. Portanto, é desconhecido se a hipotermia leve ou temperaturas normotérmicas influenciam o risco de infeção. 
+Isso é importante, pois as infecções do sítio cirúrgico são uma grande fonte de morbidade, mortalidade, prolongamento da hospitalização e custos de saúde. O risco geral de ISC é de 1 a 3%, geralmente, mas é substancialmente maior, 10 a 15%, para pacientes submetidos à cirurgia colorretal.
+
+Literatura publicada até a data sugere que a hipotermia moderada causa ISCs e várias outras complicações. No entanto, alguns desses estudos estão desatualizados (os procedimentos cirúrgicos descritos já não são realizados) e muitos não possuem dados suficientes de temperatura intraoperatória. Portanto, é desconhecido se a hipotermia leve ou temperaturas normotérmicas influenciam o risco de infecção. [^1]
+
+[^1]: *Fonte: The Core Temperature dataset was contributed by Ms. Jordyn Homoki, Research and Teaching Assistant, and Dr. Amy Nowacki, Associate Professor, Cleveland Clinic. Please refer to this resource as: Homoki, J. and Nowacki AS, "Core Temperature Dataset", TSHS Resources Portal (2023). Available at https://www.causeweb.org/tshs/core-temperature/.*
 
 ## Objetivo
-Avaliar a relação entre a média ponderada do tempo (TWATemp) da temperatura central e as infeções graves de feridas e sistêmicas que se desenvolvem dentro de 30 dias após a cirurgia colorretal, no geral e após levar em conta as informações de covariáveis.
 
-*Fonte: The Core Temperature dataset was contributed by Ms. Jordyn Homoki, Research and Teaching Assistant, and Dr. Amy Nowacki, Associate Professor, Cleveland Clinic. Please refer to this resource as: Homoki, J. and Nowacki AS, “Core Temperature Dataset”, TSHS Resources Portal (2023). Available at https://www.causeweb.org/tshs/core-temperature/.*
+Avaliar a relação entre a média ponderada do tempo (TWATemp) da temperatura central e as infecções graves de feridas e sistêmicas que se desenvolvem dentro de 30 dias após a cirurgia colorretal, no geral e após levar em conta as informações de covariáveis.
 
-## Instruções 
+## Instruções
 
-1. Usa o dataset Core_Temperature.xlsx, pode consultar a documentação em Core_Temperature_Data_Dictionary2. pdf na pasta de datasets. O objectivo geral do exercisio é avaliar o efeito da temperatura (TWATemp) no risco de ISCs (AnyInfection) 
-3. Deve criar uma tabela 1 comparando a distribuição das variaveis de confundimento (Age	FEMALE	BMI	CharlsonScore	SurgeryType	CHF) pelos doentes que tiveram ISC (AnyInfection) 
-4. Deve criar uma visualização comparando a distribuição da temperatura (TWATemp) pelo risco de ISCs (AnyInfection)
-5. Crie um modelo de regressão logistica para avaliar o efeito da temperatura no risco de ISCs (AnyInfection) 
-6. Crie um modelo de regressão logistica para avaliar o efeito da temperatura no risco de ISCs (AnyInfection) ajustado para  Age	FEMALE	BMI	CharlsonScore	SurgeryType	CHF
-7. Compare os dois modelos em termos de performance 
-8. Crie uma tabela com os OR, p value e Confidence Intervals do modelo construido em 6 
-9. Exporte a tabela criada em 8 para word
+### Dataset
+
+Use o dataset Core_Temperature.xlsx, e consulte a documentação em Core_Temperature_Data_Dictionary2.pdf na pasta de datasets. O objetivo geral do exercício é avaliar o efeito da temperatura (TWATemp) no risco de ISCs (AnyInfection).
+
+### Estatística Descritiva
+
+Deve criar uma Tabela 1 comparando a distribuição das variáveis de confundimento (Age, FEMALE, BMI, CharlsonScore, SurgeryType, CHF) pelos pacientes que tiveram ISC (AnyInfection).
+
+### Visualização
+
+Deve criar uma visualização comparando a distribuição da temperatura (TWATemp) pelo risco de ISCs (AnyInfection).
+
+### Modelos
+
+#### Univariado
+
+Crie um modelo de regressão logística para avaliar o efeito da temperatura no risco de ISCs (AnyInfection).
+
+#### Múltiplo
+
+Crie um modelo de regressão logística para avaliar o efeito da temperatura no risco de ISCs (AnyInfection) ajustado para Age, FEMALE, BMI, CharlsonScore, SurgeryType, CHF.
+
+#### Performance
+
+Compare os dois modelos em termos de performance.
+
+### Tabelas de Regressão
+
+Crie uma tabela com os OR, p-value e Confidence Intervals do modelo construído em 6. Exporte a tabela criada em 8 para Word.
+
+## FIM

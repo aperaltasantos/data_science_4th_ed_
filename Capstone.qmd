@@ -1,0 +1,80 @@
+---
+title: "Modulo Capstone | Instruções"
+author: "A. Peralta-Santos"
+date: today
+date-format: long
+lang: pt 
+format:
+  html:
+    preview: false
+    smooth-scroll: true
+    embed-resources: true
+    toc: true
+    toc-location: left
+    number-sections: true
+    number-depth: 3
+    code_download: true
+    code-copy: true
+execute:
+  warning: false
+  collapse: true
+  message: false
+  eval: true
+  echo: true
+title-block-style: default
+theme: templata_ensp
+editor: 
+  markdown: 
+    wrap: 72
+project:
+  output-dir: outputs/documents
+---
+
+# Capstone
+
+## Objetivo:
+
+Aplicar as competências adquiridas durante o curso para analisar um conjunto de dados do mundo real na área da saúde, obtendo insights que possam informar decisões e estratégias de saúde.
+
+## Visão Geral do Projeto
+Os alunos podem trabalhar com um conjunto de dados de seu interesse ou utilizar o dataset educativo (Obstetrics and Periodontal Therapy). O projeto envolverá manipulação de dados, análise exploratória de dados, visualização de dados, inferência estatística, machine learning (opcional) e a criação de um dashboard.
+
+## Etapas do Projeto
+
+1. **Criação do Projeto**
+   - Utilize R para criar um projeto com o nome "APELIDO_CAPSTONE".
+   - Organize o projeto em pastas seguindo as melhores práticas e suas preferências.
+   
+2. **Desenvolvimento do Contexto e Objetivos (Módulo 2)**
+   - Explique qual base de dados utilizou e descreva as variáveis empregadas, assim como o objetivo da pesquisa.
+   - O código de suas análises deve estar visível.
+   - Utilize pelo menos 3 funcionalidades do módulo 2 (referências, inline coding, adicionar imagem).
+
+3. **Análise Exploratória dos Dados (Módulo 3)**
+   - Desenvolva uma análise exploratória dos dados.
+   - Crie modelos lineares e modelos lineares generalizados para explorar relações nos dados.
+   - Realize análise de sobrevivência em dados de pacientes relevantes.
+
+4. **Visualização de Dados (Módulo 4)**
+   - Desenvolva visualizações de dados usando ggplot2, podendo incluir dados espaciais.
+   - Deve apresentar pelo menos 3 figuras diferentes.
+
+5. **Modelos Estatísticos (Módulo 5)**
+   - Desenvolva uma tabela sumária de dados.
+   - Elabore um modelo de regressão, apresentando os resultados em uma tabela e num gráfico.
+   - OPCIONAL: Pode desenvolver um modelo de machine learning como alternativa (Módulo 6).
+
+6. **Integração e Automação (Módulo 5)**
+   - Desenvolva um dashboard com os resultados obtidos.
+   - Apresente os resultados em HTML e docx.
+
+## Entregáveis
+
+1. Um projeto R reproduzível.
+2. Uma breve apresentação resumindo a metodologia e resultados do projeto.
+3. O projeto deve conter um HTML, PDF e dashboard (link para o repositório GitHub).
+
+## Instruções de Envio
+
+Todos os projetos finais devem ser submetidos através do Moodle até [inserir data de entrega]. Submissões atrasadas não serão aceitas sem aprovação prévia. A não submissão implica na não conclusão do curso. Alguns alunos serão convidados a apresentar no último dia de curso.
+
