@@ -1,5 +1,5 @@
 ---
-title: "Modulo Capstone | Instruções"
+title: "Módulo 9  | Capstone"
 author: "A. Peralta-Santos"
 date: today
 date-format: long
@@ -30,7 +30,7 @@ project:
   output-dir: outputs/documents
 ---
 
-# Capstone
+# CAPSTONE
 
 ## Objetivo:
 
@@ -78,3 +78,4 @@ Os alunos podem trabalhar com um conjunto de dados de seu interesse ou utilizar 
 
 Todos os projetos finais devem ser submetidos através do Moodle até [inserir data de entrega]. Submissões atrasadas não serão aceitas sem aprovação prévia. A não submissão implica na não conclusão do curso. Alguns alunos serão convidados a apresentar no último dia de curso.
 
+# FIM

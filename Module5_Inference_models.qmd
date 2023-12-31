@@ -1,5 +1,5 @@
 ---
-title: "Module 5 | Inference and statistical models"
+title: "Módulo 5 | Modelos estatísticos"
 author: "A. Peralta-Santos"
 date: today
 date-format: long
@@ -72,6 +72,16 @@ remove(pkg)
 
 # TABELAS
 
+::: callout-important
+O R(Posit) é uma ferramenta poderosa para produzir tabelas de forma muito customizavel. O package com maior potencialidade é o GT. ver mais aqui <https://gt.rstudio.com/articles/gt.html>
+
+Outra sugestão de recurso de aprendizagem <https://gt.albert-rapp.de/> 
+:::
+
+
+
+![](images/table_gt.png)
+
 Dataset de 918 doentes e com 10 variaveis:
 
 Age: age of the patient presenting with heart disease Sex: gender of the
@@ -89,9 +99,6 @@ Frequentemente os relatórios pedem tabelas descritivas pela variável de
 exposição o "gtsummary" ajuda a criar essas tabelas e pode ser
 complementado pelo package GT
 
-ver mais aqui <https://gt.rstudio.com/articles/gt.html>
-
-![](images/table_gt.png)
 
 ```{r}
 # Carregar o conjunto de dados de doença cardíaca do pacote MLDataR
@@ -107,21 +114,29 @@ hd <- hd %>%
     heart_disease == 0 ~ "No",
     heart_disease == 1 ~ "Yes",
     TRUE ~ as.character(heart_disease) # for safety, in case there are other values
-  ))
+  ),
+  Age=age,
+  Sex=sex,
+  "Blood Pressure"=resting_bp,
+  Cholesterol=cholesterol,
+  Angina=angina)
 ```
+
+## Criar a tabela
 
 ```{r}
 # Criar uma tabela resumo de variáveis selecionadas dividida pelo estado da doença cardíaca
 # O pacote gtsummary é utilizado para criar tabelas prontas para publicação
 table1 <- tbl_summary(
   hd,
-  include = c(age, sex, resting_bp, cholesterol, angina), # Selecionar variáveis específicas para o resumo
+  include = c(Age, Sex, "Blood Pressure", Cholesterol, Angina), # Selecionar variáveis específicas para o resumo
   by = heart_disease_yn, # Dividir a tabela pelo estado da doença cardíaca
-  missing = "no" # Excluir dados ausentes do resumo
-) %>%
-  add_n() %>% # Adicionar uma coluna para contar observações não ausentes
-  add_p() %>% # Realizar testes estatísticos para comparar grupos
-  modify_header(label = "**Variable**") %>% # Personalizar o cabeçalho da tabela
+  missing = "no", # Excluir dados ausentes do resumo
+) |> 
+  modify_spanning_header(c("stat_1", "stat_2") ~ "**Heart Failure**") %>%
+  add_n() |>  # Adicionar uma coluna para contar observações não ausentes
+  add_p() |>  # Realizar testes estatísticos para comparar grupos
+  modify_header(label = "**Variable**") |>  # Personalizar o cabeçalho da tabela
   bold_labels() # Tornar as etiquetas em negrito para ênfase
 
 # Visualizar a tabela criada
@@ -131,7 +146,7 @@ table1
 ```
 
 
-
+## Adaptar a tabela
 Melhorar a tabela com o GT
 
 ```{r}
@@ -141,21 +156,11 @@ table1_f <- table1 |>
     title = md("**Risk model for Heart Failure**") ,
     subtitle = "By Age and Sex"
   ) |>
-#  cols_label(
-#    age = "Age",
-#    sex = "Sex",
-#    resting_bp ="Blood Pressure",
-#    cholesterol="Cholesterol", 
-#    angina="Angina"
-#  ) |> 
   tab_source_note(
     source_note = md("Source: MlR dataset")
   ) |>
   fmt_number( decimals = 3) |>   
-  tab_style(
-    style = cell_fill(color = "grey95"),
-    locations = list(cells_column_labels())
-  ) |> 
+  opt_stylize(style = 1, color = "gray") |> 
   opt_align_table_header(align = "left") 
 # Show the gt Table
 
@@ -169,7 +174,7 @@ table1_f
 table1_f |> gtsave("tab_1.docx")
 ```
 
-# TESTES ESTATISTICOS
+# TESTES ESTATÍSTICOS 
 
 ## Comparar médias
 
@@ -178,6 +183,8 @@ library(rstatix)
 ```
 
 ### Test t (comparar médias)
+
+Realiza um teste t de duas amostras não pareadas (ou teste t independente) no R para comparar as médias de idade (age) entre dois grupos de sexo (sex) no conjunto de dados hd. Este teste é útil para determinar se há uma diferença estatisticamente significativa entre as médias dos dois grupos. 
 
 ```{r}
 # Two-samples unpaired test
@@ -188,6 +195,8 @@ hd %>% t_test(age ~ sex)
 ## Comparar proporções
 
 ### Teste Chi-Quadrado
+
+Realiza um teste qui-quadrado (χ²) para avaliar a associação entre gênero e ocorrência de doença cardíaca no conjunto de dados. Vou comentar o código em português de Portugal para explicar cada parte.
 
 ```{r}
 # Example contingency table

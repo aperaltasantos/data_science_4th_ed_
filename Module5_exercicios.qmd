@@ -30,7 +30,6 @@ project:
   output-dir: outputs/documents
 ---
 
-
 # Exercício - Hipotermia Cirúrgica
 
 ## Contexto
