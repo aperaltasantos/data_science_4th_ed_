@@ -110,8 +110,6 @@ Exempleos de websites onde podemos pesquisar qual o melhor gráfico para cada si
 
 [Data to viz project](https://datavizproject.com/)
 
-[Extensions of ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
-
 [Principles of good visuals](https://github.com/GraphicsPrinciples/CheatSheet/blob/master/NVSCheatSheet.pdf)
 
 # GGPLOT
@@ -120,17 +118,17 @@ o ggplot é uma gramatica de graficos, em que cada elemento é uma instrução p
 
 Contem os seguintes elementos
 
-1.  data: O componente de dados.
+**1.  data:** O componente de dados.
 
-2.  geom: É o tipo de gráfico. p.e. gráfico de barras, histograma, densidades suaves, qqplot e boxplot.
+**2.  geom:** É o tipo de gráfico. p.e. gráfico de barras, histograma, densidades suaves, qqplot e boxplot.
 
-3.  mapping: Posições dos pontos no eixo x e eixo y. Cada ponto representa uma observação diferente, e mapeamos dados sobre essas observações para pistas visuais como escalas x e y. A cor é outra pista visual que mapeamos para a região. Referimo-nos a isso como o componente de mapeamento estético. Como definimos o mapeamento depende da geometria que estamos usando.
+**3.  mapping:** Posições dos pontos no eixo x e eixo y. Cada ponto representa uma observação diferente, e mapeamos dados sobre essas observações para pistas visuais como escalas x e y. A cor é outra pista visual que mapeamos para a região. Referimo-nos a isso como o componente de mapeamento estético. Como definimos o mapeamento depende da geometria que estamos usando.
 
-4.  Facets - semelhante ao agrupar por
+**4.  Facets:** semelhante ao agrupar por
 
-5.  Theme - Tema do grafico p.e. preto e branco, especifico para mapas
+**5.  Theme:** Tema do grafico p.e. preto e branco, especifico para mapas
 
-6.  Labels: define outros elementos do gráfico como titutlo, legendas
+**6.  Labels:** define outros elementos do gráfico como titutlo, legendas
 
 ![Anatomia do ggplot by Cedric Scherer ](images/ggplot_themes.png)
 
@@ -145,7 +143,15 @@ required_packages <- c(
                        "here",
                        "patchwork",
                        "sf", 
-                       "ggthemes"
+                       "ggthemes",
+                       "giscoR",
+                       "eurostat",
+                       "sysfonts", 
+                       "showtext", 
+                       "scales",
+                       "geodata", 
+                       "osmdata", 
+                       "leaflet"
                        )      
 
 for (pkg in required_packages) {
@@ -192,7 +198,7 @@ ggplot(
 
 ```{r}
 # Carregar o pacote ggplot2 para visualização de dados
-library(ggplot2)
+# library(ggplot2)
 
 # Criar um gráfico de boxplot com o conjunto de dados 'inpatient_hospital_lite'
 ggplot(data = inpatient_hospital_lite, 
@@ -357,9 +363,10 @@ theme_r_datascience <-
 
 ```
 
-```{=html}
-<iframe width="780" height="500" src="https://www.rdocumentation.org/packages/ggplot2/versions/3.4.4/topics/theme" title="Rio Package"></iframe>
-```
+::: callout-important
+Este recurso é bastante útil porque permite alterar completamente o tema <https://www.rdocumentation.org/packages/ggplot2/versions/3.4.4/topics/theme>
+:::
+
 
 ```{r}
 p1<- ggplot(data= inpatient_hospital_lite, 
@@ -380,17 +387,24 @@ p1
 ### Alterar um tema existente
 
 ```{r}
-# NOT WORKING
+
+# Carregar os pacotes necessários para manipulação de fontes
 library(sysfonts)
 library(showtext)
-font_add_google("Open Sans", family = "Open Sans")
-font_add_google("Special Elite", family = "special")
+
+# Adicionar fontes do Google
+font_add_google("Open Sans", family = "Open Sans") # Adiciona a fonte 'Open Sans'
+font_add_google("Special Elite", family = "special") # Adiciona a fonte 'Special Elite'
+
+# Ativar automaticamente o uso de fontes personalizadas nos gráficos
 showtext_auto()
 
-## change global theme settings (for all following plots)
-theme_set(theme_minimal())
-theme_replace(text=element_text(family = "Open Sans"))
-# ao definir com o theme set todos os plot estarão com o minimal com Open Sans a não ser que passemos um argumento de tema 
+
+# Configurar o tema global para todos os gráficos ggplot
+theme_set(theme_minimal()) # Define 'theme_minimal' como o tema padrão
+theme_replace(text = element_text(family = "Open Sans")) # Altera a fonte padrão para 'Open Sans'
+
+# Ao definir com o theme set todos os plot estarão com o minimal com Open Sans a não ser que passemos um argumento de tema 
 ```
 
 ```{r}
@@ -450,6 +464,8 @@ p2<- ggplot(data= inpatient_hospital_lite,
     label = "What happened here?",
     color = "firebrick",
   ) 
+
+p2
 ```
 
 
@@ -497,12 +513,12 @@ p_final_1<- ggplot(data= inpatient_hospital_lite,
 
 ## Tamanho e aspecto 
 
-**Não depender exclusivamente do painel de visualização do RStudio!**
+**Podemos não depender exclusivamente do painel de visualização do RStudio!**
 
 Quando o protótipo de gráfico estiver quase pronto, decida um tamanho fixo para o gráfico.
 
-**Abordagem 1:** salvar o arquivo e inspecioná-lo - voltar ao seu IDE - repetir.
-Isso pode ser tedioso e demorado...
+**Abordagem 1:** salvar o grafico e inspecioná-lo e repetir.
+Isso pode ser chato e demorado...
 
 **Abordagem 2:** usar um qmd ou rmd com saída inline e configurações de chunk.
 Definir fig-width / fig.width e fig-height / fig.height por chunk ou globalmente.
@@ -603,7 +619,7 @@ Uso: Excelente para comparar a distribuição de uma variável numérica entre d
 Descrição: No gráfico de dispersão com jitter, uma pequena quantidade de ruído aleatório (jitter) é adicionada à posição dos pontos. Isso ajuda a separar visualmente os pontos que, de outra forma, cairiam exatamente na mesma posição.
 Uso: É particularmente útil quando você tem muitos pontos de dados que estão alinhados verticalmente ou horizontalmente devido à sua natureza discreta ou categórica. O jitter ajuda a visualizar a densidade desses pontos e a evitar que eles se sobreponham, o que pode obscurecer a quantidade real de dados em qualquer posição específica.
 
-### Density plot  
+### Gráfico de Densidade (Density plot)  
 
 ```{r}
 
@@ -642,7 +658,8 @@ p1<- ggplot(data=inpatient_hospital_lite,
 p1
 ```
 
-### Histogram 
+### Histograma (Histogram)
+
 ```{r}
 
 p1<- ggplot(data=inpatient_hospital_lite, 
@@ -696,6 +713,8 @@ Uso: O gráfico de barras é às vezes descrito como uma forma monótona de visu
 
 ### Gráfico de Barras (Bar plot)
 
+Vamos criar um novo dataset com a soma de doentes saidos por ano.
+
 ```{r}
 inpatient_hospital_year <- inpatient_hospital_lite |>
   summarise(
@@ -741,7 +760,7 @@ library(scales)
 
 # Gerar códigos hexadecimais de cores para um gráfico com três elementos
 hex <- hue_pal()(3)
-hex 
+ 
 
 # Preparar o conjunto de dados 'inpatient_hospital_year' com fatores ordenados
 inpatient_hospital_year <- inpatient_hospital_year |>
@@ -853,7 +872,7 @@ p1
 
 
 
-###Gráfico tarte (Doughnut plot)
+### Gráfico tarte (Doughnut plot)
 
 Descrição:O gráfico de tarte tem com 'fatias' representando as percentagens de diferentes categorias. A diferença é o espaço em branco no meio, que o faz parecer uma rosca.
 
@@ -969,7 +988,7 @@ p1
 ```
 
 ::: callout-warning
-**ATENÇÃO** Se queremos definir uma cor temos de Definir fora o aes. Podemos definir também o formato da figura.
+**ATENÇÃO** Se queremos definir uma cor temos de definir fora o aes. Podemos definir também o formato da figura.
 :::
 
 ```{r}
@@ -1009,7 +1028,7 @@ p1<- ggplot(inpatient_hospital_lite,
            y=doentes_saidos_var, 
            colour=tipo_de_especialidade)) + 
   geom_point(alpha=0.1) +
-  geom_smooth(method = loess, # Adicionar uma linha de tendência linear
+  geom_smooth(method = lm, # Adicionar uma linha de tendência linear
               se = TRUE,     #  Incluir a banda de erro padrão
               linetype = "dashed") + # Linha tracejada para a linha de tendência
   ylim(0, 3000) +  # Limites para o eixo Y
@@ -1288,15 +1307,16 @@ p3<- ggplot(data= inpatient_hospital_year_mean,
 geom_errorbar(aes(ymin = mean_saidos_var - sd_saidos_var,  # Limite inferior da barra de erro
                   ymax = mean_saidos_var + sd_saidos_var), # Limite superior da barra de erro
               width = .2,                                  # Largura das 'barras' horizontais nas extremidades
-              position = position_dodge(0.05))             # Ajuste da posição para evitar sobreposição
+              position = position_dodge(0.05))  +           # Ajuste da posição para evitar sobreposição
 
   
-  labs(title = "Mean and SD of inpatients discharged in Hospitals",
-         subtitle = "2015-2022",
-         y = "Mean Nunumber of inpatients discharged",
-         x = "Year", 
-         caption = "Source: Ministry of Health, Portugal") +
-  
+  labs(
+#    title = "Mean and SD of inpatients discharged",
+#         subtitle = "2015-2022",
+         y = "Mean number",
+#         x = "Year", 
+#         caption = "Source: MoH, Portugal"
+) +
   theme_minimal()
 
 p3
@@ -1335,7 +1355,9 @@ geom_ribbon é usada no ggplot2 para adicionar uma "faixa" ou "área" sombreada 
 :::
 
 
-## ESTATISTICAS EM GRÁFICOS (STATISTICS)
+## ESTATÍSTICAS EM GRÁFICOS (STATISTICS)
+
+Podemos adicionar medidas estatísticas directamente nos gráficos sem necessidade de as calcular previamente.
 
 ```{r}
 
@@ -1403,9 +1425,9 @@ p1
 ## COMBINAR PLOTS
 
 O pacote patchwork no R oferece uma solução elegante para combinar e organizar múltiplos gráficos criados com ggplot2. Esta biblioteca destaca-se pela  simplicidade e flexibilidade, permitindo aos utilizadores dispor gráficos de forma intuitiva numa única janela gráfica, facilitando a comparação e a análise conjunta de diferentes visualizações. 
-::: callout-note
+
 Ver mais aqui <https://patchwork.data-imaginist.com/articles/patchwork.html>
-:::
+
 
 
 
@@ -1542,14 +1564,18 @@ sanity <- anti_join(comm_pt,
 
 
 **Color**
-Função: A estética color é usada para definir a cor das linhas ou bordas de um objeto no gráfico. No contexto de mapas, color define a cor das fronteiras ou linhas que delimitam as unidades geográficas (como países, regiões, estados, etc.).
+Função: 
+A estética color é usada para definir a cor das linhas ou bordas de um objeto no gráfico. No contexto de mapas, color define a cor das fronteiras ou linhas que delimitam as unidades geográficas (como países, regiões, estados, etc.).
 
-Exemplo: geom_sf(color = "black") desenha as fronteiras de unidades geográficas em preto.
+Exemplo: 
+geom_sf(color = "black") desenha as fronteiras de unidades geográficas em preto.
 
 **Fill**
-Função: A estética fill é usada para definir a cor de preenchimento do interior de um objeto. Em mapas, fill define a cor dentro das fronteiras das unidades geográficas.
+Função: 
+A estética fill é usada para definir a cor de preenchimento do interior de um objeto. Em mapas, fill define a cor dentro das fronteiras das unidades geográficas.
 
-Exemplo: geom_sf(aes(fill = variavel)) preenche as áreas internas das unidades geográficas com cores que podem variar de acordo com uma variável, como a densidade populacional, categorias de dados, etc.
+Exemplo: 
+geom_sf(aes(fill = variavel)) preenche as áreas internas das unidades geográficas com cores que podem variar de acordo com uma variável, como a densidade populacional, categorias de dados, etc.
 
 ```{r}
 
@@ -1673,7 +1699,7 @@ p <- ggplot() +
          caption = "Data: DGS, 2022") +         # Legenda dos dados
     # Personalizar a escala de cores para a variável 'Incidencia_categoria'
     scale_fill_manual(values = cols,
-                      name = "Incidência") +
+                      name = "Incidence") +
     # Ajustar a posição e estilo da legenda
     theme(
       legend.position = "right",
@@ -1710,40 +1736,177 @@ comm_ars <- comm_pt |>                # Usar o conjunto de dados 'comm_pt'
 Podemos adicionar as fronteiras das ARS
 
 ```{r}
-
-# Criar um mapa temático de Portugal com dados de incidência de COVID-19
 p <- ggplot() +
-      # Primeira camada: desenhar os concelhos de Portugal
       geom_sf(data = comm_pt, 
-              aes(fill = Incidencia_categoria),  # Preencher áreas com base na categoria de incidência
-              size = 0.1,                        # Espessura das linhas de fronteira
-              color = "gray"                     # Cor das linhas de fronteira
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "gray"
           ) +
-  
-      # Segunda camada: desenhar as fronteiras das regiões de saúde (ARS)
-      geom_sf(data = comm_ars, 
-              size = 0.1,                        # Espessura das linhas de fronteira
-              color = "black"
+        geom_sf(data = comm_ars, 
+              size = 0.1,
+              color = "black",
+              alpha = 0
           ) +
-    # Aplicar o tema personalizado para mapas
-    theme_map() +
-    # Personalizar rótulos e títulos
-    labs(x = NULL,                              # Remover rótulo do eixo X
-         y = NULL,                              # Remover rótulo do eixo Y
-         title = "Portugal's COVID-19 incidence", # Título do mapa
-         subtitle = "January, 2022",             # Subtítulo do mapa
-         caption = "Data: DGS, 2022") +          # Legenda dos dados
-    # Definir a escala de cores manualmente para a categoria de incidência
-    scale_fill_manual(values = cols,
-                      name = "") +
-    # Personalizar a legenda
-    theme(legend.position = "right",
-          legend.direction = "vertical",
-          legend.text = element_text(size = 8, colour = "gray50")) 
-# Exibir o mapa
+    # add the previously defined basic theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022") +
+    # and we use guide_legend instead of guide_colourbar
+  scale_fill_manual(values = cols,
+                    name = "") +
+  theme(legend.position = "right",
+        legend.direction = "vertical",
+        legend.text = element_text(size = 8, colour = "black")) 
 p
+```
+
+
+#### Mapa Europeu 
+
+Podemos descarregar os mapas das NUTS directamente do pacote giscoR. Neste caso vamos fazer o download de NUTS0 (paises)
+
+```{r}
+# Carregar o pacote giscoR
+library(giscoR)
+
+# Obter dados geográficos dos NUTS nível 0 para o ano de 2016
+# NUTS nível 0 geralmente se refere a grandes regiões ou países
+nuts0 <- gisco_get_nuts(
+  year = "2016",        # Ano dos dados
+  epsg = "3035",        # Sistema de coordenadas espaciais 
+  resolution = "3",     # Resolução dos dados (3 = baixa resolução)
+  nuts_level = "0"      # Nível NUTS (0 = nível mais alto)
+)
 
 ```
+
+Podemos obter dados do Eurostat directamente do pacote eurostat. 
+
+Podemos explorar mais aqui <https://ropengov.github.io/eurostat/articles/eurostat_tutorial.html> 
+
+
+```{r}
+# Carregar o pacote eurostat
+library(eurostat)
+
+# Baixar o conjunto de dados de expectativa de vida saudável do Eurostat
+healthy_life_expectancy <- get_eurostat("hlth_silc_17") |>
+  # Filtrar para o ano de 2021, sexo total (ambos os sexos) e indicador de expectativa de vida saudável ao nascer
+  filter(TIME_PERIOD == "2021-01-01", 
+         sex == "T", 
+         indic_he == "HE_BIRTH"
+         )
+
+```
+
+Os passos para gerar o mapa são 1. Juntar os dados, 2. Definir as categorias, 3. criar o mapa
+
+```{r}
+# Combinar os dados NUTS com os dados de expectativa de vida saudável
+nuts0.sf <- nuts0 |> 
+  left_join(healthy_life_expectancy, by = c("NUTS_ID" = "geo"))
+```
+
+
+```{r}
+# Definir intervalos para categorização
+br <- c(0, 68, 70, 75, 77, 80, 85)
+
+# Categorizar os dados de expectativa de vida
+nuts0.sf <- nuts0.sf %>%
+  mutate(values_cut = cut(values, br, dig.lab = 6))
+
+
+labs_plot <- prettyNum(br[-1], big.mark = ",")
+
+# Paleta de cores 
+pal <- hcl.colors(length(br) - 1, "Lajolla")
+
+```
+
+
+```{r}
+# Criar um mapa temático com ggplot2
+p_map <- ggplot(nuts0.sf) +
+  # Adicionar as regiões NUTS com preenchimento baseado na expectativa de vida saudável
+    # Adicionar linhas de fronteira dos países
+  geom_sf(data = nuts0.sf, 
+          col = "black",  # Cor das linhas de fronteira
+          linewidth = 0.1) + # Espessura das linhas de fronteira
+  
+  geom_sf(aes(fill = values_cut), 
+          linewidth = 0,  # Linhas de fronteira sem largura
+          color = NA,     # Sem cor de linha
+          alpha = 0.9) +  # Transparência das cores de preenchimento
+
+  # Configurar as coordenadas para centralizar na Europa (EPSG 3035)
+  coord_sf(
+    xlim = c(2377294, 7453440),
+    ylim = c(1313597, 5628510)
+  ) +
+  # Adicionar rótulos ao mapa
+  labs(
+    title = "Healthy Life Expectacy in the EU", # Título
+    subtitle = "2021", # Subtítulo
+    caption="Data: Eurostat"
+  ) +
+  # Configurar a escala de cores manualmente
+  scale_fill_manual(
+    name = "Years",       # Nome da legenda
+    values = pal,         # Paleta de cores
+    labels = labs_plot,   # Rótulos para as categorias de cor
+    drop = FALSE,         # Manter todas as categorias na legenda
+    guide = guide_legend( # Configurar a aparência da legenda
+      direction = "horizontal",
+      keyheight = 0.4,
+      keywidth = 1.5,
+      title.position = "top",
+      title.hjust = 0.5,
+      label.hjust = .5,
+      nrow = 1,
+      byrow = TRUE,
+      reverse = FALSE,
+      label.position = "bottom"
+    )
+  ) +
+  # Aplicar um tema personalizado para mapas
+  theme_map() +
+  # Personalizar aspectos adicionais do tema
+  theme(
+    plot.caption = element_text(
+      size = 8, color = "grey60"
+      ),
+    legend.text = element_text(
+      size = 8,
+      color = "grey20"
+    ),
+    legend.title = element_text(
+      size = 9,
+      color = "grey20"
+    ),
+    legend.position = "bottom" # Posição da legenda
+  )
+
+p_map
+```
+
+```{r}
+ggsave(
+  p_map,
+  filename = here::here("output", 
+                        "figures", 
+                        paste0( "map_eu_HE", ".png")),
+  width = 10,
+  height = 8,
+  units = c("cm"),
+  dpi = "retina",
+  bg = "white"
+)
+```
+
 
 ### Dados Raster  
 
@@ -1786,6 +1949,8 @@ g_tmax_map
 
 
 ### Dados de Localização
+
+Os dados de localização são pontos de coordenadas (lat, long) que podemos adicionar à nossa shapefile.
 
 ```{r}
 # Filtrar só para a ARS de Lisboa e Vale do Tejo
@@ -1914,179 +2079,24 @@ l
 
 # EXTENÇÕES
 
+As extensões ggplot2 são pacotes no R que ampliam a funcionalidade do ggplot2. Estas extensões adicionam novas camadas, temas, escalas e outras funcionalidades, permitindo aos usuários criar gráficos mais complexos e personalizados. 
+
+Aqui estão algumas das extensões ggplot2 mais populares e suas funcionalidades:
+
+**gganimate:** Permite criar animações com ggplot2. Com gganimate, você pode transformar gráficos estáticos em animações para mostrar mudanças nos dados ao longo do tempo ou destacar movimentos ou transições.
+
+**ggridges:** Usado para criar gráficos de "ridgeplot", que são úteis para visualizar a distribuição de uma variável contínua ao longo de várias categorias. Esses gráficos são uma alternativa esteticamente agradável aos gráficos de densidade ou violino.
+
+**ggforce:** Fornece uma variedade de funcionalidades que não estão disponíveis no ggplot2 padrão, como links geométricos entre pontos, gráficos de densidade facetados e muito mais.
+
+**patchwork:** Uma biblioteca para combinar vários gráficos ggplot2 em um único layout. É muito útil para criar painéis de gráficos complexos.
+
+**ggrepel:** Oferece melhorias na forma como os rótulos de texto são adicionados aos gráficos. Ajuda a evitar a sobreposição de texto, tornando os gráficos mais legíveis.
+
 [extensions of ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
 
-https://dreamrs.github.io/esquisse/index.html 
-# Adicional Resources
+**esquisse:** é um add-in para R que permite criar e personalizar visualizações de dados interativas com ggplot2 e filtrar dados com dplyr. Ele fornece uma interface gráfica intuitiva que facilita a criação de gráficos, mesmo para usuários que não estão familiarizados com a sintaxe do ggplot2. Aqui estão algumas de suas principais características:
 
-<https://www.cedricscherer.com/slides/useR-2021_ggplot-wizardry-extended.pdf>
+Interface de Arrastar e Soltar: esquisse oferece uma interface de arrastar e soltar para mapear suas variáveis em diferentes estéticas, tornando a criação de gráficos rápida e acessível. <https://dreamrs.github.io/esquisse/index.html>
 
-# Exercicio 
-Para os exercicios 6 e 7 deve utilizar o dataset hypoxia
-```{r}
-hypoxia <- read_csv("datasets/hypoxia.csv")
-```
-
-
-
-## Exercicio 6
-1. Compara a distribuição de idades entre homens e mulheres
-2. O gráfico deve ter um título, caption, legenda. A distribuição estar preenchido por cor "#91bfdb" e "#ef8a62". Utiliza o tema classic  
-
-
-## Exercicio 7
-1. Explora a relaçao entre MinSao2 e o BMI
-2. O gráfico deve ter um título, caption, legenda. Usa o theme minimal e adiciona uma linha tendencia linear
-
-## Exercicio 9
-1. Cria um mapa usado o shapefile comm_pt, e as caracteristicas da base de dados "mortalidade_coracao_2021.csv"
-2. O mapa deve conter a mortalidade por doenças cardiovasculares com uma escala de 5 cores 
-3. O gráfico deve ter um título, caption, legenda.
-
-# NOT WORKING 
-
-
-#### Juntar datasets (Joins) 
-
-```{r}
-
-# Left join data
-country_lines_sf <- country_lines %>%
-  left_join(healthy_life_expectancy, by = c("CNTR_CODE" = "geo"))
-```
-
-```{r}
-br <- c(0, 60, 70, 75, 80, 85)
-
-country_lines_sf <- country_lines_sf %>%
-  mutate(values_cut = cut(values, br, dig.lab = 5))
-
-labs_plot <- prettyNum(br[-1], big.mark = ",")
-
-# Palette
-pal <- hcl.colors(length(br) - 1, "Lajolla")
-
-```
-```{r}
-country_lines_sf <- country_lines_sf |> drop_na(values_cut)
-```
-
-
-```{r}
-# Plot
-
-ggplot(country_lines_sf) +
-  geom_sf(aes(fill= values_cut), linewidth = 1.5,color="black") +
-  #geom_sf(data = country_lines, col = "black", linewidth = 0.1) +
-  # Center in Europe: EPSG 3035
-  coord_sf(
-    xlim = c(2377294, 7453440),
-    ylim = c(1313597, 5628510)
-  ) +
-  labs(
-    title = "Healthy life expectancy in 2021",
-    subtitle = "",
-    caption = "Source: Eurostat"
-  ) 
-
-+
-  scale_fill_manual(
-    name = "Healthy life expectancy",
-    values = pal,
-    labels = labs_plot,
-    drop = FALSE,
-    guide = guide_legend(
-      direction = "horizontal",
-      keyheight = 0.5,
-      keywidth = 2.5,
-      title.position = "top",
-      title.hjust = 0.5,
-      label.hjust = .5,
-      nrow = 1,
-      byrow = TRUE,
-      reverse = FALSE,
-      label.position = "bottom"
-    )
-  ) +
-  theme_void() +
-  # Theme
-  theme(
-    plot.title = element_text(
-      size = 12, color = pal[length(pal) - 1],
-      hjust = 0.5, vjust = -6
-    ),
-    plot.subtitle = element_text(
-      size = 14,
-      color = pal[length(pal) - 1],
-      hjust = 0.5, vjust = -10, face = "bold"
-    ),
-    plot.caption = element_text(
-      size = 9, color = "grey60",
-      hjust = 0.5, vjust = 0,
-      margin = margin(t = 5, b = 10)
-    ),
-    legend.text = element_text(
-      size = 10,
-      color = "grey20"
-    ),
-    legend.title = element_text(
-      size = 11,
-      color = "grey20"
-    ),
-    legend.position = "bottom"
-  )
-
-```
-
-### Dados (features) espaciais 
-
-```{r}
-# Use eurostat
-library(eurostat)
-
-# Que datasets estão disponiveis no Eurostat
-health_datasets <- search_eurostat("health")
-```
-
-
-```{r}
-# Download do dataset 	 Healthy life expectancy based on self-perceived health
-
-healthy_life_expectancy <- get_eurostat("hlth_silc_17") |> filter(TIME_PERIOD=="2021-01-01", 
-                                                                  sex=="T", 
-                                                                  indic_he=="HE_BIRTH")
-```
-
-
-### Àreas 
-
-```{r}
-# Get shapes
-nuts3 <- gisco_get_nuts(
-  year = "2016",
-  epsg = "3035",
-  resolution = "3",
-  nuts_level = "3"
-)
-
-# Group by NUTS by country and convert to lines
-country_lines <- nuts3 %>%
-  group_by(
-    CNTR_CODE
-  ) %>%
-  summarise(n = n()) %>%
-  st_cast("MULTILINESTRING")
-```
-
-```{r}
-ggplot(nuts3) +
-  geom_sf() +
-  theme_map()
-```
-
-
-```{r}
-ggplot(country_lines) +
-  geom_sf() +
-  theme_map()
-```
+# FIM 
