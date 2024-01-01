@@ -1,6 +1,6 @@
 ---
-title: "Module 2 | Reporting with Quarto "
-subtitle: "Introduction to html quarto"
+title: "Módulo 2 | Quarto "
+subtitle: "Introdução ao html em quarto"
 author: 
   name: A. Peralta-Santos
   affiliation: 
@@ -21,7 +21,7 @@ lang: pt
 execute:
   warning: false
   echo: TRUE
-bibliography: references2.bib 
+bibliography: references.bib 
 ---
 
 # Título 1
@@ -34,7 +34,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eu tempor velit. 
 
 ## Título 2
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neque ex, vehicula dictum risus fermentum, feugiat faucibus neque. Etiam purus quam, lacinia vel porta in, malesuada ac nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed bibendum placerat tellus, ac finibus lectus euismod eget. [@strabelli2020covid]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neque ex, vehicula dictum risus fermentum, feugiat faucibus neque. Etiam purus quam, lacinia vel porta in, malesuada ac nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed bibendum placerat tellus, ac finibus lectus euismod eget.
 
 ### Título 3
 
@@ -48,7 +48,7 @@ Nulla mattis diam vitae bibendum consequat. Etiam vitae eros tristique, porta sa
 
 <!--- citacao importante --->
 
-## Definir a configuração markdown
+## Definir a configuração do Quarto
 
 ```{r setup, include=FALSE}
 # Configurações gerais para o pacote knitr
@@ -131,16 +131,13 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neque ex, veh
 
 ## Imagens
 
-![Logotipo do curso](images/logo.png "Logo of our course"){width="6cm"}
+![Logotipo do curso](images/HEX_R_DATA_SCIENCE.png "Logo of our course"){width="6cm"}
 
-![Portugal](images/map_pt.jpeg){width="250"}
 :::
 
 ## Equações
 
-Usar dois símbolos de dólar para uma equação separada do texto, e assim por diante.$$
-E(log(Y_t)) 
-$$
+Usar dois símbolos de dólar para uma equação separada do texto, e assim por diante. $E(log(Y_t))$
 
 $$ E(log(Y_t)) = \beta_0 + \beta_{1-11} \sum_{m=1}^{m=12} MONTH_t + \beta_{12} TIME + \beta_{13} INT_t + \beta_{14} TIME*INT_t + log(POP_t) + \epsilon_t$$
 
@@ -148,7 +145,7 @@ equação simples $Y=ax+2$
 
 usar um símbolo de dólar para equações inline no texto $E(log(Y_t))$
 
-## Código Inline e Code Annotations
+## Anotações ao Código 
 
 ```{r include=TRUE}
 #| echo: true
@@ -166,6 +163,7 @@ x #<4>
 3. Definir x como a soma de a mais b.
 4. Mostrar x ao utilizador
 
+## Codigo 'inline'
 ```{r}
 # Z e a media de idades
 media_idade  <- 43
@@ -258,11 +256,8 @@ EX:Tabela
 | `r  c` | 150     |
 | 2      | 160     |
 
-: 4.ª Edição
+: 5.ª Edição
 
-#### Inserir um URL
-
-[this is a URL](https://www.ensp.unl.pt/cursos/cursos-de-curta-duracao/data-science-with-r-in-healthcare/)
 
 Escrever em **negrito**
 
@@ -274,10 +269,6 @@ Como o Quarto funciona com suporte a múltiplas linguagens é possível colocar 
 
 Desde vídeos a iframe de HTMl permitindo embutir dentro do documento sites web.
 
-
-```{=html}
-<iframe width="780" height="500" src="https://www.ensp.unl.pt/cursos/cursos-de-curta-duracao/data-science-with-r-in-healthcare/" title="this is a Iframe"></iframe>
-```
 
 ::: {.callout-tip}
 ## Atenção 
@@ -357,8 +348,6 @@ Os dados estão atualizados até ao dia `r Sys.Date()`
 [@sharma2010various]
 
 [@perkins2020increasing]
-
-A COVID mata toda a gente com EAM. [@strabelli2020covid]
 
 ## Problemas
 

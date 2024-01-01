@@ -1,18 +1,18 @@
 ---
-title: "Module 2 | Reporting with Quarto - PPT"
+title: "Módulo 2 | Quarto "
 subtitle:
-    Data Science for Healthcare
+    Introdução ao word em quarto
     A. Peralta-Santos
 date-format: long
 format: 
   pptx:
-    reference-doc: template.pptx
+    reference-doc: templates/template.pptx
 theme: cosmo
 lang: pt   
 execute:
   warning: false
   echo: TRUE
-bibliography: references2.bib 
+bibliography: references.bib 
 output-dir: documents
 ---
 
@@ -137,7 +137,6 @@ Pedir feedback aos colegas.
 
 - [@perkins2020increasing]
 
-- A COVID mata toda a gente com EAM. [@strabelli2020covid]
 
 ## Bibliografia
 
