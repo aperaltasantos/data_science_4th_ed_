@@ -1,5 +1,5 @@
 ---
-title: "Módulo 5 | Visualização de dados"
+title: "Módulo 4 | Visualização de dados"
 author: "A. Peralta-Santos"
 date: today
 lang: pt
@@ -22,17 +22,17 @@ project:
 
 # PRINCIPIOS DE VISUALIZAÇÃO
 
-por Cédric Scherer
+*por Cédric Scherer*
 
-1.  INFORMAÇÃO (integridade) Apresentar os dados de forma precisa e honesta, sem manipular ou distorcer os fatos para enganar o público.
+**1.  INFORMAÇÃO** (integridade) Apresentar os dados de forma precisa e honesta, sem manipular ou distorcer os fatos para enganar o público.
 
-2.  HISTÓRIA (interesse) Narrativa cativante dentro da visualização de dados, tornando a informação não apenas informativa, mas também envolvente e memorável para o espectador.
+**2.  HISTÓRIA** (interesse) Narrativa cativante dentro da visualização de dados, tornando a informação não apenas informativa, mas também envolvente e memorável para o espectador.
 
-3.  OBJETIVO (utilidade) Garantir que a visualização de dados sirva a um propósito claro, seja para informar, persuadir, educar ou apoiar a tomada de decisões.
+**3.  OBJETIVO** (utilidade) Garantir que a visualização de dados sirva a um propósito claro, seja para informar, persuadir, educar ou apoiar a tomada de decisões.
 
-4.  FORMA VISUAL (beleza) Valor do design esteticamente agradável na visualização de dados, que realça a experiência do leitor e pode tornar as informações complexas mais acessíveis e compreensíveis.
+**4.  FORMA VISUAL** (beleza) Valor do design esteticamente agradável na visualização de dados, que realça a experiência do leitor e pode tornar as informações complexas mais acessíveis e compreensíveis.
 
-5.  Dicas úteis Layout Limpo --- "menos é mais"
+**5.  Dicas úteis** *Layout Limpo --- "menos é mais"*
 
 -   Use anotações diretas para melhorar a legibilidade e interpretabilidade.
 -   Utilize hierarquia para orientar o leitor.
@@ -1999,6 +1999,9 @@ p
 
 ### Open Streep maps
 
+O OpenStreetMap (OSM) é um projeto colaborativo que cria mapas livres e editáveis do mundo, semelhante à Wikipedia, mas para mapas. Fornece dados geográficos acessíveis e atualizados que são úteis para uma variedade de aplicações, desde navegação e planejamento urbano até análises geoespaciais e projetos de pesquisa.
+
+O osmdata é um pacote no R que permite manipular os dados do OpenStreetMap diretamente do R. É uma ferramenta para cientistas de dados e pesquisadores que trabalham com dados geoespaciais. 
 
 ::: callout-warning
 
@@ -2062,19 +2065,53 @@ ggplot() +
 
 ### Mapas Interactivos (leaflet) 
 
-```{r}
-library(leaflet)
-pal <- colorNumeric(palette = "YlOrRd", domain = comm_pt$Incidencia)
+O Leaflet para R é usado para criar mapas interativos que podem ser integrados em relatórios R Markdown, aplicativos Shiny ou páginas da web. Esses mapas podem incluir funcionalidades como zoom, pan e layers interativos.
 
-l <- leaflet(comm_pt) |>  
-  addTiles() |> 
-  addPolygons(color = "grey", fillColor = ~ pal(Incidencia),
-              fillOpacity = 0.9) %>%
-  addLegend(pal = pal, values = ~Incidencia, opacity = 0.9) |> 
-  addMiniMap()
-l
+Personalização: Oferece ampla personalização de mapas, ver mais aqui <https://rstudio.github.io/leaflet/>
+
+```{r}
+
+# Preparar as cores usadas
+mybins <- c(0,60,120,240,480,Inf)
+mycolors <- c("#f7f7f7","#fee391","#fb6a4a","#cb181d","#67000d")
+mypalette <- colorBin( palette=mycolors, domain=comm_pt$Incidencia, na.color="transparent", bins=mybins)
+
+# Preparar o texto da legenda interactiva
+mytext <- paste(
+    "Concelho: ", comm_pt$NAME_2,"<br/>",
+    "Incidência: ", comm_pt$Incidencia, 
+    sep="") %>%
+  lapply(htmltools::HTML)
+
+
 ```
 
+```{r}
+# Carregar o pacote leaflet
+library(leaflet)
+
+# Criar um mapa interativo com leaflet
+p <- leaflet(comm_pt) |> # Inicializar o mapa com os dados 'comm_pt'
+  setView(lat=39.5, lng=-7.6, zoom=6) |> # Definir a visualização inicial (foco em Portugal)
+  addProviderTiles(providers$CartoDB.Positron) |> # Adicionar tiles de base do CartoDB (estilo Positron)
+  addPolygons(
+    fillColor = ~mypalette(Incidencia), # Definir a cor de preenchimento dos polígonos baseada em 'Incidencia'
+    stroke=TRUE,                       # Ativar as bordas dos polígonos
+    fillOpacity = 0.9,                 # Definir a opacidade de preenchimento
+    color="grey",                      # Definir a cor da borda dos polígonos
+    weight=0.3,                        # Definir a espessura da borda dos polígonos
+    label = mytext,                    # Adicionar rótulos aos polígonos
+    labelOptions = labelOptions(
+      style = list("font-weight" = "normal", padding = "3px 8px"), # Estilo dos rótulos
+      textsize = "13px",              # Tamanho do texto dos rótulos
+      direction = "auto"              # Direção automática dos rótulos
+    )) |> 
+  addMiniMap() # Adicionar um mini-mapa para navegação
+
+# Exibir o mapa
+p
+
+```
 
 
 # EXTENÇÕES

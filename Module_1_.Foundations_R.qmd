@@ -1,0 +1,657 @@
+---
+title: "Module 1 | Foundations in R"
+subtitle: "Data Wrangling"
+author: "Autor"
+affiliation: 
+    - Escola Nacional de Saúde Pública
+date: today
+date-format: long
+lang: pt  
+format: 
+  html:
+    smooth-scroll: true
+    toc: true
+    toc-location: left
+    embed-resources: true
+    number-sections: true
+    code_download: true
+    code-fold: show
+    fig_caption: true
+    force_captions: true
+    subtitle: ""
+    urlcolor: darkblue
+    linkcolor: darkblue
+    fig_width: 12
+    fig_height: 8
+    code-copy: true
+    always_allow_html: true
+    output-file: "module1.html"
+theme:
+  light: flatly
+  dark: darkly
+execute:
+  warning: false
+  echo: true
+  message: false
+---
+
+# Fundamentos do R
+
+Este documento é um guia abrangente sobre os fundamentos da programação em R, com foco em conceitos-chave e suas aplicações, especialmente no campo da saúde.
+
+# GUIA DE ESTILO - fase de Planeamento de um projeto
+
+## Boas práticas gerais
+
+Um projeto funciona tão melhor quanto a sua organização.
+
+É importante criar um guia de estilos para a execução tanto de projetos individuais como em equipa para garantir consistência. Isto tem alguns benefícios:
+
+1. Criar interoperabilidade: Os dados podem ser combinados e comparados através do tempo e em locais diferentes;
+2. Melhoria na interpretação: Manter estruturas de código, nomenclatura e de projetos permite que quando colegas e nós próprios olhamos para um projeto consigamos rapidamente verificar erros e oportunidades de  melhoria;
+3. Reprodutibilidade: Algo que será o foco do Módulo 7 mas que implica que os nomes dos ficheiros, pastas e variáveis sejam coerentes, pois a ausência dos mesmos limita a gestão de dados ou a análise possa ser replicada no futuro;
+
+Em termos individuais, este tipo de guias deve ser criado antes da criação de um projeto.
+
+:::{.callout-note}
+
+O nosso guia pessoal pode mudar ao longo do tempo, mas se seguir princípios claros logo de ínicio ajuda a direcionar a nossa jornada em *Data Science*
+:::
+
+:::{.callout-warning}
+O resto desta explicação será mais aprofundada mas ficam aqui um guia geral:
+
+1. Evitar espaços em tudo - Não lidos pela maior parte dos sistemas de linha de comando
+    - Alternativa: underscore (_) ou hífen (-)
+2. Evitar caracteres especiais ?, ., *, \, /, +, ', &, ".
+    - Alternativa: underscore (_) ou hífen (-) ou mudar o nome a usar
+3. Conveções de nomes usadas em programação
+    - Existem várias opções mas as mais usadas são a Snake case (data_science) e o Camel case (dataScience)
+4. Cuidados com o tamanho dos caracteres. Existem limites no número de caracteres lidos pelo programa.
+    - Não colocar ficheiros muito aninhados em pastas
+    - Não colocar nomes muito longos nos ficheiros/pastas/variaveis
+:::
+
+## Estrutura das pastas/organização de um projeto
+
+Podemos organizar um projeto de 2 grandes formas:
+
+1. Pastas de forma hierárquica (+comum)
+2. Metadados dos ficheiros (Tags nos ficheiros)
+  - Exemplo para consulta: [Cakici 2017](https://enterprise-knowledge.com/folders-v-metadata-sharepoint-document-libraries/)
+
+Por ser mais comum e mais fácil de entender iremos focar na organização em pastas.
+
+Podemos ter uma estratura mais ou menos profunda:
+
+1. Muitos ficheiros numa pasta pode dificultar a procura específica de um documento
+2. Estruturas muito densas dificultam o número de cliques e podem atingir limites de leitura.
+   - Exemplo: One Drive - 400 caracteres; Windows - 260 carateres
+   
+Criar clara divisão de ficheiros editáveis de ficheiros confidenciais.
+
+Decidir se se cria ficheiro de arquivo ou se as versões ficam na pasta original para *tracebility* dos dados.
+
+Exemplos de um projeto com 3 equipas a trabalhar em simultâneo:
+
+```{r }
+#| eval: false
+project/
+├── equipa_A
+|   ├── planeamento
+|   |   └── ...
+|   ├── documentação
+|   |   └── ...
+|   ├── dados
+|   |   └── ...
+|   └── ...
+├── equipa_B
+|   ├── planeamento
+|   |   └── ...
+|   ├── documentação
+|   |   └── ...
+|   ├── dados
+|   |   └── ...
+|   └── ...
+├── arquivo
+└── ...
+```
+
+
+```{r }
+#| eval: false
+project/
+├── planeamento
+|   ├── equipa_A
+|   |   └── ...
+|   ├── equipa_B
+|   |   └── ...
+|   ├── equipa_C
+|   |   └── ...
+|   └── ...
+├── documentação
+|   ├── equipa_A
+|   |   └── ...
+|   ├── equipa_B
+|   |   └── ...
+|   ├── equipa_C
+|   |   └── ...
+|   └── ...
+├── arquivo
+└── ...
+```
+
+:::{.callout-warning}
+Ser EXPLICITO e CLARO nos nomes das pastas e ficheiros
+
+Ser consistente na Nomenclatura de ficheiros
+:::
+
+## Nomes de ficheiros
+
+Questões que devem ser repondido ao ler o nome de um ficheiro:
+
+1. O que são?
+2. Quando foram criados?
+3. Esta é a versão mais recente?
+
+Para isso:
+
+- Nomes descritivos
+- Sem informação pessoal
+- Sem espaços
+- Limitar número de caracteres 
+- Datas devems ser usadas no formato ISO 8601 - YYYY-MM-DD or YYYYMMDD
+- Se forem criadas versões - ser explicito na versão atual "v01" ou "v01.01"
+- Abreviaturas têm de ser claras para TODA a gente
+- A criação de tags/etiquetas é boa prática
+- Manter separação de ficheiros com dados "raw" ou em bruto e dados manipulados
+- Criar pastas de inputs/datasets e outputs
+
+## Nomes de variáveis
+
+Boas práticas:
+
+- Não usar palavras de funções ou operadores (mais à frente iremos ver quais são)
+- Limitar o número de caracteres numa variável
+
+:::{.callout-warning}
+Limites de programa comuns de análise estatística:
+
+1. SPSS is 64
+2. Stata is 32
+3. SAS is 32
+4. R is 10,000
+:::
+
+- Todos os nomes de variáveis devem ser únicos
+- Nomes devem explícitos e claros
+
+::: {.callout-note appearance="simple"}
+Exemplo de matadados nas variáveis
+-   Reporter
+-   Nome ou abreviatura do mesmo
+-   `Escala/Alterações (se relevante)`
+-   `Número/Versão (se relevante)`
+-   Tipo de variável (se relevante)
+:::
+
+- Variáveis só devem mudar de nome se houver uma alteração significativa feita
+- Isto deve ser utilizado mesmo em projetos diferentes para manter interoperabilidade
+- Não usar caracteres especiais, excepto o underscore "_". o - pode ser utilizado mas com cuidado pois confunde-se com a subtração
+- Ser coerente em relação a capitalização e separadores
+- É possível em R intoduzir label em variáveis com nomes corretamente elaborados
+
+:::{.callout-warning}
+Iremos explorar uma função que permite fazer isto em múltiplas estruturas de dados de forma simples
+:::
+
+## Variáveis Nominais
+
+Boas práticas
+
+- Código único
+- Consistente com significado (Homem = "H")
+- Consistente ao longo do tempo e projeto
+- Fatores ordinais devem ser claros na ordem
+
+## Valores em Falta
+
+Boas práticas
+
+- Uniformizar é a palavra-chave
+- Código deve ser claro e impossível de obter de outra forma
+- Pode ser usado código único ou múltiplos para inclusão de razões de falta de dados
+- Se for atribuído um valor deve ser do mesmo tipo que a variável que está em falta (Ex: "NA_character_" ou "NA_real_")
+
+## Estrutura de Código
+
+Exemplo de template de estrutura
+
+```{r}
+#### Overview ####
+# Associated project: 
+# Script purpose:
+# Data cleaning plan followed:
+# Created by: 
+# Date created:
+# Code checked by:
+# Code checked date:
+
+
+#### Workspace setup ####
+
+# Settings, packages, root paths
+
+
+#### Data import ####
+
+
+#### Cleaning code section 1 ####
+
+
+#### Cleaning code section 1 ####
+```
+
+Boas práticas:
+
+- Usar comentários (iremos abordar como mais à frente)
+- Usar espeços, identação e limites de linha
+
+```{r}
+#| eval: false
+# Mau código
+# É o código mais conciso em espaço mas é confuso e não ajuda o leitor a perceber a mensagem
+sum_patients_year_speciality <- inpatient_hospital_lite |> summarise(all_patients = sum(doentes_saidos, na.rm = TRUE),days_patients = sum(dias_de_internamento, na.rm = TRUE), mean_patient_days = mean(dias_de_internamento, na.rm = TRUE), sd_patient_days = sd(dias_de_internamento, na.rm = TRUE), max_patient_days = max(dias_de_internamento, na.rm = TRUE),min_patient_days = min(dias_de_internamento, na.rm = TRUE),.by = c(year, tipo_de_especialidade))
+
+# Mais ou menos
+# apesar de mais claro em termos de espaço a identação não ajuda a compreender o código utilizado
+sum_patients_year_speciality <- inpatient_hospital_lite |> 
+  summarise(all_patients = sum(doentes_saidos, na.rm = TRUE),
+    days_patients = sum(dias_de_internamento, na.rm = TRUE),
+        mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
+            sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
+          max_patient_days = max(dias_de_internamento, na.rm = TRUE),
+      min_patient_days = min(dias_de_internamento, na.rm = TRUE),
+    .by = c(year, tipo_de_especialidade)
+  )
+
+# bom
+# o codigo usa a mesma identação para toda a operação de summarise clarificando que a mesma é toda uma operação
+sum_patients_year_speciality <- inpatient_hospital_lite |> 
+  summarise(
+    all_patients = sum(doentes_saidos, na.rm = TRUE),
+    days_patients = sum(dias_de_internamento, na.rm = TRUE),
+    mean_patient_days = mean(dias_de_internamento, na.rm = TRUE),
+    sd_patient_days = sd(dias_de_internamento, na.rm = TRUE),
+    max_patient_days = max(dias_de_internamento, na.rm = TRUE),
+    min_patient_days = min(dias_de_internamento, na.rm = TRUE),
+    .by = c(year, tipo_de_especialidade)
+  )
+```
+
+- Usar caminhos relativos: Em R todos os ficheiros são relativos ao local/pasta do nosso projeto. Este deve ser a forma de orientar os nossos ficheiro pois aumenta a reprodutibilidade.
+- Evitar repetição: Se repetirmos um código mais que 2-3 vezes o melhor será o de criar uma função ou loop que faça o queremos de forma mais sucinta
+- Mais à frente iremos abordar como maximizar a reprodutibilidade de execução de ficheiros independentemente de alterações de pacotes que usamos.
+
+::: {.callout-note appearance="simple"}
+Exemplo de estrutura de ficheiros aplicada neste curso:
+
+Pasta datasets - dados em bruto não trabalhados
+Pasta outputs - Onde estão os ficheiros de saída de scripts
+Pasta exercícios - Onde estarão os exercícios
+Pasta cheat_sheets - Onde está alguma documentação utilizada
+Pasta imagens - Onde estão a ser guardados os ficheiros de visualização
+
+:::
+
+# ESTRUTURAS DE DADOS
+
+## Objetos e Variáveis (1 dimensão)
+
+Objetos e variáveis em R são a base para armazenar e manipular dados permitindo uma maior abstração dos mesmos e uma manipulação direta por vinculação a um nome. 
+
+Esta ligação é dinâmica, significa que as variáveis podem ser reatribuidas e rescritas sem que disso surja um erro.
+
+No contexto da saúde, eles podem representar desde dados de pacientes até resultados de análises.
+
+```{r}
+# aqui criamos a variavel da paciente_idade com o valor 30
+
+paciente_idade <- 30
+
+# aqui criamos a variavel da paciente_nome com o valor "Anaª
+paciente_nome <- "Ana"
+
+
+```
+
+
+## Vetores (2 dimensões)
+
+Vetores são coleções unidimensionais de elementos. 
+Existem dois tipos principais:
+
+1. Vetores atómico (apenas um tipo de dados - como integer, double, character)
+2. Listas (mais que um tipo de dados)
+
+Em saúde, eles podem ser usados para armazenar uma séries de medições, como temperaturas corporais de um grupo de pacientes ou um conjunto de idades ou níveis de uma representação.
+
+```{r}
+# a variável temperatura tem 3 valores com os valores numéricos 36.5, 37.2,
+temperaturas <- c(36.5, 37.2, 38.0)
+
+```
+
+## Dataframes e Tibbles (3 dimensoes)
+
+Dataframes e tibbles são estruturas de dados tabulares. 
+
+Cada vetor na lista representa uma coluna.
+
+Dataframes são extremamente flexíveis, permitindo colunas de diferentes tipos mas cada coluna é de apenas um tipo.
+
+Eles são essenciais para o manipulação de conjuntos de dados clínicos, permitindo armazenar diferentes tipos de dados em colunas e linhas.
+
+```{r}
+
+dados_pacientes <- data.frame(
+  Idade = c(25, 30, 45),
+  Nome = c("João", "Ana", "Marta"),
+  Temperatura = c(36.6, 37.5, 38.2)
+)
+
+```
+
+:::{.callout-note}
+O formato tabular deve garantir que cada observação linha é única.
+:::
+
+## Listas (4 dimensoes)
+
+Listas em R são coleções que podem conter diferentes tipos de elementos.
+
+São os mais diferentes de conceptualizar mas cada elemento na listas pode ter 1, 2, 3 ou 4 dimensoes
+
+:::{.callout-note}
+Podem existir listas de listas.
+:::
+
+São úteis para armazenar dados múltiplos com uma estrutura complexa.
+
+```{r}
+
+paciente_info <- list(nome = "Ana", idade = 30, temperatura = 37.5, dados_pacientes,temperaturas)
+
+```
+
+# Notação em R
+
+Existem dois grandes tipos de notação em R para aceder a elementos das estruturas de dados.
+
+## Notação com Sinal de Dólar $ e Parênteses Curvos []
+
+A notação em Dólar tem a seguinte sintaxe:
+
+1. Objeto a referenciar
+2. Estrutura nomeada
+
+:::{.callout-warning}
+A estrutura mínima para o uso da notação de dólar é o dataframe.
+Não pode ser usada em vectores ou elementos (1 e 2 dimensões)
+:::
+
+A notação em Parênteses Curvos [] tem a seguinte sintaxe:
+
+1. Objeto a referenciar
+2. Referir posição da estrutura a referenciar
+
+```{r}
+# este cócigo retira a coluna Idade
+idades_paciente <- dados_pacientes$Idade
+# este cócigo retira a primeira linha
+primeiro_paciente <- dados_pacientes[1,]
+# este cócigo retira a primeira coluna
+primeira_coluna <- dados_pacientes[,1]
+
+# nas listas podem ser usadas notações aninhadas
+# este cócigo retira o 4 elemento da lista paciente_info e a primeira linha deste elemento
+primeiro_paciente_2 <- paciente_info[[4]][1,]
+
+```
+
+:::{.callout-note}
+A notação de parênteses é mais flexível, permitindo selecionar múltiplas linhas e/ou colunas, mas é a menos intuitivas.
+
+Em geral é preferível usar a notação de dólar por ser mais explícita e menos afetada por alterações na ordem dos dados 
+:::
+
+# COMENTÁRIOS
+
+Comentários são cruciais para explicar o propósito de código.
+A forma para introduzir "#" para adicionar comentários. 
+
+Documentar especialmente partes complexas do código e alterações no código.
+Em projetos colaborativos pode ser relevante marcar quem fez alterações
+
+```{r}
+# isto é um comentários
+# autoria: JDionisio
+# data de alterção
+```
+
+
+:::{.callout-note}
+
+Em módulos mais à frente iremos abordar outras opções para gestão de versões com o uso do Git.
+
+:::
+
+# OPERAÇÕES
+
+R é uma linguagem projetada para análise estatística, o que se reflete na sua riqueza de operações matemáticas e na disponibilidade de operadores. 
+
+## Operações Matemáticas e Operadores
+
+Existem vários operadores matemáticos:
+
+1. "+"
+2. "-"
+3. "*"
+4. "/"
+
+As operações matemáticas em R são geralmente vetorizadas, o que significa que operações como adição, subtração, multiplicação e divisão podem ser aplicadas diretamente a vetores ou matrizes. Por exemplo, ao adicionar dois vetores, a adição é realizada elemento a elemento. 
+
+A vectorização é um dos pontos fortes de R, permitindo um processamento de dados eficiente e expressivo.
+
+```{r}
+# exemplo de adição de elementos
+x <- 2+2
+x
+# exmeplo de adição de vectores
+y <- c(2,2)+c(8,3)
+y
+
+```
+
+## Operadores Condicionais, Relacionais e Lógicos
+
+Para além dos operadores matemáticos temos operadores condicionais, relacionais e lógicos.
+Operadores Condicionais:
+
+1. if (se)
+2. else
+3. ifelse
+4. or (ou)
+5. and (e)
+
+Operadores condicionais, como if e else, são utilizados para controlar o fluxo de execução de programas. 
+
+A função ifelse é um exemplo de uma construção condicional vetorizada, que é particularmente útil para substituir elementos em um vetor com base em uma condição. 
+
+- Será novamente discutido na manipulação de dados ("Data Wrangling")
+
+Operadores Relacionais:
+
+Usados para realizar comparações entre elementos.
+
+1. "< e >"
+2. ">= e <="
+3. "== (igualdade)"
+4. "!= diferença"
+5. "%in% (presente em)"
+
+:::{.callout-note}
+
+Função Negate() inverte o resultado
+
+:::
+
+Resultado da comparação é sempre um valor lógico. TRUE (Verdadeiro) ou FALSE (Falso).
+
+```{r}
+
+2==3 
+
+2!=3
+```
+
+# FUNÇÕES
+
+Para evitar a repetição de código que usa as mesmas operações, podemos usar funções.
+
+Cada função em R funciona num ambitente próprio com variáveis locais e aquelas no ambiente onde foi definida.
+
+Cada função tem inputs ou argumentos que definem variáveis internas da função.
+
+Funções em R são usadas para executar tarefas específicas. 
+
+Por exemplo, saber se um paciente é idoso.
+
+```{r}
+# aqui definimos a função idoso 
+idoso <- function(idade){ # o que definimos dentro de function são os argumentos da mesma, neste caso será idade o argumento
+  #é boa prática nomear o nosso argumento para algo claro e explícito
+  if(idade>=65){
+    print("idoso")
+  }else{
+    print("não é idoso")
+  }
+}
+# tudo o que colocamos dentro das chavetas inicais será o que queremos que seja executado na função
+```
+
+Qual será o output esperado para idoso(35)?
+```{r}
+# qual será o output da função idoso(35)
+
+idoso(35)
+```
+Qual será o output esperado para idoso(66)?
+```{r}
+idoso(66)
+```
+:::{.callout-note}
+
+Poderiamos definir um valor padrão para a função rescrevendo da seguinte forma:
+
+idoso <- function(idade=65){
+  if(idade>=65){
+    print("idoso")
+  }else{
+    print("não é idoso")
+  }
+}
+
+:::
+
+## Funções aninhadas e Pipes
+
+Em R, semelhante a outras linguagens de programação há a possibilidade de aninhar funções.
+
+No entanto, em R temos outra opção que são as pipelines que usam o pipe representado pelo %>% e o |> que indicam que a estratura anterior deve ser continuada a ser alteralada pelas funções em pipe.
+
+A capacidade de construir pipelines de processamento de dados eficientes e legíveis é crucial para a análise de dados em R de forma reprodutivel.
+
+```{r}
+# 3 exemplos de execução de 2 funções
+dados_pacientes <- data.frame(
+  Idade = c(25, 30, 45),
+  Nome = c("João", "Ana", "Marta"),
+  Temperatura = c(36.6, 37.5, 38.2)
+)
+# separate functions
+maiores_30 <- which(dados_pacientes$Idade>=30)
+maiores_30 <- length(maiores_30)
+# nested function
+maiores_30_2 <- length(which(dados_pacientes$Idade>=30))
+# piped function
+maiores_30_3 <- which(dados_pacientes$Idade>=30) |> 
+  length()
+maiores_30
+maiores_30_2
+maiores_30_3
+```
+
+# Bibliotecas e Pacotes
+
+Felizmente, muitas das funções de análise que iremos falar já foram criadas por alguém.
+
+Normalmente, um conjunto de funções é englobado num denominado pacote.
+Exemplos de pacotes em R:
+
+1. tidyr
+2. dplyr
+3. ggplot2
+
+Estes pacotes estão normalmente no CRAN (Comprehensive R Archive Network) mas nós, como utilizadores temos de os instalar e carregar para o nosso projeto.
+
+```{r}
+# para instalar um pacote podemos utilizar a função install.packages
+
+# install.packages("tidyverse")
+
+# para carregar o pacote para o projeto ativo temos de usar o comando library
+
+# library(tidyverse)
+
+```
+
+:::{.callout-warning}
+Muitas das dúvidas que temos das funções dos pacotes podem ser esclarecidas pela documentação do mesmo.
+
+Os pacotes dispoíveis no CRAN têm uma vinheta que inclui todas as funções disponíveis do pacotes
+:::
+
+:::{.callout-warning}
+Quando existem funções com o mesmo nome estão carregadas uma é escondida, sendo essa a mais recente a ser carregada.
+
+Para referenciar uma função específica de uma biblioteca devemos usar a seguinte sintaxe:
+1. pacote::função()
+:::
+# CONCEITOS ADICIONAIS 
+
+## Vetorização de funções
+
+R suporta a vectorização de funções, o que significa que operações podem ser aplicadas a cada elemento de um vetor simultaneamente, sem a necessidade de escrever loops explícitos. 
+
+Isso não apenas simplifica o código, mas muitas vezes resulta em execução mais rápida. Por exemplo, a utilização de funções vetorizadas como sapply, lapply, e vapply permite aplicar uma função a cada elemento de uma lista ou vetor.
+
+## Troubleshooting
+
+Existem vários problemas que podem surgir quando programamos, mas quando algo corre mal é normal que surjam dois tipos de mensagem.
+
+Warning - Aviso - 
+  - Significa que o R encontrou um problema mas foi possível ultrapassar, mas cujo resultado pode não ser o requesitado.
+  - Rever para verificar se é algo que possa ser minimizado
+
+Erro - Erro - 
+  - Significa que existe um erro na execução do código
+  - O erro pode só por si indicar qual é o problema.
+  Ex: Error: Incomplete expression: max(dados_pacientes$Idade
+  Falta um parênteses.
+
+```{r}
+# max(dados_pacientes$Idade
+```
+
