@@ -1,5 +1,5 @@
 ---
-title: "Module 3 | Exploratory Data Analysis and Tables"
+title: "Módulo 2 | Exploração de dados"
 author: "A. Peralta-Santos"
 date: today
 date-format: long
@@ -28,20 +28,24 @@ editor:
 
 # SETUP
 
-### Limpar o ambiente
+Limpar o ambiente
 
 ```{r}
+#| code-fold: true
+
 rm(list = ls(all.names = TRUE)) 
 # limpa todos os objetos, incluindo os ocultos
 # boa política se houver objetos antigos não relevantes
 # melhoria da performance
 ```
 
-### Instalar e carregar bibliotecas
+Instalar e carregar bibliotecas
 
 Sempre que se inicia uma nova sessão, as bibliotecas têm de ser carregadas.
 
 ```{r}
+#| code-fold: true
+
 # Forma alternativa de instalar vários pacotes e carregá-los
 
 # SOURCE: https://cedricscherer.netlify.app/2019/05/17/the-evolution-of-a-ggplot-ep
@@ -71,11 +75,11 @@ remove(pkg)
 
 ```
 
-# IMPORTAÇÃO de Dados e DATA CLEANING and WRANGLING 
+# IMPORTAÇÃO DADOS 
 
 Para esta parte da aula não será tão importante alguns passos de data cleaning e data wrangling.
 
-## Carregar e Limpar os dados
+Carregar e limpar os dados
 
 Continuamos a trabalhar os dados hospitalares.
 
@@ -125,36 +129,36 @@ hypoxia <- import("datasets/hypoxia.xlsx")|>
 
 ```
 
-# EXPLORATORY DATA ANALYSIS
+# ANÁLISE EXPLORATÓRIA DE DADOS (EDA)
 
-O passo da Exploração dos Dados (EDA em inglês), por si, não é um processo formal com regras de execução.
+A Análise Exploratória de Dados (EDA, do inglês "Exploratory Data Analysis") é uma etapa fundamental e dinâmica no processo de análise de dados. Mais do que um conjunto de procedimentos rígidos, a EDA é um processo criativo e iterativo de exploração e compreensão dos dados.
 
-> “There are no routine statistical questions, only questionable statistical routines.” — Sir David Cox
+![Análise Exploratória de Dados](images/eda.png)
 
-É um processo de exploração da curiosidade despoletado pelos dados que temos à nossa frente.
+> "Não existem perguntas estatísticas rotineiras, apenas rotinas estatísticas questionáveis." — Sir David Cox
 
-É um passo necessário na investigação da qualidade dos dados.
+A EDA é motivada pela curiosidade e guiada pelos dados disponíveis, sendo essencial na avaliação da qualidade dos dados e na geração de insights valiosos.
 
-É um processo iterativo no qual:
+### Processo Iterativo de EDA
 
-1. Geramos questões sobre os dados;
-2. Procuramos responder às questões que temos através de simples:
-- Visualizações
-- Transformações
-- Modelação
-3. Assimilamos o que aprendemos e refinamos/geramos novas questões
+1. **Formulação de Perguntas a Partir dos Dados**: Levante questionamentos baseados nos dados disponíveis. Este passo é crucial para direcionar a  análise.
 
-## FORMULAR QUESTÕES
+2. **Exploração dos dados**:
+   - **Visualizações**: Use gráficos e visualizações de dados para avaliar tendências, padrões e anomalias.
+   - **Transformações de Dados**: Manipule e transforme os dados para melhor compreensão e análise.
+   - **Modelos**: Aplique modelos estatísticos simples para testar hipóteses e explorar relações.
 
-Pré-requisitos:
+3. **Reflexão e Aprofundamento**: Reflita sobre o que foi aprendido com as análises iniciais. Use esses conhecimento para melhorar as perguntas existentes ou formular novas.
 
-- Conhecer os dados que temos
-- Se não conhecemos, ver os metadados
-- Começar uma análise já com questões com resposta nos dados que temos
-- Colocar hipóteses, garante que expomos os nossos presupostos na análise
-- Colocar múltiplas questões é melhor que uma questão
 
-## VER OS CONTEÚDOS
+**Pré-requisitos**
+
+- **Conhecimento dos Dados**: Conheça o dataset em profundidados entenda as variáveis, as unidades de medida e o contexto dos dados.
+
+- **Consulta aos Metadados**: Se os dados forem desconhecidos ou complexos, consulte os metadados para uma compreensão detalhada das variáveis e da estrutura dos dados. Se não existirem metadados fale com alguem que conheça o dataset e o processo de geração de dados. 
+
+
+## Exploração inicial 
 
 Estas primeiras funções não dirão muito mas permitem ter uma melhor compreensão ds dados que temos á frente.
 
@@ -185,7 +189,9 @@ colnames(inpatient_hospital)
 
 length(inpatient_hospital)
 ```
+
 Nos dados originais temos 7 variáveis:
+
 - periodo
 - regiao
 - instituicao
@@ -243,6 +249,7 @@ Vamos confirmar as alterações com o str
 str(inpatient_hospital_lite)
 
 ```
+
 Agora já temos um melhor conhecimento sobre os dados:
 
 - Uma variável de Data
@@ -251,11 +258,11 @@ Agora já temos um melhor conhecimento sobre os dados:
   - Intituicão com 51 valores possíveis
   - Tipo de especialidade com 2 valores posssíveis
 
-## PREVISUALIZAR OS DADOS
+## Visualizar os dados 
 
 Uma boa prática numa primeira fase é visualizar pequenas porções dos dados para ver possíveis problemas imediatamente.
 
-### Função HEAD() e TAIL()
+### Função head() e tail()
 
 Estas funções expõe n linhas dos dados. 
 
@@ -266,11 +273,13 @@ Por default, são 5 linhas
 head(inpatient_hospital_lite)
 
 ```
+
 ```{r}
 
 tail(inpatient_hospital_lite)
 
 ```
+
 Pelos dados do Head e do Tail verificamos que os dados:
 
 - Estão orientados de forma ascendente pelo período
@@ -301,10 +310,15 @@ summary(inpatient_hospital_lite)
 Com mais esta função aprofundamos mais o nosso conhecimento dos dados:
 
 - A data vai de janeiro de 2015 a janeiro de 2022 e parece ser mensal que o ponto médio é julho de 2018
+
 - Existem mais registos de LVT e Norte (possivel razão?)
+
 - Parecem haver 170 registos por hospital
+
 - Existem mais registos de Especialidades Médicas do que de Cirúrgicas
+
 - Os doentes saídos têm 2 valores em falta
+
 - As distribuições das variáveis dos doentes saidos e dos dias de internamento têm uma variabilidade
 
 ### Ver os números por hospital
@@ -322,12 +336,13 @@ inp_hosp_lite_count <- inpatient_hospital_lite |>
   .by = instituicao) |> 
    arrange(count)
 
-inp_hosp_lite_count
+head(inp_hosp_lite_count)
 ```
+
 Quais são algumas considerações que podemos fazer sobre estes dados?
 
 
-## VARIATION
+## Variação 
 
 A variação é a tendência dos dados variarem por medições consecutivas ou por sujeitos ou tempos.
 
@@ -364,8 +379,18 @@ Qual a diferença da distribuição de dados entre 2015 e 2022
 
 
 p1 <- ggplot()+
-    geom_histogram(data=inpatient_hospital_lite |> filter(periodo<"2016-01-01"),aes(x=doentes_saidos), binwidth = 500, fill="blue", alpha=0.9)+#isto cria um histograma com intervalos de 500 doentes
-    geom_histogram(data=inpatient_hospital_lite |> filter(periodo>"2021-01-01"),aes(x=doentes_saidos), binwidth = 500, fill="red", alpha=0.5)
+    geom_histogram(data=inpatient_hospital_lite |> 
+                     filter(periodo<"2016-01-01"),
+                   aes(x=doentes_saidos),
+                   binwidth = 500, 
+                   fill="blue", 
+                   alpha=0.5)+ #isto cria um histograma com intervalos de 500 doentes
+    geom_histogram(data=inpatient_hospital_lite |> 
+                     filter(periodo>"2021-01-01"),
+                   aes(x=doentes_saidos), 
+                   binwidth = 500, 
+                   fill="red", 
+                   alpha=0.5)
 
 p1
 
@@ -377,8 +402,18 @@ Qual é a variação dos dados por Tipo de Especialidade
 
 ```{r}
 p1 <- ggplot()+
-    geom_histogram(data=inpatient_hospital_lite |> filter(tipo_de_especialidade=="Especialidade Médica"),aes(x=doentes_saidos), binwidth = 500, fill="blue", alpha=0.9)+#isto cria um histograma com intervalos de 500 doentes
-    geom_histogram(data=inpatient_hospital_lite |> filter(tipo_de_especialidade=="Especialidade Cirurgica"),aes(x=doentes_saidos), binwidth = 500, fill="red", alpha=0.5)
+    geom_histogram(data=inpatient_hospital_lite |> 
+                     filter(tipo_de_especialidade=="Especialidade Médica"),
+                   aes(x=doentes_saidos), 
+                   binwidth = 500, 
+                   fill="blue", 
+                   alpha=0.5)+#isto cria um histograma com intervalos de 500 doentes
+    geom_histogram(data=inpatient_hospital_lite |> 
+                     filter(tipo_de_especialidade=="Especialidade Cirurgica"),
+                   aes(x=doentes_saidos), 
+                   binwidth = 500, 
+                   fill="red", 
+                   alpha=0.4)
 
 p1
 
@@ -392,13 +427,8 @@ Outras questões?
 
 - Existem diferenças entre os dados de Dezembro e de Junho?
 
-## VALORES INCOMUNS ou IMPOSSÍVEIS
 
-Pelos dados do summary sabemos que existem dados em falta e existem valores muito elevados que poderão ser outliers.
-
-Estes dados podem ajudar a fazer novas inferências sobre os dados que temos.
-
-### Valores Omissos
+## Valores omissos
 
 Para filtrarmos os dados em falta iremos utilizar a função is.na().
 
@@ -424,7 +454,7 @@ inpatient_hospital_zero
 
 Não existem valore codificados para 0, sendo que o valor mínimo é de 3.
 
-### Valores extremos OUTLIERS
+## Valores incomuns (outliers)
 
 Para efeitos de deteção de outliers foram consideradas todas as observações fora da equação abaixo.
 
@@ -451,6 +481,7 @@ inpatient_hospital_outliers <- inpatient_hospital_lite |>
 
 nrow(inpatient_hospital_outliers)
 ```
+
 Existem 627 valores que são outliers.
 
 ```{r}
@@ -481,6 +512,7 @@ inpatient_hospital_outliers_nome <- inpatient_hospital_lite |>
 
 inpatient_hospital_outliers_nome
 ```
+
 Existem 6 hospitiais que reportam valores outliers severos superiores.
 
 1. Centro Hospitalar Universitário do Porto, EPE
@@ -564,18 +596,8 @@ create_report(
               )
 ```
 
-Exemplo de relatório do Data Explorer
 
-```{=html}
-<iframe width="780" height="500" src="outputs/reportDataExplorer.html" title="Report do Pacote Data Explorer"></iframe>
-```
+As ferramentas apenas automatizam algum código, dependo do utilizador para a interpretação dos dados.
 
-Reforçar que estas ferramentas apenas automatizam algum código, dependo do utilizador para a interpretação dos dados.
-
-Outras opções:
-
-```{=html}
-<iframe width="780" height="500" src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*swq8dNmFywVKrYJHoZT44Q.png" title="Comparação de Múltiplos pacotes de EDA, De Putatunda et al.(2019)"></iframe>
-```
  
 # FIM
