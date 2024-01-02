@@ -16,6 +16,14 @@ format:
     code-copy: true
 execute:
   warning: false
+  echo: TRUE
+  message: false
+params:
+  ano: 2024
+  escola: "ENSP"
+  pessoa: "Aluno"
+  edicao: "4ª"
+  curso: "Data Science with R in Healthcare"
 title-block-style: default
 ---
 
@@ -75,6 +83,8 @@ Para isso temos o RENV.
 
 O RENV ajuda na criação de AMBIENTES REPRODUTÍVEIS ISOLADOS do sistema em que correm.
 
+Neste sistema existe uma separação claro entre o que são as bibliotecas do sistema e as bibliotecas do nosso projeto.
+
 ![Sistema de Produção de um Sistema RENV](images/renv.png)
 
 Vantagens:
@@ -89,16 +99,61 @@ Desvantagens:
 ### Como criar?
 
 - Ativar com o comando renv::init()
-- Colocar essa opção na 
+- Colocar essa opção ao criar novo projeto
+
+![Possibilidade de criar um projeto com reprodutibilidade como prioridade](images/renv_init.png){width="100%"}
+
+### Como documentar?
+
+Existe a função snapshot() que permite documentar a origem e gravamos no ficheiro "renv.lock" que é o arquivo de todas as opções que definimos
+
+### Como colaborar?
+
+O comando renv::status() permite saber os próximos passos como eu, colega que quer reproduzir o que me foi enviado o possa fazer de forma semelhante.
+
+Este comando dá logo orientação como proceder.
+
+Worflow:
+
+1. init
+2. install
+3. snapshot
+produção
+4. restore
+
+## SLUSHY
+
+O pacote slushy foi criada pela empresa GSK.
+
+O objetivo é o de, ao invés de termos projetos congelados (como o RENV), mas o de termos programadores podemos querer avançar de forma lenta com o tempo sem perder estabilidade, introduzindo novas versões e verificando problemas
+
+Workflow:
+
+1. new_config()  
+2. slushy_init()
+3. slushy_add("packagename")
+4. slushy_drop("packagename")
+5. slushy_update(date = "2023-01-01") 
+
+- A vantagem do Slushy está em poder usar snapshot do CRAN para adquirir pacotes e atualizar o projeto.
+
+```{=html}
+<iframe width="780" height="500" src="https://gsk-biostatistics.github.io/slushy/" title="Slushy as an alternative to RENV"></iframe>
+```
 
 # INTERMIDIATE QUARTO
 
 ## Includes
 
-Em Quarto, o 
-Reutilizar conteúdo em Quarto é possível usando o código "{{< include >}}". 
+Em Quarto, esiste um funcionalidade para reutilização eficiente de conteúdo entre vários documentos.
 
-Isto permite reutilizar código de outros documentos sem precisar de copiar e colar código.
+Reutilizar conteúdo como secções de texto comuns, código ou resultados, em vários documentos em Quarto é possível usando o código "{{< include >}}". 
+
+Ex: Um boletim externo sem anexos para divulgação e um boletim interno com internos com anexos de validação.
+
+Exemplo:
+
+{{< include Include.qmd >}}
 
 ```{r}
 #| echo: true
@@ -113,13 +168,62 @@ Isto permite reutilizar código de outros documentos sem precisar de copiar e co
 # Usar os dados e outputs do documentos atuais...
 ```
 
+
+Benefícios:
+
+1. Evitar a repetição de código
+2. Modularidade (múltiplos documento com parte modulares de mais fácil correção)
+3. Conteúdo Dinâmico
+
 ## Parameters in Quarto
 
-## HTML e CSS
+Os parâmetros em Quarto é uma funcionalidade que aumenta a personalização dinâmica do conteúdo de um documento.
 
-## Quarto Websites
+Este tipo de funcionalidade é útil em várias situações:
 
-## Intro to SHINY
+1. Análises de anos diferentes após correções de dados ou atualização da análises
+2. Criação de documento personalizados baseados em critérios que são definidos:
+    - ULS
+    - Região
+    - Cidade
+3. Relatórios para pessoas diferentes.
+
+```{r}
+#| eval: false
+
+---
+title: "Relatório de Saúde Regional"
+params:
+  ano: 2024
+  escola: "ENSP"
+  pessoa: "Aluno"
+  edicao: "4ª"
+  curso: "Data Science with R in Healthcare"
+---
+
+
+```
+  
+
+Nós estamos na `r params$edicao` do curso `r params$curso` na `r params$escola` e este documento pertence ao `r params$pessoa`.
+
+Um exemplo de como podemos mudar o output será correndo o seguinte código na consola.
+
+```{r}
+#| eval: false
+#| echo: false
+quarto::quarto_render(input="Module_7_Advanced_DS_tools.qmd",
+                      output_format = "html",
+                      execute_params = list(
+                        ano= 2026,
+                        escola= "ENSP",
+                        pessoa= "João Dionísio", # Mudar o nome do aluno e ver o output
+                        edicao= "4ª",
+                        curso= "Data Science with R in Healthcare"
+                      )
+                      )
+```
+
 
 ## Quarto Dashboards
 
@@ -127,11 +231,37 @@ Isto permite reutilizar código de outros documentos sem precisar de copiar e co
 
 ## O quê?
 
+O Git é um sistema de controle de versão distribuído, utilizado para controlar mudanças em arquivos de código durante o desenvolvimento de código.
+
+GitHub é uma plataforma baseada na web que utiliza os sistema Git para o armazenamento e gestão de repositórios de código.
+
+![Git como sistema de controlo de versões e GitHub como plataforma colaborativas e de partilha de projetos](images/git-github.png){width="100%"}
+
 ## Porquê?
+
+Vantagens de usar um sistema git nos nossos projetos:
+
+1. Controlo de versões - Permite que múltiplas versões estejam armazenadas. Se um erro for introduzido, é simples reverter para uma versão anterior.
+2. Versões locais - Permite que cada colaborador num projeto trabalhe numa cópia local dos ficheiros e possa consultar o histórico de alterações.
+3. Ramificações e Fusão - Permite a criação de ramificações (branches) para testar análise e relatórios isoladamente. Estas ramificações podem ser fundidas (merge) de volta ao ramo principal (master/main) após a conclusão do seu desenvolvimento. 
+
+O plataforma Github permite o armazenamento e gestão de repositórios/projetos de código. Para além disso permite:
+
+1. Armazenamento remoto de código (limites de armazenamento é de 1 Gb com tráfego de dados de 1 Gb)
+2. 
+
+## Como implementar?
+
+
+
 
 # AUTOMATED REPORTING 
 
+## Github Actions
+
 ## Task Schedualing (Gestão de tarefas automáticas)
+
+## Emails automáticos
 
 # GENERATIVE AI MODELS IN R Programming
 
@@ -214,10 +344,6 @@ Para já não recomendamos este uso enquanto as ferramentas não estabilizarem n
 
 ```
 
-## Ferramentas 
-
-```{=html}
-<iframe width="780" height="500" src="https://analytica.shinyapps.io/codelingo/" title="Tradução de linguas de programação"></iframe>
-```
+Esta semana não existem exercícios para que o foco seja o projeto *capstone*.
 
 # Fim

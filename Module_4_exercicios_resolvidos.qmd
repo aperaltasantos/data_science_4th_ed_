@@ -68,10 +68,11 @@ Este é um estudo sobre a pressão arterial média intraoperatória em pacientes
 
 [^1]:*The Hypoxia MAP dataset was contributed by Dr. Amy Nowacki, Associate Professor, Cleveland Clinic. Please refer to this resource as: Amy S. Nowacki, “Hypoxia MAP Treatment Dataset”, TSHS Resources Portal (2022). Available at https://www.causeweb.org/tshs/hypoxia/.*
 
-Para os exercicios deve utilizar o dataset hypoxia em csv.
-
+Para os exercicios deve utilizar o dataset hypoxia
 ```{r}
 
+hypoxia <- import("datasets/hypoxia.csv") |> 
+  clean_names()
 ```
 
 ## Exercicio M4.1 Distribuições
@@ -83,6 +84,24 @@ Compara a distribuição de idades entre homens e mulheres. O gráfico deve ter 
 #| fig-width: 7.5
 #| 
 
+p1<- ggplot(data=hypoxia, 
+       aes(x=age,
+           fill=as.factor(female)
+       ) )+
+  geom_histogram(alpha=.4) +
+    labs(title = "Distribuição de idades",
+         subtitle = "Hypoxia MAP Treatment Dataset",
+         y = "Contagem da frequência de idades",
+         fill= "Género",
+         x = "Idade", 
+         caption = "Source: Amy S. Nowacki, TSHS Resources Portal (2022)") +
+  coord_cartesian(expand=FALSE)+
+  theme_classic()+
+  scale_fill_manual(values=c("#91bfdb","#ef8a62"),
+                    labels=c("Homem", "Mulher"))
+  
+
+p1
 
 ```
 
@@ -94,7 +113,26 @@ Explora a relaçao entre MinSao2 e o BMI. O gráfico deve ter um título, captio
 ```{r}
 #| fig-height: 5
 #| fig-width: 7.5
-#|
+#| 
+
+p2<- ggplot(data=hypoxia, 
+       aes(x=min_sao2,
+           y=bmi
+       ) )+
+  geom_point(alpha=0.5) +
+  geom_smooth(method=lm, 
+              se=FALSE,
+              linetype="dashed") +
+    labs(title = "Indice de Massa Corporal por Saturação mínima de oxigénio",
+         subtitle = "Hypoxia MAP Treatment Dataset",
+         y = "Indice de Massa Corporal",
+         x = "Saturação mínima de oxigénio", 
+         caption = "Source: Amy S. Nowacki, TSHS Resources Portal (2022)") +
+  theme_minimal()
+  
+
+p2
+
 ```
 
 
@@ -104,15 +142,46 @@ Cria um mapa usado o shapefile comm_pt, e as caracteristicas da base de dados "m
 
 ```{r}
 
+comm_pt <- st_read(
+  "datasets/map_json_portugal/concelhos_portugal_light.json") |> 
+  clean_names()
+
+mortalidade_coracao_2021 <- import("datasets/mortalidade_coracao_2021.csv") |> 
+  clean_names() |> 
+  mutate(
+    quintil_mortalidade= as.factor(ntile(valor, n=5))
+  )
+
+mortalidade_coracao_2021_mapeado <- left_join(
+  comm_pt,
+  mortalidade_coracao_2021,
+  by= join_by(name_2==geodsg)
+)
+
 ```
 
 
 ```{r}
 #| fig-height: 10
 #| fig-width: 7
+#| 
+
+
+p3 <- ggplot() +
+    geom_sf(data = mortalidade_coracao_2021_mapeado, 
+          aes(fill = quintil_mortalidade),
+              size = 0.1,
+              color = "white"
+          ) +
+   theme_minimal() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Quintil Mortalidade por Doenças Cardiovasculares",
+         fill= "Quintil",
+         caption = "Data: INE, 2021")
+p3
 
 ```
-
 
 
 # FIM

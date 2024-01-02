@@ -1,0 +1,35 @@
+---
+title: "Module 7 | Include  "
+subtitle: "Example of an include"
+author: 
+  name: A. Peralta-Santos
+  affiliation: 
+    - Escola Nacional de Saúde Pública
+date: today
+date-format: long
+format:
+  html:
+    embed-resources: true
+    smooth-scroll: true
+    toc: true
+    toc-location: left
+    number-sections: true
+    code-copy: true
+theme: cosmo
+smooth-scroll: true
+lang: pt   
+execute:
+  warning: false
+  echo: TRUE
+bibliography: references2.bib 
+---
+
+## Secção INTERNA
+
+Este texto não vem do qmd "Module 7 | Advanced Data Science Tools"
+
+:::{.callout-warning}
+
+Contém informação sensível
+
+:::

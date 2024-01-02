@@ -1,8 +1,7 @@
 ---
-title: "Módulo 4 | Visualização de dados"
+title: "Module 4: Data Visualization"
 author: "A. Peralta-Santos"
 date: today
-lang: pt
 date-format: long
 format:
   html:
@@ -22,17 +21,17 @@ project:
 
 # PRINCIPIOS DE VISUALIZAÇÃO
 
-*por Cédric Scherer*
+por Cédric Scherer
 
-**1.  INFORMAÇÃO** (integridade) Apresentar os dados de forma precisa e honesta, sem manipular ou distorcer os fatos para enganar o público.
+1.  INFORMAÇÃO (integridade) Apresentar os dados de forma precisa e honesta, sem manipular ou distorcer os fatos para enganar o público.
 
-**2.  HISTÓRIA** (interesse) Narrativa cativante dentro da visualização de dados, tornando a informação não apenas informativa, mas também envolvente e memorável para o espectador.
+2.  HISTÓRIA (interesse) Narrativa cativante dentro da visualização de dados, tornando a informação não apenas informativa, mas também envolvente e memorável para o espectador.
 
-**3.  OBJETIVO** (utilidade) Garantir que a visualização de dados sirva a um propósito claro, seja para informar, persuadir, educar ou apoiar a tomada de decisões.
+3.  OBJETIVO (utilidade) Garantir que a visualização de dados sirva a um propósito claro, seja para informar, persuadir, educar ou apoiar a tomada de decisões.
 
-**4.  FORMA VISUAL** (beleza) Valor do design esteticamente agradável na visualização de dados, que realça a experiência do leitor e pode tornar as informações complexas mais acessíveis e compreensíveis.
+4.  FORMA VISUAL (beleza) Valor do design esteticamente agradável na visualização de dados, que realça a experiência do leitor e pode tornar as informações complexas mais acessíveis e compreensíveis.
 
-**5.  Dicas úteis** *Layout Limpo --- "menos é mais"*
+5.  Dicas úteis Layout Limpo --- "menos é mais"
 
 -   Use anotações diretas para melhorar a legibilidade e interpretabilidade.
 -   Utilize hierarquia para orientar o leitor.
@@ -95,20 +94,17 @@ Fonte <https://www.nytimes.com/interactive/2015/03/24/science/earth/arctic-ice-l
 
 ### COVID-19
 
-![Excesso de Mortes por COVID-19](images/covid19.png) 
+![Excesso de Mortes por COVID-19](images/covid19.png) Fonte <https://www.ft.com/content/f1a270c3-3870-46ad-99e8-45b5d8f127e0>
 
-Fonte <https://www.ft.com/content/f1a270c3-3870-46ad-99e8-45b5d8f127e0>
-
-
-## Outros recursos 
-
-Qual o tipo de gráfico que devo escolher?
+## Qual o tipo de gráfico que devo escolher?
 
 Exempleos de websites onde podemos pesquisar qual o melhor gráfico para cada situação.
 
 [Data to viz website](https://www.data-to-viz.com/)
 
 [Data to viz project](https://datavizproject.com/)
+
+[Extensions of ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
 
 [Principles of good visuals](https://github.com/GraphicsPrinciples/CheatSheet/blob/master/NVSCheatSheet.pdf)
 
@@ -118,21 +114,26 @@ o ggplot é uma gramatica de graficos, em que cada elemento é uma instrução p
 
 Contem os seguintes elementos
 
-**1.  data:** O componente de dados.
+1.  data: O componente de dados.
 
-**2.  geom:** É o tipo de gráfico. p.e. gráfico de barras, histograma, densidades suaves, qqplot e boxplot.
+2.  geom: É o tipo de gráfico. p.e. gráfico de barras, histograma, densidades suaves, qqplot e boxplot.
 
-**3.  mapping:** Posições dos pontos no eixo x e eixo y. Cada ponto representa uma observação diferente, e mapeamos dados sobre essas observações para pistas visuais como escalas x e y. A cor é outra pista visual que mapeamos para a região. Referimo-nos a isso como o componente de mapeamento estético. Como definimos o mapeamento depende da geometria que estamos usando.
+3.  mapping: Posições dos pontos no eixo x e eixo y. Cada ponto representa uma observação diferente, e mapeamos dados sobre essas observações para pistas visuais como escalas x e y. A cor é outra pista visual que mapeamos para a região. Referimo-nos a isso como o componente de mapeamento estético. Como definimos o mapeamento depende da geometria que estamos usando.
 
-**4.  Facets:** semelhante ao agrupar por
+4.  Facets - semelhante ao agrupar por
 
-**5.  Theme:** Tema do grafico p.e. preto e branco, especifico para mapas
+5.  Theme - Tema do grafico p.e. preto e branco, especifico para mapas
 
-**6.  Labels:** define outros elementos do gráfico como titutlo, legendas
+6.  Labels: define outros elementos do gráfico como titutlo, legendas
 
-![Anatomia do ggplot by Cedric Scherer ](images/ggplot_themes.png)
+![Anatomia do ggplot](images/ggplot.png)
 
-
+```{r}
+# install.packages("ggthemes")
+# install.packages("scales")
+# install.packages("patchwork")
+# install.packages("sf")
+```
 
 ```{r}
 # Packages
@@ -142,16 +143,7 @@ required_packages <- c(
                        "scales",
                        "here",
                        "patchwork",
-                       "sf", 
-                       "ggthemes",
-                       "giscoR",
-                       "eurostat",
-                       "sysfonts", 
-                       "showtext", 
-                       "scales",
-                       "geodata", 
-                       "osmdata", 
-                       "leaflet"
+                       "sf"
                        )      
 
 for (pkg in required_packages) {
@@ -197,25 +189,18 @@ ggplot(
 ```
 
 ```{r}
-# Carregar o pacote ggplot2 para visualização de dados
-# library(ggplot2)
-
-# Criar um gráfico de boxplot com o conjunto de dados 'inpatient_hospital_lite'
-ggplot(data = inpatient_hospital_lite, 
-       mapping = aes(x = tipo_instituicao,  # Variável categórica no eixo x
-                     y = doentes_saidos_var) # Variável numérica no eixo y
-       ) +
-  geom_boxplot()  # Utilizar o geom_boxplot para criar o gráfico de caixa
-
+# 3. Definir o tipo de gráfico
+ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot()
 ```
 
 ```{r}
-# Criar um objeto ggplot e armazená-lo na variável 'p'
-p <- ggplot(data = inpatient_hospital_lite, 
-            aes(x = tipo_instituicao, y = doentes_saidos_var)) +  # Definir as variáveis do gráfico
-  geom_boxplot()  # Adicionar um gráfico de caixa
+# 4. Criar um objecto ggplot e invoca-lo
 
-# Exibir o gráfico armazenado no objecto 'p'
+p <- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot()
 p
 ```
 
@@ -223,39 +208,26 @@ p
 
 ### Box plot
 
-::: callout-important
-No ggplot2, é possível criar uma estrutura de gráfico básica sem vinculá-la diretamente a um conjunto de dados específico. 
-
-Esta abordagem permite adicionar múltiplas camadas ao gráfico, cada uma podendo vir de um conjunto de dados diferente, mas que devem compartilhar as mesmas variáveis nos eixos x e y.
-:::
-
 ```{r}
-# Criar um gráfico de boxplot sem mostrar outliers
-p1 <- inpatient_hospital_lite |> 
-  ggplot() +  # Iniciar a construção do gráfico
-    geom_boxplot(aes(x = tipo_instituicao, 
-                     y = doentes_saidos_var),  # Definir as variáveis x e y
-                  outlier.shape = NA)  # Excluir os outliers do gráfico
+# IMPORTANT
+# We can create a generic ggplot argument if we want to combite 2 diferent datasets with the same x and y axis
 
-# Exibir o gráfico
+p1<- inpatient_hospital_lite |> ggplot() + # Podemos adicionar os dados antes do ggplot 
+    geom_boxplot( aes(x = tipo_instituicao   , 
+                      y = doentes_saidos_var ),
+                  outlier.shape = NA) # Exclui os outliers
 p1
 ```
 
 ## Facets
 
-A facetação é uma técnica poderosa que permite dividir um gráfico em múltiplos subgráficos menores, chamados facetas, com cada faceta representando um subconjunto dos dados baseado em uma ou mais variáveis categóricas. Isso é particularmente útil para comparar padrões dentro de diferentes níveis ou categorias de uma variável (ou variáveis) em um conjunto de dados. 
+A facetação gera múltiplos pequenos gráficos, cada um exibindo um subconjunto diferente dos dados. Facetas são uma alternativa às estéticas para exibir variáveis discretas adicionais.
 
 ```{r}
-# Criar um gráfico de boxplot usando o conjunto de dados 'inpatient_hospital_lite'
-
-p1 <- ggplot(data = inpatient_hospital_lite, 
-             aes(x = tipo_instituicao,  # Definir as variáveis para os eixos x e y
-                 y = doentes_saidos_var)
-             ) +  
-  geom_boxplot(outlier.shape = NA) +  # Criar um gráfico de caixa sem mostrar outliers
-  facet_wrap(~tipo_de_especialidade)  # Dividir o gráfico em facetas com base na variável 'tipo_de_especialidade'
-
-# Exibir o gráfico
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
+  geom_boxplot( outlier.shape = NA) +
+  facet_wrap(~tipo_de_especialidade)
 p1
 
 ```
@@ -284,20 +256,20 @@ Define a estetica do gráfico, tamanhos de letra, alinhamentos, cores do fundo
 ```{r}
 # Theme classic
 
-# Criar um gráfico de boxplot usando o conjunto de dados 'inpatient_hospital_lite'
-p1 <- ggplot(data = inpatient_hospital_lite, 
-             aes(x = tipo_instituicao, y = doentes_saidos_var)) +  # Definir as variáveis para os eixos x e y
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
   
-  geom_boxplot(outlier.shape = NA) +  # Criar um gráfico de caixa sem mostrar outliers
+  geom_boxplot(outlier.shape = NA) + 
   
-  labs(title = "Number of inpatients discharged in Hospitals",  # Título do gráfico
-       subtitle = "2015-2022",  # Subtítulo do gráfico
-       y = "Number of inpatients discharged",  # Etiqueta do eixo y
-       x = "Type of hospital",  # Etiqueta do eixo x
-       caption = "Source: Ministry of Health, Portugal") +  # Legenda da fonte de dados
-  theme_classic()  # Aplicar um tema clássico ao gráfico
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of  hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  
+  theme_classic() 
+  
 
-# Exibir o gráfico
 p1
 ```
 
@@ -363,11 +335,9 @@ theme_r_datascience <-
 
 ```
 
-::: callout-important
-Este recurso é bastante útil porque permite alterar completamente o tema <https://www.rdocumentation.org/packages/ggplot2/versions/3.4.4/topics/theme>
-:::
-
-
+```{=html}
+<iframe width="780" height="500" src="https://www.rdocumentation.org/packages/ggplot2/versions/3.4.4/topics/theme" title="Rio Package"></iframe>
+```
 ```{r}
 p1<- ggplot(data= inpatient_hospital_lite, 
             aes(x = tipo_instituicao, y = doentes_saidos_var)) +
@@ -387,24 +357,17 @@ p1
 ### Alterar um tema existente
 
 ```{r}
-
-# Carregar os pacotes necessários para manipulação de fontes
+# NOT WORKING
 library(sysfonts)
 library(showtext)
-
-# Adicionar fontes do Google
-font_add_google("Open Sans", family = "Open Sans") # Adiciona a fonte 'Open Sans'
-font_add_google("Special Elite", family = "special") # Adiciona a fonte 'Special Elite'
-
-# Ativar automaticamente o uso de fontes personalizadas nos gráficos
+font_add_google("Open Sans", family = "Open Sans")
+font_add_google("Special Elite", family = "special")
 showtext_auto()
 
-
-# Configurar o tema global para todos os gráficos ggplot
-theme_set(theme_minimal()) # Define 'theme_minimal' como o tema padrão
-theme_replace(text = element_text(family = "Open Sans")) # Altera a fonte padrão para 'Open Sans'
-
-# Ao definir com o theme set todos os plot estarão com o minimal com Open Sans a não ser que passemos um argumento de tema 
+## change global theme settings (for all following plots)
+theme_set(theme_minimal())
+theme_replace(text=element_text(family = "Open Sans"))
+# ao definir com o theme set todos os plot estarão com o minimal com Open Sans a não ser que passemos um argumento de tema 
 ```
 
 ```{r}
@@ -419,56 +382,6 @@ p1<- ggplot(data= inpatient_hospital_lite,
          caption = "Source: Ministry of Health, Portugal")
 p1
 ```
-
-## Anotações
-
-```{r}
-# Limitar o eixo dos Y a um máximo de 4000
-p2<- ggplot(data= inpatient_hospital_lite, 
-            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
-  geom_point() +
-  geom_boxplot(outlier.shape = TRUE) + 
-  labs(title = "Number of inpatients discharged in Hospitals",
-         subtitle = "2015-2022",
-         y = "Number of inpatients discharged",
-         x = "Type of hospital", 
-         caption = "Source: Ministry of Health, Portugal") +
-  ylim(0,4000) +
-  annotate(
-    geom = "text",
-    x = "Hospital",
-    y = 4000,
-    label = "What happened here?",
-    color = "firebrick",
-  )
-
-p2
-```
-
-```{r}
-# Limitar o eixo dos Y a um máximo de 4000
-p2<- ggplot(data= inpatient_hospital_lite, 
-            aes(x = tipo_instituicao, y = doentes_saidos_var)) +
-  geom_point() +
-  geom_boxplot(outlier.shape = TRUE) + 
-  labs(title = "Number of inpatients discharged in Hospitals",
-         subtitle = "2015-2022",
-         y = "Number of inpatients discharged",
-         x = "Type of hospital", 
-         caption = "Source: Ministry of Health, Portugal") +
-  ylim(0,4000) +
-  annotate(
-    geom = "text",
-    x = "Hospital",
-    y = 4000,
-    label = "What happened here?",
-    color = "firebrick",
-  ) 
-
-p2
-```
-
-
 
 ## Outros elementos
 
@@ -511,46 +424,7 @@ p_final_1<- ggplot(data= inpatient_hospital_lite,
  p_final_1
 ```
 
-## Tamanho e aspecto 
-
-**Podemos não depender exclusivamente do painel de visualização do RStudio!**
-
-Quando o protótipo de gráfico estiver quase pronto, decida um tamanho fixo para o gráfico.
-
-**Abordagem 1:** salvar o grafico e inspecioná-lo e repetir.
-Isso pode ser chato e demorado...
-
-**Abordagem 2:** usar um qmd ou rmd com saída inline e configurações de chunk.
-Definir fig-width / fig.width e fig-height / fig.height por chunk ou globalmente.
-
-```{r}
-#| label: fig-boxplot
-#| fig-cap: "Number of inpatients discharged in Hospitals from 2015-2022, in Portugal"
-#| fig-width: 7
-#| fig-height: 5
-#| warning: false
-
-p_final_1<- ggplot(data= inpatient_hospital_lite, 
-            aes(x = tipo_instituicao, 
-                y = doentes_saidos_var)
-            ) +
-  geom_boxplot(outlier.shape = NA,
-               fill = "gray", 
-               colour = "black") + 
-  
-  labs(title = "Number of inpatients discharged in Hospitals",
-         subtitle = "2015-2022",
-         y = "Number of inpatients discharged",
-         x = "Type of hospital", 
-         caption = "Source: Ministry of Health, Portugal") +
-  ylim(0,4000)
-  #theme(plot.background = element_rect("white")
-        #)
-
- p_final_1
-```
-
-## Save plot
+# Save plot
 
 Podemos gravar o nosso gráfico em vários formatos
 
@@ -563,9 +437,7 @@ Podemos gravar o nosso gráfico em vários formatos
 
 ggsave(
   p_final_1,
-  filename = here::here("output", 
-                        "figures", 
-                        paste0( "hospital_inpatients", ".png")),
+  filename = here::here("output", "figures", paste0( "hospital_inpatients", ".png")),
   width = 20,
   height = 10,
   units = c("cm"),
@@ -601,25 +473,7 @@ ggsave( filename = here::here("output_figures",
 
 ## VISUALIZAR DISTRIBUIÇÕES
 
-Existem vários tipos de gráficos no R que podem ser usados para visualizar distribuições, cada um adequado para diferentes tipos de dados e análises. Aqui estão alguns dos tipos mais comuns de gráficos para visualizar distribuições, juntamente com uma breve explicação de seu uso:
-
-**Gráfico de Densidade (Density plot)**
-Descrição: Similar ao histograma, mas mostra uma linha contínua que representa a distribuição de probabilidade estimada dos dados.
-Uso: Bom para visualizar a forma da distribuição, especialmente útil para comparar distribuições entre diferentes grupos.
-
-**Histograma (Histogram)**
-Descrição: Mostra a frequência de diferentes intervalos (ou "bins") de uma variável numérica.
-Uso: Útil para entender a forma e a dispersão de uma distribuição univariada.
-
-**Gráfico de Caixa (Boxplot)**
-Descrição: Representa a mediana, os quartis e os outliers dos dados.
-Uso: Excelente para comparar a distribuição de uma variável numérica entre diferentes grupos categóricos e para identificar outliers.
-
-**Jitter Plot**
-Descrição: No gráfico de dispersão com jitter, uma pequena quantidade de ruído aleatório (jitter) é adicionada à posição dos pontos. Isso ajuda a separar visualmente os pontos que, de outra forma, cairiam exatamente na mesma posição.
-Uso: É particularmente útil quando você tem muitos pontos de dados que estão alinhados verticalmente ou horizontalmente devido à sua natureza discreta ou categórica. O jitter ajuda a visualizar a densidade desses pontos e a evitar que eles se sobreponham, o que pode obscurecer a quantidade real de dados em qualquer posição específica.
-
-### Gráfico de Densidade (Density plot)  
+### Density plot  
 
 ```{r}
 
@@ -658,8 +512,7 @@ p1<- ggplot(data=inpatient_hospital_lite,
 p1
 ```
 
-### Histograma (Histogram)
-
+### Histogram 
 ```{r}
 
 p1<- ggplot(data=inpatient_hospital_lite, 
@@ -704,16 +557,11 @@ p1
 
 ## COMPARAR QUANTIDADES
 
-**Gráfico de Barras (geom_bar() ou geom_col())**
+### Bar plots
 
-Descrição: Um gráfico de barras mostra a relação entre uma variável numérica e uma variável categórica. Cada entidade da variável categórica é representada como uma barra. O tamanho da barra representa seu valor numérico.
+Um gráfico de barras mostra a relação entre uma variável numérica e uma variável categórica. Cada entidade da variável categórica é representada como uma barra. O tamanho da barra representa seu valor numérico.
 
-Uso: O gráfico de barras é às vezes descrito como uma forma monótona de visualizar informações. No entanto, é provavelmente a maneira mais eficiente de mostrar esse tipo de dados. Ordenar as barras e fornecer boas anotações são frequentemente necessários. geom_bar() é usado para dados de contagem, enquanto geom_col() é para dados de soma ou média já calculados.
-
-
-### Gráfico de Barras (Bar plot)
-
-Vamos criar um novo dataset com a soma de doentes saidos por ano.
+O gráfico de barras é às vezes descrito como uma forma monótona de visualizar informações. No entanto, é provavelmente a maneira mais eficiente de mostrar esse tipo de dados. Ordenar as barras e fornecer boas anotações são frequentemente necessários.
 
 ```{r}
 inpatient_hospital_year <- inpatient_hospital_lite |>
@@ -725,197 +573,178 @@ inpatient_hospital_year <- inpatient_hospital_lite |>
     
 ```
 
-#### Agrupadas (Dodge bar) 
+#### Dodge bar plot
 
-Cria barras agrupadas
+Cria barras paralelas
 
 ```{r}
-
-# Criar um gráfico de barras agrupadas com o conjunto de dados 'inpatient_hospital_year'
-p1 <- ggplot(data = inpatient_hospital_year, 
-             aes(x = year, 
-                 y = doentes_saidos_var,
-                 fill = tipo_instituicao)) +  # Definir as variáveis e a cor das barras
-  geom_bar(position = "dodge", 
-           stat = "identity") +  # Criar barras agrupadas e usar os valores da variável y
+p1<- ggplot(data= inpatient_hospital_year, 
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=tipo_instituicao) # ALERT
+            ) +
+  geom_bar(position="dodge", 
+           stat="identity"
+           ) +
   
-  labs(title = "Number of inpatients discharged in Hospitals",  # Título do gráfico
-       subtitle = "2015-2022",  # Subtítulo do gráfico
-       y = "Number of inpatients discharged",  # Etiqueta do eixo y
-       x = "Year",  # Etiqueta do eixo x, corrigido de "Type of hospital" para "Year"
-       caption = "Source: Ministry of Health, Portugal")  # Legenda da fonte de dados
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") 
 
-# Exibir o gráfico
 p1
-
 
 ```
 
-Podemos definir manualmente as cores e inverter os eixos X e Y
+Specify the colours of the bar plots and flip the coordinates
 
 ```{r}
 
-# Carregar o pacote necessário para manipulação de cores
 library(scales)
-
-# Gerar códigos hexadecimais de cores para um gráfico com três elementos
+#extract hex color codes for a plot with three elements in ggplot2 
 hex <- hue_pal()(3)
- 
+hex 
 
-# Preparar o conjunto de dados 'inpatient_hospital_year' com fatores ordenados
 inpatient_hospital_year <- inpatient_hospital_year |>
   mutate(
     tipo_instituicao = factor(tipo_instituicao, levels = c("Hospital", "University", "Cancer hospital"))
   ) 
 
-# Criar um gráfico de barras agrupadas com várias personalizações
-p1 <- ggplot(data = inpatient_hospital_year,
-             aes(x = year, 
-                 y = doentes_saidos_var,
-                 fill = tipo_instituicao)
+
+p1<-  ggplot( data = inpatient_hospital_year,
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=tipo_instituicao)
             ) +
-  geom_bar(position = "dodge", 
-           stat = "identity"
+  geom_bar(position="dodge", 
+           stat="identity"
            ) +
-  coord_flip() +  # Inverter os eixos x e y
-  scale_y_continuous(labels = comma) +  # Formatar os rótulos do eixo y com vírgulas
-  scale_fill_manual(values = hex) +  # Usar cores personalizadas para as barras
+  coord_flip() +
+  scale_y_continuous(labels = comma) +
+  
+  scale_fill_manual(values=hex) +
+  
   labs(title = "Number of inpatients discharged in Hospitals",
-       subtitle = "2015-2022",
-       y = "Number of inpatients discharged",
-       x = "Type of hospital", 
-       caption = "Source: Ministry of Health, Portugal",
-       fill = "") +
-  theme_minimal() +  # Usar um tema minimalista
-  theme(legend.position = "bottom")  # Posicionar a legenda na parte inferior
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+         fill="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
 
-# Exibir o gráfico
 p1
-
 
 ```
 
-#### Empilhadas (Stacked bar) 
+#### Stacked bar plot
 
-
+Cria barras empilhadas
 
 ```{r}
-# Carregar o pacote ggplot2 para visualização de dados
-#library(ggplot2)
-# library(scales)  # Para usar a função 'comma' na formatação dos rótulos
-
-# Criar um gráfico de barras empilhadas com personalizações
-p1 <- ggplot(data = inpatient_hospital_year,
-             aes(x = year, 
-                 y = doentes_saidos_var,
-                 fill = factor(tipo_instituicao, 
-                               levels = c("Hospital", "University", "Cancer hospital"))
-            )) +
-  geom_bar(position = "stack",  # Empilhar as barras
-           stat = "identity"  # Usar os valores da variável y
+p1<-  ggplot( data = inpatient_hospital_year,
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=factor(tipo_instituicao, 
+                            levels = c("Hospital", "University", "Cancer hospital")))
+            ) +
+  geom_bar(position="stack", 
+           stat="identity"
            ) +
-  scale_y_continuous(labels = comma) +  # Formatar rótulos do eixo y com vírgulas
-  scale_fill_manual(values = c("#00BA38", "#619CFF", "#F8766D")) +  # Cores personalizadas para as barras
-  labs(title = "Number of inpatients discharged in Hospitals",  # Título do gráfico
-       subtitle = "2015-2022",  # Subtítulo
-       y = "Number of inpatients discharged",  # Etiqueta do eixo y
-       x = "Type of hospital",  # Etiqueta do eixo x
-       caption = "Source: Ministry of Health, Portugal",  # Legenda da fonte
-       fill = "") +  # Legenda das categorias de 'fill'
-  theme_minimal() +  # Tema minimalista
-  theme(legend.position = "bottom")  # Posição da legenda
+  
+  scale_y_continuous(labels = comma) +
+  scale_fill_manual(values=c("#00BA38","#619CFF" ,"#F8766D")) +
+  
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+         fill="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
 
-# Exibir o gráfico
 p1
-
 ```
 
 
 ## COMPARAR PROPORÇÕES
 
-### Gráfico de Barras (Bar plot)
+### Bar plots
 
 #### Fill
 
 Cria barras de area relativa (percentagem)
 
 ```{r}
-# Carregar o pacote ggplot2 para visualização de dados
-#library(ggplot2)
-#library(scales)  # Para usar a função 'percent' na formatação dos rótulos
-
-# Criar um gráfico de barras empilhadas e normalizadas (a 100%)
-p1 <- ggplot(data = inpatient_hospital_year,
-             aes(x = year, 
-                 y = doentes_saidos_var,
-                 fill = factor(tipo_instituicao, 
-                               levels = c("Hospital", "University", "Cancer hospital"))
-            )) +
-  geom_bar(position = "fill",  # Normalizar as barras para mostrar a porcentagem
-           stat = "identity"  # Usar os valores da variável y
+p1<-  ggplot( data = inpatient_hospital_year,
+            aes(x = year, 
+                y = doentes_saidos_var,
+                fill=factor(tipo_instituicao, 
+                            levels = c("Hospital", "University", "Cancer hospital")))
+            ) +
+  geom_bar(position="fill", 
+           stat="identity"
            ) +
-  scale_y_continuous(labels = percent) +  # Formatar rótulos do eixo y como percentagens
-  scale_fill_manual(values = c("#00BA38", "#619CFF", "#F8766D")) +  # Cores personalizadas para as barras
-  labs(title = "Percentage of inpatients discharged in Hospitals",  # Título do gráfico
-       subtitle = "2015-2022",  # Subtítulo
-       y = "Percentage of inpatients discharged",  #  Eixo y
-       x = "Type of hospital",  # Etiqueta do eixo x
-       caption = "Source: Ministry of Health, Portugal",  
-       fill = "") +  # Legenda das categorias de 'fill'
-  theme_minimal() +  # Tema minimalista
-  theme(legend.position = "bottom")  # Posicionar a legenda na parte inferior
+  
+  scale_y_continuous(labels = percent) +
+  scale_fill_manual(values=c("#00BA38","#619CFF" ,"#F8766D")) +
+  
+  labs(title = "Percentage of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Percentage  of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal",
+         fill="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
 
-# Exibir o gráfico
 p1
-
 ```
 
 
 
-### Gráfico tarte (Doughnut plot)
-
-Descrição:O gráfico de tarte tem com 'fatias' representando as percentagens de diferentes categorias. A diferença é o espaço em branco no meio, que o faz parecer uma rosca.
-
-Uso: Cada 'fatia' do gráfico representa uma categoria dos dados, e o tamanho da fatia é proporcional à quantidade ou percentagem da categoria em relação ao total.
+### Doughnut plot
 
 ```{r}
 
-# Criar dados de teste
+# Create test data.
 data <- data.frame(
-  category = c("Cancer Hospital", "University", "Hospital"),
-  count = c(2, 23, 75)
+  category=c("Cancer Hospital", "University", "Hospital"),
+  count=c(2, 23, 75)
 )
  
-# Calcular as percentagens
+# Compute percentages
 data$fraction <- data$count / sum(data$count)
 
-# Calcular as percentagens cumulativas (topo de cada retângulo)
+# Compute the cumulative percentages (top of each rectangle)
 data$ymax <- cumsum(data$fraction)
 
-# Calcular a base de cada retângulo
-data$ymin <- c(0, head(data$ymax, n = -1))
+# Compute the bottom of each rectangle
+data$ymin <- c(0, head(data$ymax, n=-1))
 
-# Criar o gráfico tipo 'doughnut'
-ggplot(data, aes(ymax = ymax, ymin = ymin, xmax = 4, xmin = 3, fill = category)) +
-  geom_rect() +  # Usar retângulos para criar as 'fatias' da rosca
 
-  coord_polar(theta = "y") +  # Transformar o gráfico de barras em um gráfico polar (rosca)
-  xlim(c(2, 4)) +  # Definir limites para criar um buraco no meio do gráfico
-  scale_fill_manual(values = c("#00BA38", "#619CFF", "#F8766D")) +  # Cores personalizadas para as categorias
+# Make the plot
+ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
+  geom_rect() +
+
+  coord_polar(theta="y") +
+  xlim(c(2, 4))  +
+  scale_fill_manual(values=c("#00BA38","#619CFF" ,"#F8766D")) +
   
-  labs(title = "Percentage of inpatients discharged in Hospitals",  # Título do gráfico
-       subtitle = "2015-2022",  # Subtítulo
-       caption = "Source: Ministry of Health, Portugal",  # Legenda da fonte
-       fill = "") +  # Legenda das categorias de 'fill'
-  theme_void()  # Usar um tema que remove os eixos e rótulos
-
+  labs(title = "Percentage of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         caption = "Source: Ministry of Health, Portugal",
+         fill="") +
+  theme_void() 
 ```
 
-## RELAÇÕES ENTRE VARIÁVEIS 
+## RELAÇÕES ENTRE VARIAVEIS 
   
-### Dispersão (Scatterplot)
+### Scatterplot
 
-Um gráfico de dispersão (scatterplot) é uma ferramenta fundamental na análise de dados, utilizada para examinar a relação entre duas variáveis numéricas. Este tipo de gráfico exibe pontos representando a combinação de valores de duas variáveis, uma no eixo horizontal (eixo X) e outra no eixo vertical (eixo Y). A posição de cada ponto no gráfico indica os valores dessas variáveis para cada observação no conjunto de dados. 
+Um gráfico de dispersão exibe a relação entre 2 variáveis numéricas. Para cada ponto de dados, o valor da primeira variável é representado no eixo X e o da segunda no eixo Y.
 
 ```{r}
 inpatient_hospital_lite <- inpatient_hospital_lite |>
@@ -924,13 +753,10 @@ inpatient_hospital_lite <- inpatient_hospital_lite |>
 
 ```{r}
 
-# Criar um gráfico de dispersão usando o conjunto de dados 'inpatient_hospital_lite'
 ggplot(data = inpatient_hospital_lite, 
-       aes(x = dias_de_internamento_var,  # Variável no eixo X
-           y = doentes_saidos_var)         # Variável no eixo Y
-       ) + 
-  geom_point(alpha = 0.5) +  # Adicionar pontos ao gráfico com transparência
-  theme_clean()              # Aplicar um tema limpo e minimalista
+       aes(x=dias_de_internamento_var, y=doentes_saidos_var)) + 
+  geom_point(alpha=0.5) +
+  theme_clean()
 
 ```
 
@@ -938,83 +764,69 @@ Adicionar mais elementos
 
 ```{r}
 
-# Criar um gráfico de dispersão com personalizações
-p1 <- ggplot(data = inpatient_hospital_lite, 
-             aes(x = dias_de_internamento_var,  # Variável no eixo X
-                 y = doentes_saidos_var,        # Variável no eixo Y
-                 colour = tipo_de_especialidade) # Cor para diferenciar as especialidades
-             ) + 
-  geom_point(alpha = 0.2) +  # Adicionar pontos com transparência
-    labs(title = "Number of inpatients discharged and length of stay",  # Título do gráfico
-         subtitle = "2015-2022",  # Subtítulo
-         y = "Number of inpatients discharged",  # Etiqueta do eixo Y
-         x = "Length of stay",  # Etiqueta do eixo X
-         caption = "Source: Ministry of Health, Portugal",  # Legenda da fonte
-         colour = "") +  # Legenda para a cor
-  ylim(0, 3000) +  # Limites para o eixo Y
-  xlim(0, 25000) +  # Limites para o eixo X
-  theme_minimal() +  # Aplicar um tema minimalista
-  theme(legend.position = "bottom")  # Posicionar a legenda na parte inferior
+p1<- ggplot(data = inpatient_hospital_lite, 
+       mapping = aes(x=dias_de_internamento_var, y=doentes_saidos_var, colour=tipo_de_especialidade))+ 
+  geom_point(alpha=0.2) +
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal",
+       colour="") +
+  ylim(0, 3000) +
+  xlim(0, 25000) +
+  theme_minimal() +
+  theme(legend.position="bottom")
 
-# Exibir o gráfico
 p1
-
 ```
 
 Podemos adicionar uma condição à cor
 
 ```{r}
 
-# Criar um gráfico de dispersão com personalizações
-p1 <- ggplot(inpatient_hospital_lite, 
-             aes(x = dias_de_internamento_var,  # Variável no eixo X
-                 y = doentes_saidos_var,        # Variável no eixo Y
-                 colour = dias_de_internamento_var > 10000) # Colorir pontos baseado na condição
-             ) + 
-  geom_point(alpha = 0.1) +  # Adicionar pontos com transparência
-    ylim(0, 3000) +  # Limites para o eixo Y
-  xlim(0, 25000) +  # Limites para o eixo X  
-  labs(title = "Number of inpatients discharged and length of stay",  # Título do gráfico
-         subtitle = "2015-2022",  # Subtítulo
-         y = "Number of inpatients discharged",  # Etiqueta do eixo Y
-         x = "Length of stay",  # Etiqueta do eixo X
-         caption = "Source: Ministry of Health, Portugal") +  # Legenda da fonte
-  theme_minimal() +  # Aplicar um tema minimalista
-  theme(legend.position = "bottom")  # Posicionar a legenda na parte inferior
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, 
+           y=doentes_saidos_var, 
+           colour=dias_de_internamento_var > 10000)
+       ) + 
+  geom_point(alpha=0.1
+             ) +
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal") +
+  theme_minimal() +
+  theme(legend.position="bottom")
 
-# Exibir o gráfico
 p1
-
 ```
 
 ::: callout-warning
-**ATENÇÃO** Se queremos definir uma cor temos de definir fora o aes. Podemos definir também o formato da figura.
+**ATENÇÃO** Se queremos definir uma cor temos de definir fora o aes.
 :::
 
 ```{r}
 
-# Criar um gráfico de dispersão com personalizações
-p1 <- ggplot(inpatient_hospital_lite, 
-             aes(x = dias_de_internamento_var,  # Variável no eixo X
-                 y = doentes_saidos_var,        # Variável no eixo Y
-                 shape = tipo_de_especialidade) # Diferenciar por tipo de especialidade
-             ) + 
-  geom_point(alpha = 0.5,                      # Adicionar pontos com transparência
-             color = "#0868ac"                 # Cor dos pontos
+p1<- ggplot(inpatient_hospital_lite, 
+       aes(x=dias_de_internamento_var, 
+           y=doentes_saidos_var,
+           shape = tipo_de_especialidade)
+       ) + 
+  geom_point(alpha=0.9,
+             color="#0868ac"
              ) +
-    ylim(0, 3000) +  # Limites para o eixo Y
-  xlim(0, 25000) +  # Limites para o eixo X
-    labs(title = "Number of inpatients discharged and length of stay",  # Título do gráfico
-         subtitle = "2015-2022",  # Subtítulo
-         y = "Number of inpatients discharged",  # Etiqueta do eixo Y
-         x = "Length of stay",  # Etiqueta do eixo X
-         caption = "Source: Ministry of Health, Portugal") +  # Legenda da fonte
-  theme_minimal() +  # Aplicar um tema minimalista
-  theme(legend.position = "bottom")  # Posicionar a legenda na parte inferior
+    labs(title = "Number of inpatients discharged and length of stay",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Length of stay ", 
+         caption = "Source: Ministry of Health, Portugal",
+         colour="") +
+  theme_minimal() +
+  theme(legend.position="bottom")
 
-# Exibir o gráfico
 p1
-
 ```
 
 #### Adicionar medidas de tendencia
@@ -1028,11 +840,11 @@ p1<- ggplot(inpatient_hospital_lite,
            y=doentes_saidos_var, 
            colour=tipo_de_especialidade)) + 
   geom_point(alpha=0.1) +
-  geom_smooth(method = lm, # Adicionar uma linha de tendência linear
-              se = TRUE,     #  Incluir a banda de erro padrão
-              linetype = "dashed") + # Linha tracejada para a linha de tendência
-  ylim(0, 3000) +  # Limites para o eixo Y
-  xlim(0, 25000) +  # Limites para o eixo X
+  # NEW
+  geom_smooth(method=lm, 
+              se=FALSE,
+              linetype="dashed") +
+  
     labs(title = "Number of inpatients discharged and length of stay",
          subtitle = "2015-2022",
          y = "Number of inpatients discharged",
@@ -1052,15 +864,16 @@ p1
 
 p1<- ggplot(inpatient_hospital_lite, 
        aes(x=dias_de_internamento_var, 
-           y=doentes_saidos_var)) + 
+           y=doentes_saidos_var, 
+           colour=tipo_de_especialidade)) + 
   geom_point(alpha=0.1
              ) +
-  geom_smooth(method = loess, # Adicionar uma linha de tendência LOESS
-              se = FALSE,     # Não incluir a banda de erro padrão
-              linetype = "dashed") + # Linha tracejada para a linha de tendência
-  ylim(0, 3000) +  # Limites para o eixo Y
-  xlim(0, 25000) +  # Limites para o eixo X
-  labs(title = "Number of inpatients discharged and length of stay",
+  # NEW
+  geom_smooth(method=loess, 
+              se=FALSE,
+              linetype="dashed") +
+  
+    labs(title = "Number of inpatients discharged and length of stay",
          subtitle = "2015-2022",
          y = "Number of inpatients discharged",
          x = "Length of stay ", 
@@ -1075,11 +888,11 @@ p1
 
 
 
-## Gráfico de linhas (Line plot)
+## Line plot
 
-Descrição: Um gráfico de linhas ou gráfico linear exibe a evolução de uma ou várias variáveis numéricas. Os pontos de dados são conectados por segmentos de linha reta. É semelhante a um gráfico de dispersão, exceto que os pontos de medição são ordenados (tipicamente pelo seu valor no eixo x) e unidos com segmentos de linha reta.
+Um gráfico de linhas ou gráfico linear exibe a evolução de uma ou várias variáveis numéricas. Os pontos de dados são conectados por segmentos de linha reta. É semelhante a um gráfico de dispersão, exceto que os pontos de medição são ordenados (tipicamente pelo seu valor no eixo x) e unidos com segmentos de linha reta.
 
-Uso: Um gráfico de linhas é frequentemente usado para visualizar uma tendência nos dados ao longo de intervalos de tempo -- uma série temporal -- portanto, a linha é frequentemente desenhada de forma cronológica.
+Um gráfico de linhas é frequentemente usado para visualizar uma tendência nos dados ao longo de intervalos de tempo -- uma série temporal -- portanto, a linha é frequentemente desenhada de forma cronológica.
 
 ```{r}
 inpatient_hospital_sum <- inpatient_hospital_lite |>
@@ -1092,31 +905,31 @@ inpatient_hospital_sum <- inpatient_hospital_lite |>
 ### Gráfico de linhas
 
 ```{r}
-# Criar um gráfico de linhas com personalizações
-p1 <- ggplot() +
+# Now let's make a similar plot but with a line across time
+
+p1<- ggplot() +
   
-  geom_line(data = inpatient_hospital_sum,   # Usar dados de 'inpatient_hospital_sum'
-            aes(x = periodo,                 # Definir 'periodo' como variável do eixo X
-                y = doentes_saidos_var,      # Definir 'doentes_saidos_var' como variável do eixo Y
-                colour = tipo_instituicao)) + # Diferenciar as linhas por 'tipo_instituicao'
+  geom_line(data= inpatient_hospital_sum,  # definimos que é um grafico de linhas 
+            aes(x = periodo, 
+                y = doentes_saidos_var,
+                colour = tipo_instituicao)) + # queremos que cada tipo de instituição tenha uma cor
 
-  labs(title = "Number of inpatients discharged in Hospitals",  # Título do gráfico
-       subtitle = "2015-2022",  # Subtítulo
-       y = "Number of inpatients discharged",  # Etiqueta do eixo Y
-       x = "Type of hospital",  # Etiqueta do eixo X
-       caption = "Source: Ministry of Health, Portugal") +  # Legenda da fonte
+  labs(title = "Number of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Number of inpatients discharged",
+         x = "Type of hospital", 
+         caption = "Source: Ministry of Health, Portugal") +
+  
+  theme_minimal() 
 
-  theme_minimal()  # Aplicar um tema minimalista
-
-# Exibir o gráfico
 p1
-
 
 ```
 
-#### Alterar o posicionamento da legenda
+### Alterar o posicionamento da legenda
 
 ```{r}
+# Lets change the position of the legend
 
 p1<- ggplot() +
   geom_line(data= inpatient_hospital_sum, 
@@ -1140,9 +953,10 @@ p1
 
 ```
 
-#### Alterar a cor e tipo da linha
+### Alterar a cor e tipo da linha
 
 ```{r}
+# Lets change the position of the legend
 
 p1<- ggplot() +
   geom_line(data= inpatient_hospital_sum, 
@@ -1169,9 +983,11 @@ p1
 
 ```
 
-#### Adicionar outros elementos
+### Adicionar outros elementos
 
 ```{r}
+# Lets change the position of the legend
+
 p2<- ggplot() +
   geom_line(data= inpatient_hospital_sum, 
             aes(x = periodo, 
@@ -1200,73 +1016,31 @@ p2
 	
 ```
 
-
-
-```{r}
-
-p2<- ggplot(data= inpatient_hospital_sum, 
-            aes(x = periodo, 
-                y = doentes_saidos_var,
-                colour=tipo_instituicao)
-            ) +
-  geom_line(linewidth=1.15) +
-  
-  scale_color_manual(values = c("#fdb462", "#80b1d3", "#b3de69")) +
-  
-  geom_vline(xintercept=as.Date("2020-03-01"), 
-             colour="red") + 
-  
-  labs(title = "Number of inpatients discharged in Hospitals",
-         subtitle = "2015-2022",
-         y = "Number of inpatients discharged",
-         x = "", 
-         caption = "Source: Ministry of Health, Portugal",
-       colour = "") +
-  theme_minimal() +
-  theme(legend.position="bottom",
-        legend.title=element_blank(),
-        plot.title = element_text(face = "bold", size = 12)
-        )
-
-p2
-
-```
-
 ::: callout-note
 Embora não seja necessário, existe um espaço entre o gráfico e os eixos. Para eliminar esse espaço podemos adicionarpo seguinte código:
 
 coord_cartesian( expand = FALSE )
 :::
 
-## Gráfico Área (Area chart)
-
-O Gráfico de Área (Area chart) é uma forma de visualização de dados frequentemente utilizada para representar quantidades numéricas ao longo do tempo, sendo semelhante ao gráfico de linhas, mas com as áreas abaixo das linhas preenchidas. Este tipo de gráfico é útil para destacar a magnitude das mudanças ao longo do tempo, oferecendo uma visão clara do volume ou da quantidade dentro de um determinado período.
+## Area chart
 
 ```{r}
 p1<-  ggplot( data = inpatient_hospital_year,
             aes(x = year, 
                 y = doentes_saidos_var,
                 fill=factor(tipo_instituicao, 
-                levels = c("Hospital", 
-                           "University", 
-                           "Cancer hospital"))
-                )
+                levels = c("Hospital", "University", "Cancer hospital")))
             ) +
-  
-  geom_area(position="stack",
-            alpha=0.6, 
-            size=0.1, 
-            colour="black"
+  geom_area(position="stack",alpha=0.6 , size=0.1, colour="black"
            ) +
   
   scale_y_continuous(labels = comma) +
-  
   scale_fill_manual(values=c("#00BA38","#619CFF" ,"#F8766D")) +
   
   labs(title = "Number of inpatients discharged in Hospitals",
          subtitle = "2015-2022",
          y = "Number of inpatients discharged",
-         x = "", 
+         x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal",
          fill="") +
   theme_minimal() +
@@ -1277,10 +1051,7 @@ p1
 
 ## VISUALIZAR INCERTEZA
 
-### Barras de erro (Error Bars)
-
-
-As barras de erro (Error Bars) são uma ferramenta crucial em gráficos para representar a incerteza nos dados. Elas permitem aos espectadores compreender a variabilidade ou a precisão das medidas,
+### Error Bars
 
 ```{r}
 
@@ -1304,25 +1075,22 @@ p3<- ggplot(data= inpatient_hospital_year_mean,
   
   geom_point()+
   
-geom_errorbar(aes(ymin = mean_saidos_var - sd_saidos_var,  # Limite inferior da barra de erro
-                  ymax = mean_saidos_var + sd_saidos_var), # Limite superior da barra de erro
-              width = .2,                                  # Largura das 'barras' horizontais nas extremidades
-              position = position_dodge(0.05))  +           # Ajuste da posição para evitar sobreposição
-
+  geom_errorbar(aes(ymin=mean_saidos_var-sd_saidos_var, 
+                    ymax=mean_saidos_var+sd_saidos_var), 
+                width=.2,
+                position=position_dodge(0.05)) +
   
-  labs(
-#    title = "Mean and SD of inpatients discharged",
-#         subtitle = "2015-2022",
-         y = "Mean number",
-#         x = "Year", 
-#         caption = "Source: MoH, Portugal"
-) +
+  labs(title = "Mean and SD of inpatients discharged in Hospitals",
+         subtitle = "2015-2022",
+         y = "Mean Nunumber of inpatients discharged",
+         x = "Year", 
+         caption = "Source: Ministry of Health, Portugal") +
+  
   theme_minimal()
 
 p3
 
 ```
-
 ### Confidence intervals
 
 ```{r}
@@ -1348,70 +1116,75 @@ p1
 
 ```
 
-::: callout-note
-A função geom_ribbon no ggplot2 do R é uma ferramenta poderosa para visualizar intervalos de confiança ou outras áreas de incerteza em torno de uma linha num gráfico. 
-
-geom_ribbon é usada no ggplot2 para adicionar uma "faixa" ou "área" sombreada ao gráfico. Esta faixa é definida por duas linhas, uma representando o limite superior e outra o limite inferior do intervalo que se deseja destacar.
-:::
 
 
-## ESTATÍSTICAS EM GRÁFICOS (STATISTICS)
 
-Podemos adicionar medidas estatísticas directamente nos gráficos sem necessidade de as calcular previamente.
+## STATISTICS IN PLOTS
 
 ```{r}
+# Let's change the caracteristics of the box plot
+# Change the colours and theme
+# Dont show the NA in the plot
 
-# Criar um gráfico com características personalizadas
-p1 <- ggplot(data = inpatient_hospital_lite, 
-             aes(x = tipo_instituicao, 
-                 y = doentes_saidos_var)
-             ) +
+p1<- ggplot(data= inpatient_hospital_lite, 
+            aes(x = tipo_instituicao, 
+                y = doentes_saidos_var)
+            ) +
   stat_summary(
-    geom = "point",     # Adicionar pontos representando a mediana
-    fun.y = "median",   # Função para calcular a mediana
-    col = "black",      # Cor dos pontos
-    size = 3,           # Tamanho dos pontos
-    shape = 2,          # Forma dos pontos
-    fill = "black") +   # Cor de preenchimento dos pontos
+    geom = "point",
+    fun.y = "median",
+    col = "black",
+    size = 3,
+    shape = 2,
+    fill = "black") +
   
-  geom_jitter(          # Adicionar jitter para mostrar a dispersão
-    alpha = 0.02,       # Transparência dos pontos do jitter
-    width = 0.3,        # Largura do jitter
-    colour = "gray") +  # Cor dos pontos do jitter
+  geom_jitter(alpha=0.02,
+              width = 0.3,
+              colour = "gray") +
   
   labs(title = "Number of inpatients discharged in Hospitals",
          subtitle = "2015-2022",
          y = "Number of inpatients discharged",
          x = "Type of hospital", 
          caption = "Source: Ministry of Health, Portugal") +
+  ylim(0, 4000)
   
   theme_minimal()
-
 p1
 ```
 
 ```{r}
+# Let's change the caracteristics of the box plot
+# Change the colours and theme
+# Dont show the NA in the plot
 
 p1<- ggplot(data= inpatient_hospital_lite, 
             aes(x = tipo_instituicao, 
                 y = doentes_saidos_var)
             ) +
-    stat_summary(
-      geom = "point",
-      fun.y = "mean",
-      col = "black",
-      size = 3,
-      shape = 3) +
+        stat_summary(
+    geom = "point",
+    fun.y = "mean",
+    col = "black",
+    size = 3,
+    shape = 3,
+    fill = "blue") +
+  ylim(0, 4000) +
+  
   stat_summary(
     geom = "point",
     fun.y = "median",
-    col = "red",
+    col = "black",
     size = 3,
-    shape = 1) +
-  ylim(0, 4000) +
+    shape = 1,
+    fill = "red") +
+  
+
+  
   geom_jitter(alpha=0.02,
               width = 0.2,
               colour = "gray") +
+  
   labs(title = "Number of inpatients discharged in Hospitals",
          subtitle = "2015-2022",
          y = "Number of inpatients discharged",
@@ -1424,22 +1197,16 @@ p1
 
 ## COMBINAR PLOTS
 
-O pacote patchwork no R oferece uma solução elegante para combinar e organizar múltiplos gráficos criados com ggplot2. Esta biblioteca destaca-se pela  simplicidade e flexibilidade, permitindo aos utilizadores dispor gráficos de forma intuitiva numa única janela gráfica, facilitando a comparação e a análise conjunta de diferentes visualizações. 
+O pacote patchwork em R é uma biblioteca muito útil para combinar e organizar gráficos criados com ggplot2. Fornece uma forma intuitiva e flexível de dispor múltiplos gráficos em uma única janela gráfica. 
 
-Ver mais aqui <https://patchwork.data-imaginist.com/articles/patchwork.html>
-
-
-
+Ver mais aqui https://patchwork.data-imaginist.com/articles/patchwork.html
 
 ```{r}
-library(patchwork)
-p2 + p3  # Combina 'p2' e 'p3' lado a lado
+p2 + p3
 ```
 
 ```{r}
-
-p2 / p3  # Empilha 'p2' sobre 'p3'
-
+p2 / p3
 ```
 
 
@@ -1461,61 +1228,94 @@ Podemos encontrar shapefiles de diversas fontes, p.e. Ministério da Administra�
 
 
 ```{r}
-# Carregar o pacote giscoR para obter dados geográficos
 library(giscoR)
-
-# Obter os dados geográficos (shapefile) de Portugal com uma resolução de 10M
-# e adicionar uma nova coluna 'res' com o valor "10M"
-PT_res10 <-
-  gisco_get_countries(resolution = "10", 
-                      country = "PT") %>%
-  mutate(res = "10M")
-
 ```
 
+```{r}
+PT_res10 <-
+  gisco_get_countries(resolution = "10", country = "PT") %>%
+  mutate(res = "10M")
+```
 
 ```{r}
-# Utilizar ggplot para criar um mapa de Portugal
-# geom_sf desenha as fronteiras de Portugal, preenchendo o interior de azul
-# theme_map aplica um tema adequado para mapas
 ggplot(PT_res10) +
   geom_sf(fill = "blue") +
   theme_map()
-
 ```
 
 ```{r}
-# Obter dados geográficos das regiões NUTS de Portugal (nível 2)
 PT_nuts <- gisco_get_nuts(country = "Portugal", nuts_level = 2)
 
-# Criar um mapa das regiões NUTS
-# geom_sf desenha as fronteiras das regiões
-# geom_sf_text adiciona rótulos às regiões
-# theme_map aplica um tema adequado para mapas
 ggplot(PT_nuts) +
   geom_sf() +
-  geom_sf_text(aes(label = NAME_LATN), size = 2) +
+  geom_sf_text(aes(label = NAME_LATN), size=3) +
   theme_map()
-
 ```
 
 ```{r}
-# Definir as regiões a serem excluídas do mapa
 target <- c("Região Autónoma dos Açores", "Região Autónoma da Madeira")
 
-# Filtrar os dados, excluindo as regiões definidas em 'target'
 PT_nuts <- PT_nuts |> 
   filter(! NUTS_NAME %in% target)
 
-# Criar um mapa das regiões NUTS, excluindo Açores e Madeira
-# geom_sf desenha as fronteiras das regiões
-# geom_sf_text adiciona rótulos menores às regiões
-# theme_map aplica um tema adequado para mapas
 ggplot(PT_nuts) +
   geom_sf() +
-  geom_sf_text(aes(label = NAME_LATN), size = 2) +
+  geom_sf_text(aes(label = NAME_LATN), size=2) +
   theme_map()
 
+```
+
+### Dados (features) espaciais 
+
+```{r}
+# Use eurostat
+library(eurostat)
+
+# Que datasets estão disponiveis no Eurostat
+health_datasets <- search_eurostat("health")
+```
+
+
+```{r}
+# Download do dataset 	 Healthy life expectancy based on self-perceived health
+
+healthy_life_expectancy <- get_eurostat("hlth_silc_17") |> filter(TIME_PERIOD=="2021-01-01", 
+                                                                  sex=="T", 
+                                                                  indic_he=="HE_BIRTH")
+```
+
+
+### Àreas 
+
+```{r}
+# Get shapes
+nuts3 <- gisco_get_nuts(
+  year = "2016",
+  epsg = "3035",
+  resolution = "3",
+  nuts_level = "3"
+)
+
+# Group by NUTS by country and convert to lines
+country_lines <- nuts3 %>%
+  group_by(
+    CNTR_CODE
+  ) %>%
+  summarise(n = n()) %>%
+  st_cast("MULTILINESTRING")
+```
+
+```{r}
+ggplot(nuts3) +
+  geom_sf() +
+  theme_map()
+```
+
+
+```{r}
+ggplot(country_lines) +
+  geom_sf() +
+  theme_map()
 ```
 
 #### Mapas 
@@ -1523,132 +1323,104 @@ ggplot(PT_nuts) +
 Por vezes podemos carregar a shapefile e os dados e juntar os dados, desde que tenhamos um identificador comum
 
 ```{r}
-# Carregar o pacote sf para trabalhar com dados espaciais
 library(sf)
 
-# Ler a shapefile dos concelhos de Portugal a partir de um arquivo JSON
-comm_pt <- st_read("datasets/map_json_portugal/concelhos_portugal_light.json")
-
+comm_pt <- st_read(
+  "datasets/map_json_portugal/concelhos_portugal_light.json")
 ```
 
 ```{r}
-# Ler dados de incidência de COVID-19 de um arquivo CSV
+
 covid_inc <- read_csv("datasets/covid_inc.csv") 
 
-# Renomear a coluna 'Concelho' para 'NAME_2' para correspondência com a shapefile
-# e ajustar a nomenclatura de alguns concelhos
+
 covid_inc <- covid_inc |>
-  rename(NAME_2 = Concelho) |>
-  mutate(NAME_2 = recode(NAME_2,
+  rename(NAME_2=Concelho) |>
+  mutate( NAME_2=recode(NAME_2,
                          'Ponte de Sor' = "Ponte de Sôr"
                          ))
 
-# Nota sobre erros frequentes com nomes de concelhos como Lagoa, Calheta, Mealhada, Sátão
-```
+## Erro frequente com Logoa, Calheta, Mealhada, Sátão
 
 
-```{r}
-
-# Combinar a shapefile com os dados de COVID-19 usando a função left_join
-# A combinação é feita com base no nome dos concelhos (NAME_2)
-comm_pt <- left_join(comm_pt,
+comm_pt <-left_join(comm_pt,
                      covid_inc,
                      by = "NAME_2")
 
-# Identificar as entradas na shapefile que não têm correspondência nos dados de COVID-19
-sanity <- anti_join(comm_pt,
-                    covid_inc,
-                    by = "NAME_2")
+sanity <-anti_join(comm_pt,
+                     covid_inc,
+                     by = "NAME_2")
 
 ```
 
-
-**Color**
-Função: 
-A estética color é usada para definir a cor das linhas ou bordas de um objeto no gráfico. No contexto de mapas, color define a cor das fronteiras ou linhas que delimitam as unidades geográficas (como países, regiões, estados, etc.).
-
-Exemplo: 
-geom_sf(color = "black") desenha as fronteiras de unidades geográficas em preto.
-
-**Fill**
-Função: 
-A estética fill é usada para definir a cor de preenchimento do interior de um objeto. Em mapas, fill define a cor dentro das fronteiras das unidades geográficas.
-
-Exemplo: 
-geom_sf(aes(fill = variavel)) preenche as áreas internas das unidades geográficas com cores que podem variar de acordo com uma variável, como a densidade populacional, categorias de dados, etc.
+We need to specify the fill variable and the color variable (boundaries)
 
 ```{r}
 
-# Criar um mapa temático dos concelhos de Portugal
-p1 <- ggplot() + 
-  geom_sf(data = comm_pt,                   # Usar os dados geográficos de 'comm_pt'
-          aes(fill = Incidencia_categoria), # Preencher áreas com base na 'Incidencia_categoria'
-          size = 1,                         # Definir o tamanho das linhas das fronteiras
-          color = "black"                   # Cor das linhas das fronteiras
-         ) 
-
-# Exibir o mapa
-p1
-
-```
-
-
-```{r}
-
-# Criar um mapa temático dos concelhos de Portugal
-p1 <- ggplot() + 
-  geom_sf(data = comm_pt,                      # Usar os dados geográficos de 'comm_pt'
-          aes(fill = Incidencia_categoria),    # Preencher áreas com base na 'Incidencia_categoria'
-          size = 0.1,                          # Definir o tamanho das linhas das fronteiras
-          color = "white"                      # Cor das linhas das fronteiras
+p1<- ggplot() + 
+  geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 1,
+              color = "black"
           ) 
 
-# Exibir o mapa
 p1
-
 ```
 
-Adicionar o tema e título 
+We can chage the thickness of the boundaries and the color
 
 ```{r}
-# Criar um mapa temático de Portugal com dados de incidência de COVID-19
-p <- ggplot() +
-    geom_sf(data = comm_pt,                  # Usar dados geográficos 'comm_pt'
-            aes(fill = Incidencia_categoria),# Preencher áreas com base na categoria de incidência
-            size = 0.1,                      # Definir espessura das linhas de fronteira
-            color = "white"                  # Cor das linhas de fronteira
-           ) +
-    # Aplicar um tema clássico para um visual limpo e tradicional
-    theme_classic() +
-    # Personalizar rótulos e títulos
-    labs(x = NULL,                           # Remover rótulo do eixo X
-         y = NULL,                           # Remover rótulo do eixo Y
-         title = "Portugal's COVID-19 incidence", # Título do mapa
-         subtitle = "January, 2022",              # Subtítulo do mapa
-         caption = "Data: DGS, 2022")             # Legenda dos dados
+library(ggthemes)
 
-p  # Exibir o mapa
+p1<- ggplot() + 
+  geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) 
+
+p1
+```
+
+We now will add a theme and labels
+
+```{r}
+p <- ggplot() +
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) +
+    # add a theme
+   theme_classic() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022")
+p
+
 
 ```
 
-Podemos alterar o tema 
+We can change the default specification
 
 ```{r}
 theme_map <- function(...) {
-  theme_minimal() +                    # Começa com o tema minimalista do ggplot2
+  theme_minimal() +
   theme(
-    axis.line = element_blank(),       # Remove as linhas dos eixos
-    axis.text.x = element_blank(),     # Remove o texto do eixo X
-    axis.text.y = element_blank(),     # Remove o texto do eixo Y
-    axis.ticks = element_blank(),      # Remove os ticks (marcadores) dos eixos
-    axis.title.x = element_blank(),    # Remove o título do eixo X
-    axis.title.y = element_blank(),    # Remove o título do eixo Y
-    panel.grid.major = element_blank(),# Remove as grades principais do painel
-    panel.grid.minor = element_blank(),# Remove as grades menores do painel
-    panel.border = element_blank(),    # Remove a borda do painel
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    ...
   )
 }
-
 ```
 
 ```{r}
@@ -1670,70 +1442,48 @@ p
 
 ```
 
-Podemos alterar as cores agora 
-
-::: callout-note
-
-Este website é um optimo recurso para escolher cores <https://colorbrewer2.org/>
-:::
+We can change the colors now
 
 ```{r}
 
-# Definir um vetor de cores para as categorias de incidência
+# It's recommended to use a named vector
+# Use this website https://colorbrewer2.org/#type=sequential&scheme=OrRd&n=5 
+
 cols <- c("#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000")
 
-# Criar um mapa temático de Portugal com dados de incidência de COVID-19
 p <- ggplot() +
-    geom_sf(data = comm_pt,                     # Usar os dados geográficos 'comm_pt'
-            aes(fill = Incidencia_categoria),   # Preencher áreas com base na categoria de incidência
-            size = 0.1,                         # Definir espessura das linhas de fronteira
-            color = "gray"                      # Cor das linhas de fronteira
-           ) +
-    # Aplicar o tema personalizado para mapas
-    theme_map() +
-    # Personalizar rótulos e títulos
-    labs(x = NULL,                             # Remover rótulo do eixo X
-         y = NULL,                             # Remover rótulo do eixo Y
-         title = "Portugal's COVID-19 incidence", # Título do mapa
-         subtitle = "January, 2022",            # Subtítulo do mapa
-         caption = "Data: DGS, 2022") +         # Legenda dos dados
-    # Personalizar a escala de cores para a variável 'Incidencia_categoria'
-    scale_fill_manual(values = cols,
-                      name = "Incidence") +
-    # Ajustar a posição e estilo da legenda
-    theme(
-      legend.position = "right",
-      legend.direction = "vertical",
-      legend.text = element_text(size = 8, colour = "gray50")
-    )
-
-# Exibir o mapa
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "gray"
+          ) +
+    # add the previously defined basic theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022") +
+    # and we use guide_legend instead of guide_colourbar
+  scale_fill_manual(values = cols,
+                    name = "Incidência") +
+  theme(
+    legend.position = "right",
+       legend.direction = "vertical",
+       legend.text = element_text(size = 8, colour = "gray50")
+  )
+        
+        
 p
-
 ```
-
-
 #### Operações com shapefiles 
 
-**Criação de Geometrias:** st_sfc() e st_sf() são usados para criar objetos de geometria simples ou um dataframe espacial, respectivamente.
-
-**Operações Geométricas:** Funções como st_union(), st_intersection(), st_difference() são utilizadas para realizar operações geométricas entre objetos espaciais.
-
-::: callout-note
-
-Este website é um optimo recurso <file:///Users/andreperaltasantos/Downloads/sf.pdf>
-:::
-
-
 ```{r}
-comm_ars <- comm_pt |>                # Usar o conjunto de dados 'comm_pt'
-  group_by(ARS) |>                    # Agrupar os dados pela variável 'ARS'
-  summarize(geometry = st_union(geometry) # Combinar as geometrias dentro de cada grupo
+comm_ars<- comm_pt |>
+  group_by(ARS) |> 
+  summarize(geometry = st_union(geometry)
             )
-
 ```
-
-Podemos adicionar as fronteiras das ARS
 
 ```{r}
 p <- ggplot() +
@@ -1757,212 +1507,56 @@ p <- ggplot() +
     # and we use guide_legend instead of guide_colourbar
   scale_fill_manual(values = cols,
                     name = "") +
+  
   theme(legend.position = "right",
         legend.direction = "vertical",
-        legend.text = element_text(size = 8, colour = "black")) 
+        legend.text = element_text(size = 8, colour = "gray50")) 
 p
 ```
 
-
-#### Mapa Europeu 
-
-Podemos descarregar os mapas das NUTS directamente do pacote giscoR. Neste caso vamos fazer o download de NUTS0 (paises)
+### Raster data 
 
 ```{r}
-# Carregar o pacote giscoR
-library(giscoR)
-
-# Obter dados geográficos dos NUTS nível 0 para o ano de 2016
-# NUTS nível 0 geralmente se refere a grandes regiões ou países
-nuts0 <- gisco_get_nuts(
-  year = "2016",        # Ano dos dados
-  epsg = "3035",        # Sistema de coordenadas espaciais 
-  resolution = "3",     # Resolução dos dados (3 = baixa resolução)
-  nuts_level = "0"      # Nível NUTS (0 = nível mais alto)
-)
-
-```
-
-Podemos obter dados do Eurostat directamente do pacote eurostat. 
-
-Podemos explorar mais aqui <https://ropengov.github.io/eurostat/articles/eurostat_tutorial.html> 
-
-
-```{r}
-# Carregar o pacote eurostat
-library(eurostat)
-
-# Baixar o conjunto de dados de expectativa de vida saudável do Eurostat
-healthy_life_expectancy <- get_eurostat("hlth_silc_17") |>
-  # Filtrar para o ano de 2021, sexo total (ambos os sexos) e indicador de expectativa de vida saudável ao nascer
-  filter(TIME_PERIOD == "2021-01-01", 
-         sex == "T", 
-         indic_he == "HE_BIRTH"
-         )
-
-```
-
-Os passos para gerar o mapa são 1. Juntar os dados, 2. Definir as categorias, 3. criar o mapa
-
-```{r}
-# Combinar os dados NUTS com os dados de expectativa de vida saudável
-nuts0.sf <- nuts0 |> 
-  left_join(healthy_life_expectancy, by = c("NUTS_ID" = "geo"))
-```
-
-
-```{r}
-# Definir intervalos para categorização
-br <- c(0, 68, 70, 75, 77, 80, 85)
-
-# Categorizar os dados de expectativa de vida
-nuts0.sf <- nuts0.sf %>%
-  mutate(values_cut = cut(values, br, dig.lab = 6))
-
-
-labs_plot <- prettyNum(br[-1], big.mark = ",")
-
-# Paleta de cores 
-pal <- hcl.colors(length(br) - 1, "Lajolla")
-
-```
-
-
-```{r}
-# Criar um mapa temático com ggplot2
-p_map <- ggplot(nuts0.sf) +
-  # Adicionar as regiões NUTS com preenchimento baseado na expectativa de vida saudável
-    # Adicionar linhas de fronteira dos países
-  geom_sf(data = nuts0.sf, 
-          col = "black",  # Cor das linhas de fronteira
-          linewidth = 0.1) + # Espessura das linhas de fronteira
-  
-  geom_sf(aes(fill = values_cut), 
-          linewidth = 0,  # Linhas de fronteira sem largura
-          color = NA,     # Sem cor de linha
-          alpha = 0.9) +  # Transparência das cores de preenchimento
-
-  # Configurar as coordenadas para centralizar na Europa (EPSG 3035)
-  coord_sf(
-    xlim = c(2377294, 7453440),
-    ylim = c(1313597, 5628510)
-  ) +
-  # Adicionar rótulos ao mapa
-  labs(
-    title = "Healthy Life Expectacy in the EU", # Título
-    subtitle = "2021", # Subtítulo
-    caption="Data: Eurostat"
-  ) +
-  # Configurar a escala de cores manualmente
-  scale_fill_manual(
-    name = "Years",       # Nome da legenda
-    values = pal,         # Paleta de cores
-    labels = labs_plot,   # Rótulos para as categorias de cor
-    drop = FALSE,         # Manter todas as categorias na legenda
-    guide = guide_legend( # Configurar a aparência da legenda
-      direction = "horizontal",
-      keyheight = 0.4,
-      keywidth = 1.5,
-      title.position = "top",
-      title.hjust = 0.5,
-      label.hjust = .5,
-      nrow = 1,
-      byrow = TRUE,
-      reverse = FALSE,
-      label.position = "bottom"
-    )
-  ) +
-  # Aplicar um tema personalizado para mapas
-  theme_map() +
-  # Personalizar aspectos adicionais do tema
-  theme(
-    plot.caption = element_text(
-      size = 8, color = "grey60"
-      ),
-    legend.text = element_text(
-      size = 8,
-      color = "grey20"
-    ),
-    legend.title = element_text(
-      size = 9,
-      color = "grey20"
-    ),
-    legend.position = "bottom" # Posição da legenda
-  )
-
-p_map
-```
-
-```{r}
-ggsave(
-  p_map,
-  filename = here::here("output", 
-                        "figures", 
-                        paste0( "map_eu_HE", ".png")),
-  width = 10,
-  height = 8,
-  units = c("cm"),
-  dpi = "retina",
-  bg = "white"
-)
-```
-
-
-### Dados Raster  
-
-Os dados raster são uma forma fundamental de representação de dados espaciais, especialmente utilizados em análises geográficas e de remote sensing. Em comparação comos dados vetoriais, que representam características geográficas como pontos, linhas e polígonos, os dados raster são formados por células (ou pixels) organizados em uma grade regular (latice). Cada célula de um raster tem um valor associado, que pode representar diversas informações, como temperatura, altitude, umidade, etc.
-
-```{r}
-# Carregar o pacote geodata para trabalhar com dados geoespaciais
 library(geodata)
+tavg_pt <- worldclim_country(country = "Portugal", var = "tavg",
+                       path = tempdir())
 
-# Obter dados climáticos (temperatura média) para Portugal
-tavg_pt <- worldclim_country(country = "Portugal", 
-                             var = "tavg",
-                             path = tempdir())
-
-# Converter os dados raster para um data.frame
-tavg_pt_df <- as.data.frame(tavg_pt, xy = TRUE) 
-
+#convert to data.frame
+tavg_pt_df <-
+  as.data.frame(d, xy = TRUE) 
 
 ```
 
 ```{r}
 
-# Criar um mapa temático da temperatura média em Portugal
 g_tmax_map <- ggplot(data = tavg_pt_df) +
     geom_raster(aes(x = x, y = y, 
-                    fill = PRT_wc2.1_30s_tavg_1)) + # Usar 'geom_raster' para criar o mapa temático
+                    fill = PRT_wc2.1_30s_tavg_1)) +
 
-    theme_void() + # Aplicar um tema sem elementos extras
+    theme_void() +
     theme(
-      legend.position = "bottom")  +
-    scale_fill_viridis_c(name = "Temperatura Média") + # Usar uma escala de cores 'viridis' para a temperatura
-    labs(
-      title = "Temperatura Média em Portugal", # Título do mapa
-      caption = "Source: Eurostat" # Fonte dos dados
-    ) 
-# Exibir o mapa
+      legend.position = "bottom"
+    )  +
+      scale_fill_viridis_c(name = "Temperatura Média") +
+  labs(
+    title = "Temperatura Média em Portugal",
+    caption = "Source: Eurostat"
+  ) 
 g_tmax_map
-
 ```
-
 
 ### Dados de Localização
 
-Os dados de localização são pontos de coordenadas (lat, long) que podemos adicionar à nossa shapefile.
-
 ```{r}
-# Filtrar só para a ARS de Lisboa e Vale do Tejo
 comm_lvt<- comm_pt |>
   filter(ARS=="Lisboa e Vale do Tejo")  
 
-# Contem as coordenadas dos hospitais do SNS em Porugal
 geo_hospitals <-  read_csv("datasets/geo_location_hospitals.csv")
   
 ```
 
 ```{r}
+
 p <- ggplot() +
         geom_sf(data = comm_lvt, 
               size = 0.2,
@@ -1974,19 +1568,15 @@ p <- ggplot() +
                  aes(x = long, 
                      y = lat), 
                  size = 2, 
-                 shape = 23, 
-                 fill = "red",
-                 alpha=0.5) +
+        shape = 23, 
+        fill = "red") +
   
-      # Usar geom_text ou geom_label para adicionar rótulos
-      geom_text(data = geo_hospitals,
+  geom_sf_text(data = geo_hospitals,
                 aes(x = long, 
-                    y = lat, 
-                    label = Hospital),
-                check_overlap = TRUE, 
-                size = 2,
-                nudge_y = 0.05 
+                     y = lat,
+                    label = Hospital)
                 ) +
+    # add the previously defined basic theme
    theme_map() +
     labs(x = NULL, 
          y = NULL, 
@@ -1994,146 +1584,309 @@ p <- ggplot() +
          subtitle = "January, 2022", 
          caption = "Data: MoH, 2022") 
 p
-
 ```
 
-### Open Streep maps
-
-O OpenStreetMap (OSM) é um projeto colaborativo que cria mapas livres e editáveis do mundo, semelhante à Wikipedia, mas para mapas. Fornece dados geográficos acessíveis e atualizados que são úteis para uma variedade de aplicações, desde navegação e planejamento urbano até análises geoespaciais e projetos de pesquisa.
-
-O osmdata é um pacote no R que permite manipular os dados do OpenStreetMap diretamente do R. É uma ferramenta para cientistas de dados e pesquisadores que trabalham com dados geoespaciais. 
-
-::: callout-warning
-
-Por vezes pode ser necessario reiniciar o R depois de instalar o osmdata
-:::
-
+**Open Streep maps**
 ```{r}
-# Carregar pacotes necessários
 library(osmdata)
-library(ggplot2)
-
-
-```
-
-```{r}
-# Definir a área de Lisboa
-bbox_lisbon <- getbb("Lisbon, Portugal")
-
-```
-
-```{r}
-# Consultar e obter dados de instalações de saúde
-health_data <- opq(bbox = bbox_lisbon) %>%
-  add_osm_feature(key = "amenity", value = "hospital") %>%
-  osmdata_sf()
-
-# Consultar e obter dados das ruas principais (primary e secondary)
-streets_data <- opq(bbox = bbox_lisbon) %>%
-  add_osm_feature(key = "highway", value = c("primary", "secondary")) %>%
-  osmdata_sf()
 
 ```
 
 
 
-```{r}
-# Preparar os dados para construir o grafico
-health_facilities <- health_data$osm_points
-main_streets <- streets_data$osm_lines
-
-# Criar o mapa com ggplot2
-ggplot() +
-    # Adicionar ruas principais
-    geom_sf(data = main_streets, 
-            color = "gray", 
-            size = 0.15) +
-    # Adicionar instalações de saúde
-    geom_sf(data = health_facilities, 
-            color = "blue", 
-            size = 1.5,
-            alpha=0.3) +
-    # Configurar tema e rótulos
-   theme_map() +
-    labs(title = "Instalações de Saúde e Ruas Principais em Lisboa",
-         subtitle = "Dados do OpenStreetMap",
-         caption = "Fonte: OpenStreetMap") 
-
-```
-
-
-
-### Mapas Interactivos (leaflet) 
-
-O Leaflet para R é usado para criar mapas interativos que podem ser integrados em relatórios R Markdown, aplicativos Shiny ou páginas da web. Esses mapas podem incluir funcionalidades como zoom, pan e layers interativos.
-
-Personalização: Oferece ampla personalização de mapas, ver mais aqui <https://rstudio.github.io/leaflet/>
+Steps 1. Choose a shapefile 2. Chose the data you want to add to the shapefile 3. Linkage the data
 
 ```{r}
+library(sf)
 
-# Preparar as cores usadas
-mybins <- c(0,60,120,240,480,Inf)
-mycolors <- c("#f7f7f7","#fee391","#fb6a4a","#cb181d","#67000d")
-mypalette <- colorBin( palette=mycolors, domain=comm_pt$Incidencia, na.color="transparent", bins=mybins)
-
-# Preparar o texto da legenda interactiva
-mytext <- paste(
-    "Concelho: ", comm_pt$NAME_2,"<br/>",
-    "Incidência: ", comm_pt$Incidencia, 
-    sep="") %>%
-  lapply(htmltools::HTML)
-
-
+comm_pt <- st_read(
+  "datasets/map_json_portugal/concelhos_portugal_light.json")
 ```
 
 ```{r}
-# Carregar o pacote leaflet
-library(leaflet)
 
-# Criar um mapa interativo com leaflet
-p <- leaflet(comm_pt) |> # Inicializar o mapa com os dados 'comm_pt'
-  setView(lat=39.5, lng=-7.6, zoom=6) |> # Definir a visualização inicial (foco em Portugal)
-  addProviderTiles(providers$CartoDB.Positron) |> # Adicionar tiles de base do CartoDB (estilo Positron)
-  addPolygons(
-    fillColor = ~mypalette(Incidencia), # Definir a cor de preenchimento dos polígonos baseada em 'Incidencia'
-    stroke=TRUE,                       # Ativar as bordas dos polígonos
-    fillOpacity = 0.9,                 # Definir a opacidade de preenchimento
-    color="grey",                      # Definir a cor da borda dos polígonos
-    weight=0.3,                        # Definir a espessura da borda dos polígonos
-    label = mytext,                    # Adicionar rótulos aos polígonos
-    labelOptions = labelOptions(
-      style = list("font-weight" = "normal", padding = "3px 8px"), # Estilo dos rótulos
-      textsize = "13px",              # Tamanho do texto dos rótulos
-      direction = "auto"              # Direção automática dos rótulos
-    )) |> 
-  addMiniMap() # Adicionar um mini-mapa para navegação
+covid_inc <- read_csv("datasets/covid_inc.csv") 
 
-# Exibir o mapa
+
+covid_inc <- covid_inc |>
+  rename(NAME_2=Concelho) |>
+  mutate( NAME_2=recode(NAME_2,
+                         'Ponte de Sor' = "Ponte de Sôr"
+                         ))
+
+## Erro frequente com Logoa, Calheta, Mealhada, Sátão
+
+
+comm_pt <-left_join(comm_pt,
+                     covid_inc,
+                     by = "NAME_2")
+
+sanity <-anti_join(comm_pt,
+                     covid_inc,
+                     by = "NAME_2")
+
+```
+
+We need to specify the fill variable and the color variable (boundaries)
+
+```{r}
+
+p1<- ggplot() + 
+  geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 1,
+              color = "black"
+          ) 
+
+p1
+```
+
+We can chage the thickness of the boundaries and the color
+
+```{r}
+library(ggthemes)
+
+p1<- ggplot() + 
+  geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) 
+
+p1
+```
+
+We now will add a theme and labels
+
+```{r}
+p <- ggplot() +
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) +
+    # add a theme
+   theme_classic() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022")
 p
 
+
 ```
+
+We can change the default specification
+
+```{r}
+theme_map <- function(...) {
+  theme_minimal() +
+  theme(
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    ...
+  )
+}
+```
+
+```{r}
+p <- ggplot() +
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "white"
+          ) +
+    # add the theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022")
+p
+
+
+```
+
+We can change the colors now
+
+```{r}
+
+# It's recommended to use a named vector
+# Use this website https://colorbrewer2.org/#type=sequential&scheme=OrRd&n=5 
+
+cols <- c("#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000")
+
+p <- ggplot() +
+    geom_sf(data = comm_pt, 
+          aes(fill = Incidencia_categoria),
+              size = 0.1,
+              color = "gray"
+          ) +
+    # add the previously defined basic theme
+   theme_map() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Portugal's COVID-19 incidence", 
+         subtitle = "January, 2022", 
+         caption = "Data: DGS, 2022") +
+    # and we use guide_legend instead of guide_colourbar
+  scale_fill_manual(values = cols,
+                    name = "Incidência") +
+  theme(legend.position = "right",
+        legend.direction = "vertical",
+        legend.text = element_text(size = 8, colour = "gray50")) 
+p
+```
+
+### Interactive maps 
+
+```{r}
+library(leaflet)
+pal <- colorNumeric(palette = "YlOrRd", domain = comm_pt$Incidencia)
+
+l <- leaflet(comm_pt) |>  addTiles() |> 
+  addPolygons(color = "grey", fillColor = ~ pal(Incidencia),
+              fillOpacity = 0.9) %>%
+  addLegend(pal = pal, values = ~Incidencia, opacity = 0.9) |> 
+  addMiniMap()
+l
+```
+
+
 
 
 # EXTENÇÕES
 
-As extensões ggplot2 são pacotes no R que ampliam a funcionalidade do ggplot2. Estas extensões adicionam novas camadas, temas, escalas e outras funcionalidades, permitindo aos usuários criar gráficos mais complexos e personalizados. 
-
-Aqui estão algumas das extensões ggplot2 mais populares e suas funcionalidades:
-
-**gganimate:** Permite criar animações com ggplot2. Com gganimate, você pode transformar gráficos estáticos em animações para mostrar mudanças nos dados ao longo do tempo ou destacar movimentos ou transições.
-
-**ggridges:** Usado para criar gráficos de "ridgeplot", que são úteis para visualizar a distribuição de uma variável contínua ao longo de várias categorias. Esses gráficos são uma alternativa esteticamente agradável aos gráficos de densidade ou violino.
-
-**ggforce:** Fornece uma variedade de funcionalidades que não estão disponíveis no ggplot2 padrão, como links geométricos entre pontos, gráficos de densidade facetados e muito mais.
-
-**patchwork:** Uma biblioteca para combinar vários gráficos ggplot2 em um único layout. É muito útil para criar painéis de gráficos complexos.
-
-**ggrepel:** Oferece melhorias na forma como os rótulos de texto são adicionados aos gráficos. Ajuda a evitar a sobreposição de texto, tornando os gráficos mais legíveis.
-
 [extensions of ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
 
-**esquisse:** é um add-in para R que permite criar e personalizar visualizações de dados interativas com ggplot2 e filtrar dados com dplyr. Ele fornece uma interface gráfica intuitiva que facilita a criação de gráficos, mesmo para usuários que não estão familiarizados com a sintaxe do ggplot2. Aqui estão algumas de suas principais características:
+https://dreamrs.github.io/esquisse/index.html 
+# Adicional Resources
 
-Interface de Arrastar e Soltar: esquisse oferece uma interface de arrastar e soltar para mapear suas variáveis em diferentes estéticas, tornando a criação de gráficos rápida e acessível. <https://dreamrs.github.io/esquisse/index.html>
+<https://www.cedricscherer.com/slides/useR-2021_ggplot-wizardry-extended.pdf>
 
-# FIM 
+# Exercicio 
+Para os exercicios 6 e 7 deve utilizar o dataset hypoxia
+```{r}
+hypoxia <- read_csv("datasets/hypoxia.csv")
+```
+
+
+
+## Exercicio 6
+1. Compara a distribuição de idades entre homens e mulheres
+2. O gráfico deve ter um título, caption, legenda. A distribuição estar preenchido por cor "#91bfdb" e "#ef8a62". Utiliza o tema classic  
+
+
+## Exercicio 7
+1. Explora a relaçao entre MinSao2 e o BMI
+2. O gráfico deve ter um título, caption, legenda. Usa o theme minimal e adiciona uma linha tendencia linear
+
+## Exercicio 9
+1. Cria um mapa usado o shapefile comm_pt, e as caracteristicas da base de dados "mortalidade_coracao_2021.csv"
+2. O mapa deve conter a mortalidade por doenças cardiovasculares com uma escala de 5 cores 
+3. O gráfico deve ter um título, caption, legenda.
+
+# NOT WORKING 
+
+
+#### Juntar datasets (Joins) 
+
+```{r}
+
+# Left join data
+country_lines_sf <- country_lines %>%
+  left_join(healthy_life_expectancy, by = c("CNTR_CODE" = "geo"))
+```
+
+```{r}
+br <- c(0, 60, 70, 75, 80, 85)
+
+country_lines_sf <- country_lines_sf %>%
+  mutate(values_cut = cut(values, br, dig.lab = 5))
+
+labs_plot <- prettyNum(br[-1], big.mark = ",")
+
+# Palette
+pal <- hcl.colors(length(br) - 1, "Lajolla")
+
+```
+```{r}
+country_lines_sf <- country_lines_sf |> drop_na(values_cut)
+```
+
+
+```{r}
+# Plot
+
+ggplot(country_lines_sf) +
+  geom_sf(aes(fill= values_cut), linewidth = 1.5,color="black") +
+  #geom_sf(data = country_lines, col = "black", linewidth = 0.1) +
+  # Center in Europe: EPSG 3035
+  coord_sf(
+    xlim = c(2377294, 7453440),
+    ylim = c(1313597, 5628510)
+  ) +
+  labs(
+    title = "Healthy life expectancy in 2021",
+    subtitle = "",
+    caption = "Source: Eurostat"
+  ) 
+
++
+  scale_fill_manual(
+    name = "Healthy life expectancy",
+    values = pal,
+    labels = labs_plot,
+    drop = FALSE,
+    guide = guide_legend(
+      direction = "horizontal",
+      keyheight = 0.5,
+      keywidth = 2.5,
+      title.position = "top",
+      title.hjust = 0.5,
+      label.hjust = .5,
+      nrow = 1,
+      byrow = TRUE,
+      reverse = FALSE,
+      label.position = "bottom"
+    )
+  ) +
+  theme_void() +
+  # Theme
+  theme(
+    plot.title = element_text(
+      size = 12, color = pal[length(pal) - 1],
+      hjust = 0.5, vjust = -6
+    ),
+    plot.subtitle = element_text(
+      size = 14,
+      color = pal[length(pal) - 1],
+      hjust = 0.5, vjust = -10, face = "bold"
+    ),
+    plot.caption = element_text(
+      size = 9, color = "grey60",
+      hjust = 0.5, vjust = 0,
+      margin = margin(t = 5, b = 10)
+    ),
+    legend.text = element_text(
+      size = 10,
+      color = "grey20"
+    ),
+    legend.title = element_text(
+      size = 11,
+      color = "grey20"
+    ),
+    legend.position = "bottom"
+  )
+
+```
+

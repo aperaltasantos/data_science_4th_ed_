@@ -34,10 +34,15 @@ execute:
   message: false
 ---
 
-# Introdução
+# Exercicio manipulação de dados - Hypoxia 
 
-Esta série de exercios é destinada aos praticantes do curso de DATA SCIENCE WITH R IN HEALTHCARE.
-Estes execícios são relativos ao módulo 2.
+## Contexto 
+
+Este é um estudo sobre a pressão arterial média intraoperatória em pacientes com apneia obstrutiva do sono submetidos a procedimentos cirúrgicos de perda de peso (bariátrica). Os participantes são 281 pacientes adultos diagnosticados com apneia obstrutiva do sono nos dois anos anteriores à sua cirurgia bariátrica. Além da pressão arterial média, o conjunto de dados inclui informações sobre demografia, status de oxigênio noturno, comorbidades, tipo e duração da cirurgia, vasopressores e frequência cardíaca. Os dados foram limpos e contêm alguns dados ausentes. Não há outliers ou problemas de dados.[^1]
+
+[^1]:*The Hypoxia MAP dataset was contributed by Dr. Amy Nowacki, Associate Professor, Cleveland Clinic. Please refer to this resource as: Amy S. Nowacki, “Hypoxia MAP Treatment Dataset”, TSHS Resources Portal (2022). Available at https://www.causeweb.org/tshs/hypoxia/.*
+
+## Tarefas
 
 Os exercícios deste módulo abragem os seguintes temas:
 
@@ -49,8 +54,7 @@ Para elaborar estes exercícios são necessários dois ficheiros adicionais no f
 
 Existem seções deste documento de avaliação do mesmo que não devem ser alteradas - Estão marcadas em secção própria.
 
-Devo ser submetido o HTML resultante do render deste documento.
-
+Deve ser submetido o HTML resultante do render deste documento.
 
 # Setup
 
@@ -85,17 +89,18 @@ remove(pkg)
 
 ```
 
-# Exercicio 1
+## Exercicio M3.1
 
-Importar o ficheiro hypoxia disponível na pasta datasets para um objeto chamado hypoxia.
+Importar o ficheiro hipoxia em formato csv disponível na pasta datasets para um objeto chamado hypoxia.
 
 ```{r importation}
 
-hypoxia <- import("datasets/hypoxia.xlsx")
+hypoxia <- import("datasets/hypoxia.csv")
 
 ```
 
-# Exercício 2
+## Exercício M3.2
+
 Criar um novo objeto com o nome hypoxia_clean em que se fez a limpeza as variáveis tendo em contas as boas práticas.
 
 ```{r cleaning}
@@ -128,7 +133,8 @@ hypoxia_adult <- hypoxia_clean |>
 hypoxia_adult
 ```
 
-# Exercício 4
+## Exercício M3.4
+
 Criar um novo objeto hypoxia_adult2 com uma nova variável no dataset hypoxia_adult com o nome min_sao_class com a seguinte codificação baseada na variável min_sao2:
 
 1. 98-100 - Normal
@@ -136,6 +142,7 @@ Criar um novo objeto hypoxia_adult2 com uma nova variável no dataset hypoxia_ad
 3. 94-90 - Hipóxia Ligeira
 4. 80-89 - Hipóxia Moderada
 5. <79 - Hipóxia Grave
+
 
 ```{r mutate and case_when}
 hypoxia_adult2 <- hypoxia_adult |> 
@@ -153,10 +160,12 @@ hypoxia_adult2
 
 ```
 
-# Exercicio 5 
+## Exercicio M3.5 
+
 Criar novo objeto hypoxia_final com:
   Nova variável media - Calcular a média de bmi (remover NA!)
   Nova variével desvio_padrao - Calcular desvio-padrão do BMI
+  
 Isto deve ser calculada por cada classe de min_sao_class
 
 ```{r summarise and grouping}
@@ -171,6 +180,37 @@ hypoxia_final <- hypoxia_adult2 |>
 hypoxia_final
 ```
 
+## Exercicio M3.6
+
+O dataset survival_hypoxia tem dados dos mesmos doentes do dataset hypoxia. 
+Junta os dois datasets e explora a média do time_survival pelas varáveis female e diabetes.
+
+1. Importar o ficheiro survival_hipoxia disponível na pasta datasets para um objeto chamado survival_hypoxia
+2. Limpar variáveis
+3. Juntar os datasets no objeto survival_hypoxia_full
+4. Remover os utentes sem dados de diabetes e sexo
+5. Criar um objeto chamado survival_time on tenhamos a média de tempo de sobrevivência por homem ou mulher e por se tem diabetes
+
+
+```{r join}
+
+survival_hypoxia <- import("datasets/survival_hypoxia.csv")
+
+survival_hypoxia_full <-left_join(survival_hypoxia, hypoxia, by = join_by(patient_id))
+
+survival_time <- survival_hypoxia_full |> 
+  clean_names() |> 
+  drop_na(female, diabetes) |> 
+  summarise(
+    media = mean(bmi,na.rm = T),
+    .by = c(female, diabetes)
+  )
+
+survival_time
+
+sum(survival_time$media)
+
+```
 
 # Validation - NÃO ALTERAR
 
@@ -210,30 +250,81 @@ if(all(column_list %in% colnames(hypoxia_clean))) {
   print(":( DataFrame 'hypoxia_clean' não tem estrutura adequada")
 }
 
-if(exists("hypoxia_adult")& class(hypoxia_adult)=="data.frame") {
+if(exists("hypoxia_adult")) {
   print(":) DataFrame 'hypoxia_adult' criado com sucesso")
 } else {
   print(":( DataFrame 'hypoxia_adult' não existe")
   hypoxia_adult <- data.frame(
-    ID = "A"
+    ID = "A",
+    age= 1,
+    female = 0
   )
 }
 
-if(exists("hypoxia_adult2")& class(hypoxia_adult)=="data.frame") {
+if(exists("hypoxia_adult2")) {
   print(":) DataFrame 'hypoxia_adult2' criado com sucesso")
 } else {
   print(":( DataFrame 'hypoxia_adult2' não existe")
   hypoxia_adult2 <- data.frame(
-    ID = "A"
+    ID = "A",
+    age= 1,
+    female = 0
   )
 }
 
-if(exists("hypoxia_final")& class(hypoxia_adult)=="data.frame") {
+if(exists("hypoxia_final")) {
   print(":) DataFrame 'hypoxia_final' criado com sucesso")
 } else {
   print(":( DataFrame 'hypoxia_final' não existe")
   hypoxia_final <- data.frame(
-    ID = "A"
+    ID = "A",
+    media = 1,
+    desvio_padrao = 1
+  )
+}
+
+
+
+if(exists("survival_hypoxia")) {
+  print(":) DataFrame 'survival_hypoxia' criado com sucesso")
+} else {
+  print(":( DataFrame 'survival_hypoxia' não existe")
+  survival_hypoxia <- data.frame(
+    ID = "A",
+    media = 1,
+    desvio_padrao = 1
+  )
+}
+
+
+if(exists("survival_hypoxia_full")) {
+  print(":) DataFrame 'survival_hypoxia_full' criado com sucesso")
+  if(ncol(survival_hypoxia_full)==39){
+    print(":) DataFrame 'survival_hypoxia_full' com colunas esperadas")
+  }else{
+    print(":( DataFrame 'survival_hypoxia_full' não tem as colunas esperadas - não remoover colunas na junção")
+  }
+} else {
+  print(":( DataFrame 'survival_hypoxia_full' não existe")
+  survival_hypoxia_full <- data.frame(
+    ID = "A",
+    media = 1,
+  )
+}
+
+if(exists("survival_time")) {
+  print(":) DataFrame 'survival_time' criado com sucesso")
+  if(ncol(survival_time)==3 & "female" %in% colnames(survival_time)& "diabetes" %in% colnames(survival_time)){
+    print(":) DataFrame 'survival_time' com colunas esperadas")
+  }else{
+    print(":( DataFrame 'survival_time' não tem as colunas esperadas")
+  }
+} else {
+  print(":( DataFrame 'survival_time' não existe")
+  survival_time <- data.frame(
+    ID = "A",
+    other ="B",
+    media = 1,
   )
 }
 ```
@@ -305,14 +396,24 @@ validate(hypoxia_final, name = "Verifying data Hypoxia final") |>
         ,description = "O valor da desvio padrão obtido está no esperado")|>
   add_results(report)
 
+validate(survival_time, name = "Verifying data Survival Time") |>
+  validate_if(has_only_names(
+    "female",
+    "diabetes",
+    "media"), colnames(), description = "Survival Time tem apenas as colunas pedidas") |>
+  validate_if(nrow(survival_time)==4, description = "Survival Time tem apenas as linhas pedidas") |>
+  validate_if(sum(media, na.rm = TRUE)==186.6944,description = "Survival Time tem os resultados das médias esperados" )
+  add_results(report) 
+ 
+
 get_results(report)
-save_report(report, output_file ="validation_report2.html")
+save_report(report, output_file ="outputs/validation_report3_resolvido.html")
 
 # rm(list = ls())
 
 ```
 
 ```{=html}
-<iframe width="100%" height=1000 src="validation_report2.html"></iframe>
+<iframe width="100%" height=1000 src="outputs/validation_report3_resolvido.html"></iframe>
 ```
 

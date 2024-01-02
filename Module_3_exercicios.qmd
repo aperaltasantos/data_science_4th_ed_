@@ -1,5 +1,5 @@
 ---
-title: "Módulo 3 | Ecercícios"
+title: "Módulo 3 | Exercícios"
 subtitle: "Data Wrangling"
 author: "Autor"
 affiliation: 
@@ -54,8 +54,7 @@ Para elaborar estes exercícios são necessários dois ficheiros adicionais no f
 
 Existem seções deste documento de avaliação do mesmo que não devem ser alteradas - Estão marcadas em secção própria.
 
-Devo ser submetido o HTML resultante do render deste documento.
-
+Deve ser submetido o HTML resultante do render deste documento.
 
 ### Setup
 
@@ -100,6 +99,7 @@ Importar o ficheiro hipoxia disponível na pasta datasets para um objeto chamado
 ```
 
 ## Exercício M3.2
+
 Criar um novo objeto com o nome hypoxia_clean em que se fez a limpeza as variáveis tendo em contas as boas práticas.
 
 ```{r cleaning}
@@ -147,7 +147,15 @@ Isto deve ser calculada por cada classe de min_sao_class
 
 ## Exercicio M3.6
 
-O dataset survival_hypoxia tem dados dos mesmos doentes do dataset hypoxia. Junta os dois datasets e explora a média do time_survival pelas varáveis female e diabetes.  
+O dataset survival_hypoxia tem dados dos mesmos doentes do dataset hypoxia. 
+Junta os dois datasets e explora a média do time_survival pelas varáveis female e diabetes.
+
+1. Importar o ficheiro survival_hipoxia disponível na pasta datasets para um objeto chamado survival_hypoxia
+2. Limpar variáveis
+3. Juntar os datasets no objeto survival_hypoxia_full
+4. Remover os utentes sem dados de diabetes e sexo
+5. Criar um objeto chamado survival_time on tenhamos a média de tempo de sobrevivência por homem ou mulher e por se tem diabetes
+
 
 ```{r join}
 
@@ -223,6 +231,49 @@ if(exists("hypoxia_final")) {
     desvio_padrao = 1
   )
 }
+
+if(exists("survival_hypoxia")) {
+  print(":) DataFrame 'survival_hypoxia' criado com sucesso")
+} else {
+  print(":( DataFrame 'survival_hypoxia' não existe")
+  survival_hypoxia <- data.frame(
+    ID = "A",
+    media = 1,
+    desvio_padrao = 1
+  )
+}
+
+
+if(exists("survival_hypoxia_full")) {
+  print(":) DataFrame 'survival_hypoxia_full' criado com sucesso")
+  if(ncol(survival_hypoxia_full)==39){
+    print(":) DataFrame 'survival_hypoxia_full' com colunas esperadas")
+  }else{
+    print(":( DataFrame 'survival_hypoxia_full' não tem as colunas esperadas - não remoover colunas na junção")
+  }
+} else {
+  print(":( DataFrame 'survival_hypoxia_full' não existe")
+  survival_hypoxia_full <- data.frame(
+    ID = "A",
+    media = 1,
+  )
+}
+
+if(exists("survival_time")) {
+  print(":) DataFrame 'survival_time' criado com sucesso")
+  if(ncol(survival_time)==3 & "female" %in% colnames(survival_time)& "diabetes" %in% colnames(survival_time)){
+    print(":) DataFrame 'survival_time' com colunas esperadas")
+  }else{
+    print(":( DataFrame 'survival_time' não tem as colunas esperadas")
+  }
+} else {
+  print(":( DataFrame 'survival_time' não existe")
+  survival_time <- data.frame(
+    ID = "A",
+    other ="B",
+    media = 1,
+  )
+}
 ```
 
 
@@ -292,14 +343,23 @@ validate(hypoxia_final, name = "Verifying data Hypoxia final") |>
         ,description = "O valor da desvio padrão obtido está no esperado")|>
   add_results(report)
 
+validate(survival_time, name = "Verifying data Survival Time") |>
+  validate_if(has_only_names(
+    "female",
+    "diabetes",
+    "media"), colnames(), description = "Survival Time tem apenas as colunas pedidas") |>
+  validate_if(nrow(survival_time)==4, description = "Survival Time tem apenas as linhas pedidas") |>
+  validate_if(sum(media, na.rm = TRUE)==186.6944,description = "Survival Time tem os resultados das médias esperados" )
+  add_results(report)
+
 get_results(report)
-save_report(report, output_file ="outputs/validation_report_module2.html")
+save_report(report, output_file ="outputs/validation_report_module3.html")
 
 rm(list = ls())
 
 ```
 
 ```{=html}
-<iframe width="100%" height=1000 src="outputs/validation_report_module2.html"></iframe>
+<iframe width="100%" height=1000 src="outputs/validation_report_module3.html"></iframe>
 ```
 

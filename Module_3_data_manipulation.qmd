@@ -150,8 +150,7 @@ Passos para Importar um Dataset no RStudio Usando o Painel "Files"
 
 5. **Executar e Salvar o Código de Importação**:
    - Uma vez satisfeito com a pré-visualização, você pode clicar no botão "Import" no assistente. **Isso não só importa os dados para o ambiente do RStudio**, mas também gera  código na consola mas não no script.
-   - **Tem copiar e colar esse código para o script R para utilizar e fazer render.** 
-
+   - **Têm copiar e colar esse código para o script R para utilizar e fazer render.** 
 
 
 ### Pacote RIO
@@ -221,18 +220,17 @@ importar_recente <- import(ficheiro_recente) #<5>
 
 ## Limpeza de nomes de colunas (clean_names)
 
-Ao trabalhar com R, a nomeação clara e consistente das colunas é crucial para garantir a facilidade de leitura, compreensão e manuseio dos dados. Isso é especialmente importante quando os nomes das colunas servem como referência para legendas de figuras ou para a manipulação de dados em scripts. Abaixo, você encontrará uma versão aprimorada do texto com boas práticas para nomear colunas em R:
-
+Ao trabalhar com R, nomear clara e consistente as colunas é crucial para garantir a facilidade de leitura, compreensão e manipulação dos dados. Isso é especialmente importante quando os nomes das colunas servem como referência para legendas de figuras. Abaixo, encontraram-se as boas práticas para nomear as colunas em R:
 
 **1. Nomes curtos e concisos**: Opte por nomes breves, e descritivos, que facilitem a compreensão do conteúdo da coluna. Nomes longos podem dificultar a leitura e a escrita do código.
 
-**2. Evitar espaços**: Não use espaços nos nomes das colunas. Espaços podem levar a erros de sintaxe e complicam o acesso aos dados. Utilize underlines (`_`) ou camelCase para separar palavras (por exemplo, `idadeMeses`).
+**2. Evitar espaços**: Não usar espaços nos nomes das colunas. Espaços podem levar a erros de sintaxe e complicam o acesso aos dados. Utilize underscore (`_`) ou camelCase para separar palavras (Exemplo: `idadeMeses` ou `idade_meses`).
 
 **3. Minimizar o uso de letras maiúsculas**: Como o R é sensível a maiúsculas e minúsculas, prefira nomes de colunas em minúsculas para evitar confusões e erros decorrentes de inconsistências no uso de maiúsculas/minúsculas.
 
-**4. Evitar caracteres especiais**: Não inclua caracteres como `&`, `#`, `<`, `>`.
+**4. Evitar caracteres especiais**: Não incluir caracteres como `&`, `#`, `<`, `>`, pois podem ser confundidos como operadores /(Rever módulo 1)
 
-**5. Consistência entre colunas**: Mantenha um padrão na nomeação de colunas semelhantes. Por exemplo, se estiver usando prefixos ou sufixos em nomes de colunas relacionadas a datas, aplique essa convenção de maneira consistente em todo o conjunto de dados (por exemplo, `dataInicio`, `dataFim`).
+**5. Consistência entre colunas**: Mantenha um padrão em atribuir nomes a colunas semelhantes. Por exemplo, se usar prefixos ou sufixos em nomes de colunas relacionadas com datas, aplicar o *standard* de maneira consistente em todo o conjunto de dados (por exemplo, `dataInicio`, `dataFim`).
 
 
 ```{r}
@@ -404,8 +402,8 @@ Existem várias versões:
 
 1. slice (selecionar por posição)
 2. slice_head ou slice_tail (selecionar por posição no ínicio ou final dos dados)
-2. slice_sample (remover amostra de linhas - por número [n] ou proporção [prop])
-3. slice_min slice (remover amostra de linhas - por número [n] ou proporção [prop])
+3. slice_sample (remover amostra de linhas - por número [n] ou proporção [prop])
+4. slice_min slice (remover amostra de linhas - por número [n] ou proporção [prop])
 
 ```{r}
 #retirar 2a linha
@@ -430,7 +428,9 @@ quartil1_estadia <- inpatient_hospital_lite |>
 
 Por vezes queremos extrair os valores únicos de uma ou mais variáveis.
 
-Suponhamos que queremos selcionar doentes para reavaliar no nosso estudos de pacientes de hipóxia (dataset hypoxia). Só queremos 1 doente com a combinação sexo, race, AHI score e Smoking
+Suponhamos que queremos selcionar doentes para reavaliar no nosso estudos de pacientes de hipóxia (dataset hypoxia). 
+
+Só queremos 1 doente com a combinação sexo, race, AHI score e Smoking
 
 ```{r}
 # limpar as variáveis do dataset
@@ -439,6 +439,7 @@ hypoxia_clean <- hypoxia_clean |>
   distinct(age, sex, race, ahi, smoking)
 
 original_n <- length(hypoxia)
+
 final_n <- length(hypoxia_clean)
 
 ```
@@ -514,9 +515,9 @@ anyNA(inpatient_hospital_lite$doentes_saidos)
 
 Não obtivemos um resultado válido porque há NA no conjunto de dados, precisamos especificar para ignorar os valores NA
 
-Para isso, usamos na.rm = TRUE
+Para isso, usamos na.rm = TRUE.
 
-Este erro é muito comum em principiantes
+Este erro é muito comum em principiantes.
 :::
 
 ```{r}
@@ -755,8 +756,6 @@ sum_patients_year_speciality <- sum_patients_year_speciality |>
 ```
 
 
-
-
 # INTERMIDIATE DATA WRANGLING
 
 ## Misturar funções
@@ -846,7 +845,7 @@ Os fluxos if_else são úteis para ir definindo níveis para determinda condiç�
 
 Estrutura da Função:
 
-if_else(condição, verdadeiro, falso, tipo de dados faltante = NULL)
+if_else(condição, verdadeiro, falso, tipo de dados em falta = NULL)
 
 condição: Uma expressão lógica que é avaliada para cada elemento do vetor.
 
@@ -854,7 +853,8 @@ verdadeiro: O valor a retornar se a condição for verdadeira.
 
 falso: O valor a retornar se a condição for falsa.
 
-tipo de dados faltante: O tipo de dado a ser retornado em caso de valores NA. Se não especificado, assume-se NULL
+tipo de dados em falta: O tipo de dado a retornar em caso de valores NA. Se não especificado, assume-se NULL.
+
 :::
 
 ```{r}
@@ -885,10 +885,12 @@ Opção Tidyverse para apresentação de condições if_else
 Esta veriação permite a definição de múltiplas condições de escape.
 
 :::{.callout-note title="Utilizadores de Excel"}
-No Excel será semelhante à utilização da fórmula IFS ou SE.S
+
+No Excel será semelhante à utilização da fórmula IFS ou SE.S 
+
 :::
 
-Este tipo de fluxo pode terminar numa condição final que pode ser definida com o argumento .default ou com a condição TRUE
+Este tipo de fluxo pode terminar numa condição final que pode ser definida com o argumento .default ou com a condição TRUE.
 
 ```{r}
 # Por vezes, precisamos de alterar as categorias dentro de uma variável
@@ -959,7 +961,7 @@ Agora vamos criar um data wrangling mais complexo. Se a variável contiver uma e
 
 O grepl é uma função que permite deteção de padrões de texto dentro de expressões.
 
-Exemplo: grepl("Universitário", instituicao, ignore.case = TRUE) daria verdade para a expressão "Centro Hospitalar e Universitário de Coimbra, EPE"
+Exemplo: grepl("Universitário", instituicao, ignore.case = TRUE) daria verdade para a expressão "Centro Hospitalar e Universitário de Coimbra, EPE".
 
 :::
 
@@ -1050,7 +1052,7 @@ Os "join" são realizados com funções do pacote `tidyverse`, cada uma com cara
 **1. Inner Join**
 
 - `inner_join(a, b, by = "key")`
-- Combina linhas de `a` e `b` que têm valores correspondentes na coluna especificada em `by`.
+- Combina linhas de `a` e `b` que têm valores correspondentes na coluna especificada em `b`.
 - Retorna apenas as linhas que têm correspondências em ambas as tabelas.
 
 **2. Left Join**
@@ -1079,7 +1081,7 @@ Os "join" são realizados com funções do pacote `tidyverse`, cada uma com cara
 
 ### Como Funcionam
 
-1. **Especificação da key**: As operações de join dependem da especificação de uma ou mais chaves (`by = "key"`). Esta key são colunas nas tabelas `a` e `b` que você deseja usar para combinar as linhas.
+1. **Especificação da key**: As operações de join dependem da especificação de uma ou mais chaves-primárias (`by = "key"`). Esta key são colunas nas tabelas `a` e `b` que você deseja usar para combinar as linhas.
 
 2. **Combinação de Linhas**: O tipo de join determina como as linhas são combinadas e quais linhas são incluídas no resultado final.
 
@@ -1140,7 +1142,7 @@ anti_inpatient_workers <- anti_join(
 
 ## Join by (atualização)
 
-Em vez de definir o by numa acção join com um vector = " string do nome da coluna do outro dataframe" fica o argumento join_by que é mais intuitivo.
+Em vez de definir o by numa acção join com um vector = "string do nome da coluna do outro dataframe" fica o argumento join_by que é mais intuitivo.
 
 ### Codigo antigo
 
@@ -1238,6 +1240,7 @@ Algumas funções são úteis em determinadas circunstâncias específicas que s
 :::{.callout-warning}
 
 No bind rows temos de ter colunas com nomes em comum.
+
 No bind cols temos de ter o mesmo número de linhas.
 
 :::
