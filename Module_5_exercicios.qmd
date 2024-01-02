@@ -52,29 +52,29 @@ Avaliar a relação entre a média ponderada do tempo (TWATemp) da temperatura c
 
 Use o dataset Core_Temperature.xlsx, e consulte a documentação em Core_Temperature_Data_Dictionary2.pdf na pasta de datasets. O objetivo geral do exercício é avaliar o efeito da temperatura (TWATemp) no risco de ISCs (AnyInfection).
 
-### Estatística Descritiva
+### Exercicio M5.1 Estatística Descritiva
 
 Deve criar uma Tabela 1 comparando a distribuição das variáveis de confundimento (Age, FEMALE, BMI, CharlsonScore, SurgeryType, CHF) pelos pacientes que tiveram ISC (AnyInfection).
 
-### Visualização
+### Exercicio M5.2 Visualização
 
 Deve criar uma visualização comparando a distribuição da temperatura (TWATemp) pelo risco de ISCs (AnyInfection).
 
-### Modelos
+### Exercicio M5.3 Modelos
 
-#### Univariado
+#### Exercicio M5.3.1 Univariado
 
 Crie um modelo de regressão logística para avaliar o efeito da temperatura no risco de ISCs (AnyInfection).
 
-#### Múltiplo
+#### Exercicio M5.3.2 Múltiplo
 
 Crie um modelo de regressão logística para avaliar o efeito da temperatura no risco de ISCs (AnyInfection) ajustado para Age, FEMALE, BMI, CharlsonScore, SurgeryType, CHF.
 
-#### Performance
+#### Exercicio M5.3.3 Performance
 
 Compare os dois modelos em termos de performance.
 
-### Tabelas de Regressão
+### Exercicio M5.4 Tabelas de Regressão
 
 Crie uma tabela com os OR, p-value e Confidence Intervals do modelo construído em 6. Exporte a tabela criada em 8 para Word.
 

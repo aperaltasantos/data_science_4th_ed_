@@ -44,16 +44,16 @@ hypoxia <- read_csv("datasets/hypoxia.csv")
 
 
 
-## Distribuições
+## Exercicio M4.1 Distribuições
 
 Compara a distribuição de idades entre homens e mulheres. O gráfico deve ter um título, caption, legenda. A distribuição estar preenchido por cor "#91bfdb" e "#ef8a62". Utiliza o tema classic.  
 
 
-## Relação entre variáveis
+## Exercicio M4.2 Relação entre variáveis
 
 Explora a relaçao entre MinSao2 e o BMI. O gráfico deve ter um título, caption, legenda. Usa o theme minimal e adiciona uma linha tendência linear para explorar a relação.
 
-## Mapa
+## Exercicio M4.3 Mapa
 
 Cria um mapa usado o shapefile comm_pt, e as caracteristicas da base de dados "mortalidade_coracao_2021.csv" na pasta datasets.O mapa deve conter a mortalidade por doenças cardiovasculares com uma escala de 5 cores. O gráfico deve ter um título, caption, legenda.
 

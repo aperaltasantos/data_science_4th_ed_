@@ -1,5 +1,5 @@
 ---
-title: "Module 3 | Data Importation and Data Manipulation "
+title: "Módulo 3 | Ecercícios"
 subtitle: "Data Wrangling"
 author: "Autor"
 affiliation: 
@@ -34,10 +34,15 @@ execute:
   message: false
 ---
 
-# Introdução
+# Exercicio manipulação de dados - Hypoxia 
 
-Esta série de exercios é destinada aos praticantes do curso de DATA SCIENCE WITH R IN HEALTHCARE.
-Estes execícios são relativos ao módulo 3.
+## Contexto 
+
+Este é um estudo sobre a pressão arterial média intraoperatória em pacientes com apneia obstrutiva do sono submetidos a procedimentos cirúrgicos de perda de peso (bariátrica). Os participantes são 281 pacientes adultos diagnosticados com apneia obstrutiva do sono nos dois anos anteriores à sua cirurgia bariátrica. Além da pressão arterial média, o conjunto de dados inclui informações sobre demografia, status de oxigênio noturno, comorbidades, tipo e duração da cirurgia, vasopressores e frequência cardíaca. Os dados foram limpos e contêm alguns dados ausentes. Não há outliers ou problemas de dados.[^1]
+
+[^1]:*The Hypoxia MAP dataset was contributed by Dr. Amy Nowacki, Associate Professor, Cleveland Clinic. Please refer to this resource as: Amy S. Nowacki, “Hypoxia MAP Treatment Dataset”, TSHS Resources Portal (2022). Available at https://www.causeweb.org/tshs/hypoxia/.*
+
+## Tarefas
 
 Os exercícios deste módulo abragem os seguintes temas:
 
@@ -52,7 +57,7 @@ Existem seções deste documento de avaliação do mesmo que não devem ser alte
 Devo ser submetido o HTML resultante do render deste documento.
 
 
-# Setup
+### Setup
 
 ```{r}
 #| warning: false
@@ -85,7 +90,7 @@ remove(pkg)
 
 ```
 
-# Exercicio 1
+## Exercicio M3.1
 
 Importar o ficheiro hipoxia disponível na pasta datasets para um objeto chamado hypoxia.
 
@@ -94,7 +99,7 @@ Importar o ficheiro hipoxia disponível na pasta datasets para um objeto chamado
 
 ```
 
-# Exercício 2
+## Exercício M3.2
 Criar um novo objeto com o nome hypoxia_clean em que se fez a limpeza as variáveis tendo em contas as boas práticas.
 
 ```{r cleaning}
@@ -102,7 +107,7 @@ Criar um novo objeto com o nome hypoxia_clean em que se fez a limpeza as variáv
 
 ```
 
-# Exercício 3
+## Exercício M3.3
 
 Criar um novo objeto com o nome hypoxia_adult em que:
 - Existem apenas mulheres com idade superior a 25 e inferior 65 anos
@@ -113,7 +118,8 @@ Criar um novo objeto com o nome hypoxia_adult em que:
 
 ```
 
-# Exercício 4
+## Exercício M3.4
+
 Criar um novo objeto hypoxia_adult2 com uma nova variável no dataset hypoxia_adult com o nome min_sao_class com a seguinte codificação baseada na variável min_sao2:
 
 1. 98-100 - Normal
@@ -127,16 +133,25 @@ Criar um novo objeto hypoxia_adult2 com uma nova variável no dataset hypoxia_ad
 
 ```
 
-# Exercicio 5 
+## Exercicio M3.5 
+
 Criar novo objeto hypoxia_final com:
   Nova variável media - Calcular a média de bmi (remover NA!)
   Nova variével desvio_padrao - Calcular desvio-padrão do BMI
+  
 Isto deve ser calculada por cada classe de min_sao_class
 
 ```{r summarise and grouping}
 
 ```
 
+## Exercicio M3.6
+
+O dataset survival_hypoxia tem dados dos mesmos doentes do dataset hypoxia. Junta os dois datasets e explora a média do time_survival pelas varáveis female e diabetes.  
+
+```{r join}
+
+```
 
 # Validation - NÃO ALTERAR
 

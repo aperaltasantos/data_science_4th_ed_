@@ -45,6 +45,7 @@ Link para a localização do curso [ENSP](https://www.ensp.unl.pt/)
 ![Logótipo do curso](images/HEX_R_DATA_SCIENCE.png "Logo of our course"){#fig-logo width="6cm"}
 
 ::: {#fig-maps layout-ncol="2"}
+
 ![Mapa europeu](images/map_eu.png){#fig-eu width="360"}
 
 ![Mara de Portugal Continental](images/map_pt.jpeg){#fig-pt width="250"}
