@@ -1,0 +1,25 @@
+---
+title: Weekly Report
+output: blastula::blastula_email
+params:
+  destinatario: "André Peralta"
+  escola: "ENSP"
+  pessoa: "Aluno"
+  edicao: "4ª"
+  curso: "Data Science with R in Healthcare"
+--- 
+
+Exmo.`r params$destinatario`,
+
+Espero que este email o(a) encontre bem. Escrevo para lhe fornecer uma análise sumária do conjunto de dados que foi recentemente compilado e processado.
+
+```{r}
+summary(iris)
+plot(iris[, -5])
+```
+
+Encontra-se em anexo o relatório completo para uma análise mais detalhada.
+
+Com os melhores cumprimentos,
+
+Aluno do Curso de Data Science

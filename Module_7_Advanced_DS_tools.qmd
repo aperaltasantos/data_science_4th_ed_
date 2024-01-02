@@ -36,6 +36,7 @@ required_packages <- c(
                        "tidyverse",
                        "rio",
                        "usethis",
+                       "blastula",
                        "gptstudio"
                        )      
 
@@ -225,7 +226,7 @@ quarto::quarto_render(input="Module_7_Advanced_DS_tools.qmd",
 ```
 
 
-## Quarto Dashboards
+## Quarto Dashboards - em falta
 
 # GIT E GITHUB - INTRO
 
@@ -247,21 +248,183 @@ Vantagens de usar um sistema git nos nossos projetos:
 
 O plataforma Github permite o armazenamento e gestão de repositórios/projetos de código. Para além disso permite:
 
-1. Armazenamento remoto de código (limites de armazenamento é de 1 Gb com tráfego de dados de 1 Gb)
-2. 
+1. Armazenamento remoto de código (limites de armazenamento é de 1 Gb com tráfego de dados de 1 Gb) com backup
+2. Interface Gráfica simples e intuitiva
+3. Pull requests e revisão de código antes de junção
+4. Integração com outras ferramentas
 
 ## Como implementar?
 
+1. Criar [conta no GitHub](https://github.com/join)
+2. Podemos fazer a gestão de projetos de 2 formas:
+  - Github Desktop
+  - Dentro do Rstudio
 
+Por ser mais simples iremos utilizar o Github Deskop que pode ser instalar no seguinte [link](https://desktop.github.com/).
 
+![Exemplo da interface ](https://desktop.github.com/images/screenshot-windows-light.png)
+
+## Worflow
+
+## Criar/Clonar um repositório (Comandos init e add)
+
+![Repositórios](https://desktop.github.com/images/screenshot-windows-light.png)
+
+## Comandos Importantes GIT:
+
+1. *Commit* - Grava as alterações no repositório local
+2. *Pull* - Atualiza o repositório local com as alterações do repositório remoto.
+3. *Diff* - Mostra o estado atual do repositório, incluindo as alterações do repositório que ainda não foram adicionados ou comprometidos ao repositório.
+4. *Branch* - Criar ramificações para o repositório
+5. *Merge* - Fundir ramificações, normalmente para a ramificação principal
+6. *Log * - Mostra o histórico de commits. No Github é também utilizada a palavra Activity.
+7. *Push* - Envia as alterações do repositório local para o repositório remoto.
 
 # AUTOMATED REPORTING 
 
 ## Github Actions
 
+GitHub Actions são uma funcionalidade da plataforma GitHub que permite a automação de workflows 
+dentro dos repositório GitHub, sendo uma forma de correr código de forma automática num computador que a plataforma mantêm.
+
+São especialmente úteis para processos de Integração Contínua (CI) e Entrega Contínua (CD).
+
+As ações são acionadas por eventos específicos no GitHub, como push, pull requests, criação de tags, entre outros.
+
+Componentes principais de um *workflow* de Github Actions:
+
+1. Ficheiro de Configuração: Um arquivo YAML no diretório .github/workflows do repositório
+2. Jobs - Consiste nos passos a serem executados
+3. Steps - Comandos a serem executados nos jobs
+4. Runs-on - Qual a plataforma a utilizar
+
+Objetivos destes componentes:
+
+1. Quando correr código?
+2. Iniciar o computador virtual que irá correr a acção
+3. Instalar o R
+4. Instalr os pacotes necessários
+5. Correr o código
+
+Estas acções são muito interessantes na construção de automatismos que podem ajudar ao rever código e em análises repetidas.
+
+Deixamos 2 exemplos de tarefas que podem ser automatizadas:
+
 ## Task Schedualing (Gestão de tarefas automáticas)
 
+Deixamos o código do workflow que permite correr um script de forma automática com uma temporização regular.
+
+Se o nosso cósigo tivesse de atualizar dados isso tem de ser incoorporado no YAML ou no ficheiro a fazer render.
+
+```{r}
+#| eval: false
+
+# Definição de quando o workflow é acionado
+on:
+  schedule:
+    - cron: '0 9 1 * *' # Executa todos os dias às 9 da manhã UTC no primeiro dia do mês
+
+# Definição dos jobs
+jobs:
+  update_report: # Nome do job
+    runs-on: ubuntu-latest # Especifica que o job roda no último Ubuntu disponível
+
+    steps: # Passos a serem executados
+      - name: Set up R # Configura o ambiente R
+        uses: r-lib/actions/setup-r@v2 # Usa a ação de setup do R da r-lib
+        with:
+          # uses the RStudio Package Manager
+          use-public-rspm: true
+
+      - name: Install packages # Instala pacotes necessários
+        uses: r-lib/actions/setup-r-dependencies@v2 # Usa a ação de setup de dependências do R da r-lib
+        with:
+          packages: | # Lista de pacotes a serem instalados
+            any::quarto
+            any::base
+            any::backports
+            
+      - name: Check out repository # Faz checkout do repositório
+        uses: actions/checkout@v3 # Usa a ação padrão de checkout do GitHub
+
+      - name: Update Report # Atualiza o relatório
+        run: Rscript -e 'quarto::quarto_render("Cronjob.qmd")' # Comando para renderizar o relatório usando Quarto
+
+      - name: Commit results # Faz commit dos resultados
+        run: | # Conjunto de comandos para commit
+          git config --local user.email "actions@github.com" # Configura email para o commit
+          git config --local user.name "GitHub Actions" # Configura nome para o commit
+          git add Cronjob.html # Adiciona o arquivo HTML ao staging area
+          git commit -m 'Data updated' || echo "No changes to commit" # Faz o commit ou exibe uma mensagem se não houver mudanças
+          git push origin || echo "No changes to commit" # Faz push das mudanças ou exibe uma mensagem se não houver mudanças
+
+
+```
+
+
 ## Emails automáticos
+
+Preparação de um ficheiro com as credenciais de um email.
+
+:::{.callout-warning}
+
+Não partilhar as credenciais em pastas públicas nem em repositórios públicos.
+
+Para os efeitos as credenciais indicadas são ficticias mas podem ser subtituídas por reais.
+
+:::
+
+```{r preparation_steps}
+#| eval: false
+
+# criar ficheiros de email - antes do workflow
+create_smtp_creds_file( file= "templates/email_credenciais",
+                        user= "peralta@outlook.com",
+                        provider= "outlook")
+
+# criar um ficheiro R com o código a correr.
+#Fonte: email_automatico.R
+email_a_enviar <- render_email("email_automatico.qmd") |> 
+                  add_attachment(file="output\figures\map_eu_HE.png",
+                                 filename= "mapa_analise")
+
+smtp_send(email_a_enviar,
+          from = "peralta@outlook.com",
+          to = "ensp@outlook.com",
+          subject= paste0("Análise de dia ", Sys.Date()),
+          credentials=creds_file("templates/email_credenciais"))
+
+# criar um ficheiro ymal com esta acção
+
+name: Send email using Quarto and blastula
+on: 
+  schedule:
+    - cron: '0 9 1 * *'
+jobs:
+  render:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+      - name: Install quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+      - name: Install dependencies
+        run: |
+          install.packages("blastula", type = "win.binary")
+        shell: Rscript {0}
+      - name: Update Report
+        run: Rscript -e source("email_automatico.R")
+      - name: Commit files
+        run: |
+          git config --local user.name github-actions
+          git config --local user.email "actions@github.com"
+          git add output/*
+          git commit -am "commit on $(date)"
+          git push origin main
+          
+```
 
 # GENERATIVE AI MODELS IN R Programming
 

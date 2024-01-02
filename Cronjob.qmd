@@ -1,0 +1,35 @@
+---
+title: "Module 7 | Automated report with Github"
+author: "A. Peralta-Santos"
+date: today
+date-format: long
+format:
+  html:
+    preview: false
+    smooth-scroll: true
+    embed-resources: true
+    toc: true
+    toc-location: left
+    number-sections: true
+    number-depth: 3
+    code_download: true
+    code-copy: true
+execute:
+  warning: false
+  echo: TRUE
+  message: false
+params:
+  ano: 2024
+  escola: "ENSP"
+  pessoa: "Aluno"
+  edicao: "4ª"
+  curso: "Data Science with R in Healthcare"
+title-block-style: default
+---
+
+
+Este é um exemplo de como se podem usar Github Actons para automatizar relatórios.
+
+A última vez que este relatório correu:
+
+- `r Sys.Date()`

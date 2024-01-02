@@ -1,0 +1,34 @@
+on:
+  schedule:
+    - cron: '0 12 * * *' # isto define que queremos correr o scpit há meia noite - https://crontab.guru/#0_12_*_*_* Como traduzir este tipo de ações
+    
+jobs:
+  update_report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install packages
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::quarto
+            any::base
+            any::backports
+      - name: Install quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Update Report
+        run: Rscript -e 'quarto::quarto_render("Cronjob.qmd")'
+        
+      - name: Commit results
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add Cronjob.html
+          git commit -m 'Data updated' || echo "No changes to commit"
+          git push origin || echo "No changes to commit"
