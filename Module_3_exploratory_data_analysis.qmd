@@ -1,5 +1,5 @@
 ---
-title: "Módulo 2 | Exploração de dados"
+title: "Módulo 3 | Exploração de dados"
 author: "A. Peralta-Santos"
 date: today
 date-format: long
