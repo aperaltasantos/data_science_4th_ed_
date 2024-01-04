@@ -14,7 +14,6 @@ jobs:
         with:
           packages: |
             any::quarto
-            any::base
             any::backports
       - name: Install quarto
         uses: quarto-dev/quarto-actions/setup@v2
