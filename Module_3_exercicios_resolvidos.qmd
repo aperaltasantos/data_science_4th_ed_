@@ -1,5 +1,5 @@
 ---
-title: "Module 2 | Reporting with Quarto "
+title: "Module 3 | Exercícios "
 subtitle: "Data Wrangling"
 author: "Autor"
 affiliation: 

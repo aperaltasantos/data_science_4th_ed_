@@ -32,4 +32,4 @@ Este é um exemplo de como se podem usar Github Actons para automatizar relatór
 
 A última vez que este relatório correu:
 
-- `r Sys.Date()`
+`r Sys.Date()`
