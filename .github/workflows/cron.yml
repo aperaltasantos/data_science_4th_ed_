@@ -1,6 +1,6 @@
 on: push
   #schedule:
-   # - cron: '0 12 * * *' # isto define que queremos correr o scpit há meia noite - https://crontab.guru/#0_12_*_*_* Como traduzir este tipo de ações
+   # - cron: '0 12 1 * *' # isto define que queremos correr o scpit há meia noite - https://crontab.guru/#0_12_*_*_* Como traduzir este tipo de ações
     
 jobs:
   update_report:
@@ -31,3 +31,9 @@ jobs:
           git add output/documents/Cronjob.html
           git commit -m 'Data updated' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
+
+      - name: push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main 
