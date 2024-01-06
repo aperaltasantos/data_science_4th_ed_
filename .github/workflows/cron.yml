@@ -1,6 +1,6 @@
-on:
-  schedule:
-    - cron: '0 12 * * *' # isto define que queremos correr o scpit há meia noite - https://crontab.guru/#0_12_*_*_* Como traduzir este tipo de ações
+on: push
+  #schedule:
+   # - cron: '0 12 * * *' # isto define que queremos correr o scpit há meia noite - https://crontab.guru/#0_12_*_*_* Como traduzir este tipo de ações
     
 jobs:
   update_report:
