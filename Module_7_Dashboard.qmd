@@ -1,0 +1,817 @@
+---
+title: "Urgências/CSP Dashboard"
+format: 
+  dashboard:
+    nav-buttons: [github]
+    github: https://github.com/aperaltasantos
+    scrolling: true 
+logo: images/ensp.png
+theme: [sandstone, theme/custom.scss]
+fig-width: 10
+fig-height: 5
+fig-asp: 0.5
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: load-packages
+#| message: false
+#| warning: false
+#| echo: false
+
+
+# Forma alternativa de instalar vários pacotes e carregá-los
+
+# SOURCE: https://cedricscherer.netlify.app/2019/05/17/the-evolution-of-a-ggplot-ep
+# Packages
+required_packages <- c("janitor",
+                       "tidyverse",
+                       "rio",
+                       "data.table",
+                       "ggplot2",
+                       "downloadthis",
+                       "DT",
+                       "leaflet",
+                       "scales",
+                       "plotly",
+                       "sf",
+                       "gt",
+                       "skimr",
+                       "sysfonts",
+                       "DataExplorer"
+                       )      
+
+for (pkg in required_packages) {
+  # install packages if not already present
+  if (!pkg %in% rownames(installed.packages())) {
+    install.packages(pkg)
+  }
+  
+  # load packages to this current session 
+  library(pkg, character.only = TRUE)
+}
+remove(required_packages)
+remove(pkg)
+
+# font_add_google("Open Sans")
+# showtext::showtext_auto()
+
+# theme_set(theme_minimal(base_size = 24, base_family = "Open Sans"))
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+#| results: hide
+
+csp <- import("datasets/gripe_csp.csv") |> 
+  mutate(
+    ARS=  case_when(
+      ARS=="ARS Alentejo"~"Alentejo",
+      ARS=="ARS Norte"~"Norte",                 
+      ARS=="ARS Centro"~"Centro" ,               
+      ARS=="ARS Algarve"~"Algarve",               
+      ARS=="ARS Lisboa e Vale do Tejo"~"Lisboa e Vale do Tejo",
+    )
+  )
+
+csh <- import("datasets/gripe_csh.csv") |> 
+  select(-ID) |> 
+  pivot_wider(id_cols = c("Período","ARS"),
+              names_from = Indicador,
+              values_from = Valor
+                ) |> 
+  filter(
+    ARS!="Portugal Continental"
+  ) |> 
+  mutate(
+    ARS=case_when(
+      ARS=="ARS Alentejo"~"Alentejo",
+      ARS=="ARS Norte"~"Norte",                 
+      ARS=="ARS Centro"~"Centro" ,               
+      ARS=="ARS Algarve"~"Algarve",               
+      ARS=="ARS Lisboa e Vale do Tejo"~"Lisboa e Vale do Tejo",
+    )
+  )
+
+geo <- import("datasets/linkage_geo.csv") |> 
+  select(
+    geo,nuts3,nuts2,nuts1,ars
+  )
+
+maps <- st_read("datasets/map_json_portugal/Cont_Conc_CAOP2022.shp", quiet = T) |> 
+  select(Concelho, geometry) 
+
+maps <- maps |> 
+  left_join(geo, by= join_by("Concelho"=="geo")) |> 
+  summarise(
+    geometry= st_union(geometry),
+    .by=ars
+  ) |> 
+  st_transform(4236) |> 
+  st_as_sf()
+
+time_period <- max(csh$Período)
+
+time_period2 <- max(csp$Período)
+```
+
+#  {.sidebar}
+
+Este dashboard mostra estatísticas de:
+
+|              |                     |
+|--------------|---------------------|
+| **Tipo de Cuidados** | Cuidados de Saúde Hospitalares |
+| **Desagregação**     | ARS  |
+| **Última Atualização**    | `{r} time_period`   |
+| **Tipo de Cuidados** | Atividade do Síndrome Gripal nos Cuidados de Saúde Hospitalares |
+
+------------------------------------------------------------------------
+
+|              |                     |
+|--------------|---------------------|
+| **Tipo de Cuidados** | Cuidados de Saúde Primários |
+| **Desagregação**     | ARS  |
+| **Última Atualização**    | `{r} time_period2`   |
+| **Tipo de Cuidados** | Atividade do Síndrome Gripal nos Cuidados de Saúde Primários |
+
+------------------------------------------------------------------------
+
+::: {.callout-note collapse="true"}
+## Nota
+
+Estes dados são reais e públicos. 
+
+Foram extraídos do Portal da Tranparência a 06/01/2024.
+
+Links dos dados utilizados:
+
+1. [Dados dos CSP](https://transparencia.sns.gov.pt/explore/dataset/atendimentos-nos-csp-gripe/table/?disjunctive.ars&sort=dia);
+2. [Dados dos Hospitais](https://transparencia.sns.gov.pt/explore/dataset/atividade-sindrome-gripal-csh/table/?disjunctive.ars&disjunctive.indicador&sort=periodo).
+
+:::
+
+# Cuidados de Saúde Primários
+
+```{r}
+#| label: csp-values
+#| results: hide
+#| message: false
+#| warning: false
+
+n_consultas <-  csp |> filter(Período>=max(csp$Período)-30) |> summarise(valor=sum(`Nº Consultas nos CSP`,na.rm = T)) |> pull(valor)
+
+perc_consultas <-  csp |> filter(Período>=max(csp$Período)-30) |> summarise(valor=sum(`Nº Consultas CSP (Não Programadas)`,na.rm = T)/sum(`Nº Consultas nos CSP`,na.rm = T) ) |> pull(valor)
+
+n_gripe <-  csp |> filter(Período>=max(csp$Período)-30) |> summarise(valor=sum(`Nº Consultas Gripe nos CSP`,na.rm = T)) |> pull(valor)
+
+```
+
+## Row {height="20%"}
+
+```{r}
+#| content: valuebox
+#| title: "Consultas PT  Últimos 30 dias dos dados"
+#| message: false
+#| warning: false
+list(
+  icon = "person-circle",
+  color = "primary",
+  value = n_consultas 
+)
+```
+
+```{r}
+#| content: valuebox
+#| title: "% Consultas Programadas  Últimos 30 dias dos dados"
+#| message: false
+#| warning: false
+list(
+  icon = "clipboard2-pulse",
+  color = "secondary",
+  value = label_percent(accuracy = 0.1)(perc_consultas)
+)
+```
+
+```{r}
+#| content: valuebox
+#| title: "Consultas de Gripe \n Últimos 30 dias dos dados"
+#| message: false
+#| warning: false
+list(
+  icon = "file-medical",
+  color = "light",
+  value = n_gripe
+)
+```
+
+## Row {height="80%"}
+
+### Column {width="60%"}
+
+#### Row {height="40%" .tabset}
+
+```{r}
+#| title: Consultas Gripe - Norte
+#| message: false
+#| warning: false
+ggplotly(csp |> 
+           filter(
+             ARS=="Norte",
+             Período>=max(csp$Período)-30
+           ) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Nº Consultas Gripe nos CSP`
+  ))+
+     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Nº Consultas Gripe nos CSP da ARS Norte",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Nº Consultas Gripe nos CSP",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+```{r}
+#| title: Lisboa e Vale do Tejo
+#| message: false
+#| warning: false
+
+ggplotly(csp |> 
+           filter(
+             ARS=="Lisboa e Vale do Tejo",
+             Período>=max(csp$Período)-30
+           ) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Nº Consultas Gripe nos CSP`
+  ))+
+     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Nº Consultas Gripe nos CSP da ARS Lisboa e Vale do Tejo",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Nº Consultas Gripe nos CSP",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+```{r}
+#| title: Centro
+#| message: false
+#| warning: false
+ggplotly(csp |> 
+           filter(
+             ARS=="Centro",
+             Período>=max(csp$Período)-30
+           ) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Nº Consultas Gripe nos CSP`
+  ))+
+     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Nº Consultas Gripe nos CSP da ARS Centro",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Nº Consultas Gripe nos CSP",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+```{r}
+#| title: Alentejo
+#| message: false
+#| warning: false
+ggplotly(csp |> 
+           filter(
+             ARS=="Alentejo",
+             Período>=max(csp$Período)-30
+           ) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Nº Consultas Gripe nos CSP`
+  ))+
+     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Nº Consultas Gripe nos CSP da ARS Alentejo",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Nº Consultas Gripe nos CSP",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+```{r}
+#| title: Algarve
+#| message: false
+#| warning: false
+ggplotly(csp |> 
+           filter(
+             ARS=="Algarve",
+             Período>=max(csp$Período)-30
+           ) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Nº Consultas Gripe nos CSP`
+  ))+
+     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Nº Consultas Gripe nos CSP da ARS Algarve",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Nº Consultas Gripe nos CSP",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+#### Row {height="40%"}
+
+```{r}
+#| title: Proporção por Tipo de Conculta
+#| message: false
+#| warning: false
+ggplotly(csp |> 
+           filter(Período>=max(csp$Período)-30) |> 
+           summarise(`Nº Consultas CSP (Não Programadas)`=sum(`Nº Consultas CSP (Não Programadas)`,na.rm = T),
+                     `Nº Consultas CSP (Programadas)`=sum(`Nº Consultas CSP (Programadas)`,na.rm = T),
+                     , .by = ARS) |> 
+           pivot_longer(
+             cols = !ARS, 
+             names_to = "tipo",
+             values_to = "n"
+             ) |> 
+  ggplot(aes(x = n, y = fct_rev(ARS), fill = tipo)) +
+  geom_col(position = "fill", color = "white") +
+  scale_fill_manual(
+    values = c("darkred", "darkgreen"),
+    guide = guide_legend(reverse = TRUE)
+  ) +
+  scale_x_continuous(labels = label_percent()) +
+  labs(y = NULL, x = NULL, fill = "Tipo de \nConsulta")+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12),
+        axis.text.y = element_text(face = "bold", size = 8)
+        ))
+```
+
+### Column {width="40%"}
+
+```{r}
+#| title: "Consultas por 100 000 habitantes nos últimos 7 dias" 
+#| message: false
+#| warning: false
+bins <- c(-Inf, 30, 130, Inf)
+mycolors <- c("#2ca25f", "#fed976", "#f03b20")
+csp1 <- csp |> filter(Período>=max(csp$Período)-7) |> 
+          summarise(
+            `Nº Consultas Gripe nos CSP`= sum(`Nº Consultas Gripe nos CSP`, na.rm=T),
+            .by = ARS
+          ) |> 
+          mutate(
+            pop = case_when(
+              ARS=="Alentejo"~937344,
+              ARS=="Norte"~7160564,                 
+              ARS=="Centro"~3318998,               
+              ARS=="Algarve"~934686,               
+              ARS=="Lisboa e Vale do Tejo"~7360226
+            ),
+            incidencia=`Nº Consultas Gripe nos CSP`/pop*100000,
+            bin=cut(
+              incidencia,
+              breaks = bins, 
+              labels = c("Verde", "Amarelo", "Vermelho"), 
+              include.lowest = TRUE)
+            ) |> 
+          left_join(maps,
+                    by= join_by(ARS==ars),
+                    multiple = "all"
+                    ) |> st_as_sf()|> 
+  st_transform(4326)
+
+mypalette <- colorFactor(palette = mycolors,
+                         domain = csp1$bin,
+                         na.color = "transparent")
+
+
+leaflet(csp1) |> 
+  addTiles()  |> 
+  fitBounds(lng1= min(st_bbox(csp1)["xmin"]-2), lng2=max(st_bbox(csp1)["xmax"]), lat1=min(st_bbox(csp1)["ymin"]), lat2=max(st_bbox(csp1)["ymax"])) |> 
+  addProviderTiles("CartoDB.Positron") |> 
+  addPolygons(
+    fillColor = ~mypalette(csp1$bin),
+    stroke=TRUE,
+    fillOpacity = 0.9,
+    color="black",
+    weight=1,
+    label = ~paste("Incidência: ",round(csp1$incidencia,2)),
+    labelOptions = labelOptions(
+      style = list("font-weight" = "normal", padding = "3px 8px"),
+      textsize = "13px",
+      direction = "auto"
+    )
+  ) |> 
+  addLegend(pal = mypalette, values = ~bin, opacity = 0.9, title = "Incidência da Gripe por 100 000 habitantes", position = "bottomleft")
+```
+
+
+# Cuidados de Saúde Hospitalares {orientation="columns"}
+
+## Column {width="60%"}
+
+```{r}
+#| label: csh-values
+#| results: hide
+#| message: false
+#| warning: false
+n_consultas_csh <-  csh |> filter(Período>=max(csp$Período)-30) |> summarise(valor=sum(`Número estimado de episódios de urgência`,na.rm = T)) |> pull(valor)
+
+temp_medio <-  csh |> filter(Período>=max(csp$Período)-7) |>
+  mutate(
+    tempo=`Tempo médio de espera entre a triagem e a primeira observação médica`* `Número estimado de episódios de urgência`
+  ) |> summarise(valor=sum(tempo,na.rm = T)/sum(`Número estimado de episódios de urgência`, na.rm = T)) |> pull(valor)
+
+
+```
+
+### Row {height="20%"}
+
+```{r}
+#| component: valuebox
+#| title: "Episódios Urgências  Últimos 30 dias"
+
+list(
+  icon = "file-medical",
+  color = "danger",
+  value = n_consultas_csh 
+)
+```
+
+```{r}
+#| component: valuebox
+#| title: "Tempo médio (Observação Médica)  Últimos 7 dias"
+#| message: false
+#| warning: false
+list(
+  icon = "calendar-week",
+  color = "warning",
+  value = temp_medio
+)
+```
+
+### Row {height="40%"}
+
+```{r}
+#| title: Evolução da Taxa de Atendimentos Não Urgentes
+#| message: false
+#| warning: false
+ggplotly(csh |> 
+           filter(as.Date(Período)>=as.Date(max(csh$Período))-30) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Taxa diária de atendimentos urgentes com prioridade verde ou azul`,
+    group=ARS,
+    color=ARS
+  ))+
+     geom_line(linewidth=1.5) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Taxa diária de atendimentos não-urgentes",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Taxa",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+### Row {height="40%" .tabset}
+
+```{r}
+#| title: Episódios com diagnóstico de infeção respiratória - Norte (%)
+#| message: false
+#| warning: false
+ggplotly(csh |> 
+           filter(
+             ARS=="Norte",
+            as.Date(Período)>=as.Date(max(csh$Período))-30
+           ) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Taxa de episódios de urgência com diagnóstico de infeção respiratória`
+  ))+
+     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Taxa de episódios de urgência com diagnóstico de infeção respiratória - Norte",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Taxa de episódios de urgência com diagnóstico de infeção respiratória",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+```{r}
+#| title: Centro
+#| message: false
+#| warning: false
+ggplotly(csh |> 
+           filter(
+             ARS=="Centro",
+             as.Date(Período)>=as.Date(max(csh$Período))-30
+           ) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Taxa de episódios de urgência com diagnóstico de infeção respiratória`
+  ))+
+     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Taxa de episódios de urgência com diagnóstico de infeção respiratória - Centro",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Taxa de episódios de urgência com diagnóstico de infeção respiratória",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+```{r}
+#| title: Lisboa e Vale do Tejo
+#| message: false
+#| warning: false
+ggplotly(csh |> 
+           filter(
+             ARS=="Lisboa e Vale do Tejo",
+             as.Date(Período)>=as.Date(max(csh$Período))-30
+           ) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Taxa de episódios de urgência com diagnóstico de infeção respiratória`
+  ))+
+     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Taxa de episódios de urgência com diagnóstico de infeção respiratória - Lisboa e Vale do Tejo",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Taxa de episódios de urgência com diagnóstico de infeção respiratória",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+```{r}
+#| title: Alentejo
+#| message: false
+#| warning: false
+ggplotly(csh |> 
+           filter(
+             ARS=="Alentejo",
+             as.Date(Período)>=as.Date(max(csh$Período))-30
+           ) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Taxa de episódios de urgência com diagnóstico de infeção respiratória`
+  ))+
+     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Taxa de episódios de urgência com diagnóstico de infeção respiratória - Alentejo",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Taxa de episódios de urgência com diagnóstico de infeção respiratória",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+```{r}
+#| title: Algarve
+#| message: false
+#| warning: false
+ggplotly(csh |> 
+           filter(
+             ARS=="Algarve",
+             as.Date(Período)>=as.Date(max(csh$Período))-30
+           ) |> 
+           arrange(Período) |> 
+  ggplot(aes(
+    x=Período,
+    y=`Taxa de episódios de urgência com diagnóstico de infeção respiratória`
+  ))+
+     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
+  labs(title = "Taxa de episódios de urgência com diagnóstico de infeção respiratória - Algarve",
+         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
+         y = "Taxa de episódios de urgência com diagnóstico de infeção respiratória",
+         x = "Data", 
+         caption = "Fonte: Portal de Transparência, Portugal",
+       colour = "") +
+  coord_cartesian(expand = FALSE)+
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        plot.title = element_text(face = "bold", size = 12)
+        )
+  )
+```
+
+## Column {width="40%"}
+
+```{r}
+#| title: "Incidência de episódios IRI por 100 000 habitantes nos últimos 7 dias"
+#| message: false
+#| warning: false
+bins <- c(0, 30, 130, Inf)
+mycolors <- c("#2ca25f", "#fed976", "#f03b20")
+csh1 <- csh |> filter(as.Date(Período)>=as.Date(time_period)-7) |> 
+      mutate(
+             gripe=`Taxa de episódios de urgência com diagnóstico de infeção respiratória`/100* `Número estimado de episódios de urgência`
+  ) |>  summarise(gripe=sum(gripe, na.rm = T),
+            .by = ARS
+           ) |> 
+          mutate(
+            pop = case_when(
+              ARS=="Alentejo"~937344,
+              ARS=="Norte"~7160564,                 
+              ARS=="Centro"~3318998,               
+              ARS=="Algarve"~934686,               
+              ARS=="Lisboa e Vale do Tejo"~7360226
+            ),
+            incidencia=gripe/pop*100000,
+            bin=cut(
+              incidencia,
+              breaks = bins,
+              labels = c("Verde", "Amarelo", "Vermelho"),
+              include.lowest = TRUE)
+            )  |> 
+          left_join(maps,
+                    by= join_by(ARS==ars),
+                    multiple = "all"
+                    ) |> st_as_sf()|> 
+  st_transform(4326)
+
+mypalette <- colorFactor(palette = mycolors,
+                         domain = csh1$bin,
+                         na.color = "transparent")
+
+
+leaflet(csh1) |> 
+  addTiles()  |> 
+  fitBounds(lng1= min(st_bbox(csh1)["xmin"]-2), lng2=max(st_bbox(csh1)["xmax"]), lat1=min(st_bbox(csh1)["ymin"]), lat2=max(st_bbox(csh1)["ymax"])) |> 
+  addProviderTiles("CartoDB.Positron") |> 
+  addPolygons(
+    fillColor = ~mypalette(csh1$bin),
+    stroke=TRUE,
+    fillOpacity = 0.9,
+    color="black",
+    weight=1,
+    label = ~paste("Incidência: ",round(csh1$incidencia,2)),
+    labelOptions = labelOptions(
+      style = list("font-weight" = "normal", padding = "3px 8px"),
+      textsize = "13px",
+      direction = "auto"
+    )
+  ) |> 
+  addLegend(pal = mypalette, values = ~bin, opacity = 0.9, title = "Incidência da Infeções Respiratória Superiores em Hospital por 100 000 habitantes", position = "bottomleft")
+```
+
+# Dados CSP
+
+### Row {height="90%"}
+
+```{r}
+#| title: "Dados de Cuidados de Saúde Primários"
+#| message: false
+#| warning: false
+csp |>
+  arrange(Período) |>
+  datatable(
+    caption = 'Tabela 1: Este é uma tabela sobre os dados de urgências de cuidados de saúde primários',
+    class = 'cell-border stripe',
+    filter = 'top',
+    options = list(dom = 'ftp'
+                   , paging = TRUE)
+    )
+```
+
+### Row {height="10%"}
+
+```{r fig.align = 'right'}
+#| fig_align: "right"
+#| message: false
+#| warning: false
+csp|> 
+  download_this(
+    output_name = paste0(time_period,"urgencias_csp"),
+    output_extension = ".xlsx",
+    button_label = "Download dados para Excel",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
+```
+
+# Dados CSH
+
+### Row {height="90%"}
+
+```{r}
+#| title: "Dados de Cuidados de Saúde Hospitalares"
+#| message: false
+#| warning: false
+csh|>
+  arrange(Período) |>
+  datatable(
+    caption = 'Tabela 2: Este é uma tabela sobre os dados de urgências de cuidados de saúde hospitalares',
+    class = 'cell-border stripe',
+    filter = 'top',
+    options = list(dom = 'ftp'
+                   , paging = TRUE)
+    )
+```
+
+### Row {height="10%"}
+
+```{r}
+#| fig_align: "right"
+#| message: false
+#| warning: false
+csh |> 
+  download_this(
+    output_name = paste0(time_period2,"urgencias_csh"),
+    output_extension = ".xlsx",
+    button_label = "Download dados para Excel",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
+```

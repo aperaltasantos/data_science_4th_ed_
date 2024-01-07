@@ -226,7 +226,145 @@ quarto::quarto_render(input="Module_7_Advanced_DS_tools.qmd",
 ```
 
 
-## Quarto Dashboards - em falta
+## Quarto Dashboards 
+
+Dashboards são ferramentas interativas de visualização de dados que permitem aos utilizadores ver, analisar e compreender grandes quantidades de informação de uma forma rápida e fácil. 
+
+O objetivo de um dashboard é apresentar informações complexas de forma simplificada, permitindo ao utilizador fazer análises e tomar decisões baseadas em dados.
+
+Como já explorámos no módulo 2, o Quarto é uma ferramenta que permite criar dashboards interativos.
+
+Vamos explorar como criar um dashboard básico usando Quarto com a linguagem R.
+
+Dentro de um Dashboard podemos ter uma grande variadade de componentes:
+
+1. Mapas
+2. Gráficos
+3. Caixa de valor
+4. Anotações de texto dinêmicas
+5. Tabela
+
+Abaixo deixamos um exemplo de um dashboard.
+
+```{=html}
+<iframe width="100%" height="500" src="output/documents/Module_7_Dashboard.html" title="Exemplo de Dashboard em Quarto"></iframe>
+```
+
+Dashboards no Quarto são compostos por vários componentes para navegação e apresentação de dados. Elementos chave incluem:
+
+1. Navegação: Cada dashboard inclui uma barra de navegação no topo com título, opcionalmente um logo e autor. Exemplo de código para adicionar título e autor:
+
+```{r}
+#| eval: false
+---
+title: "Seu Título"
+author: "Seu Nome"
+---
+```
+
+2. Páginas: Para dashboards com múltiplas páginas, use cabeçalhos de nível 1 acima dos cabeçalhos de nível 2 que definem linhas e colunas.
+
+3. Layout: Os componentes dentro de uma página são organizados em linhas e colunas alternadas, definidas por cabeçalhos em markdown com (#, ##, ###) e especificações computacionais relativas ao seu comportamento em HTML. Por exemplo, um layout simples com duas linhas, sendo a segunda dividida em duas colunas seria algo assim:
+
+```{r}
+#| eval: false
+# Página 1
+## Linha {height=70%}
+Linha que ocupa 70% da página em altura
+## Linha 2 {height=30%}
+
+### Coluna A {width= 60%}
+Dentro da Linha 2 queremos uma coluna com 60% do temanho da largura da pagina
+
+### Coluna B {width= 40%}
+
+A Coluna B contém o resto da largura da página
+```
+
+4. Cards ou Cartões: São a unidade fundamental de exibição nos dashboards, criados automaticamente para células e conteúdo em markdown dentro de linhas e colunas. Cada pedaço de código separado e com output entre linhas ou colunas será colocado no Card.
+
+
+5. Orientação: Por predefinição, as páginas são organizadas primeiro por linha e depois por coluna. Isso pode ser alterado especificando a opção orientation: columns no documento.
+
+[Exemplo de Orientação em colunas](https://quarto.org/docs/dashboards/images/chart-focal-left.png)
+
+```{r}
+#| eval: false
+## Column {width=60%, orientation: columns}
+
+### ROW A {height=50%}
+
+### RoW B {height=50%}
+
+## Column {width=40%, orientation: columns}
+
+```
+
+6. Preenchimento vs. Fluxo (Fill vs. Flow): Cada elemento determina seu tamanho preenchendo o espaço disponível ou seguindo seu tamanho natural. Isso é controlado pelas classes .fill e .flow.
+
+```{r}
+#| eval: false
+## Row {.fill}
+
+## Row {.flow}
+```
+
+7. Scrolling: Por predefinição, o conteúdo do dashboard preenche todo o espaço disponível na página, mas pode ser configurado para usar a altura natural do conteúdo deixar o utilizador navegar para baixo.
+
+```{r}
+#| eval: false
+---
+title: "Urgências/CSP Dashboard"
+format: 
+  dashboard:
+    scrolling: true 
+logo: images/ensp.png
+fig-width: 10
+---
+```
+
+8. Conjuntos de Tabsets: É possível fazer separadores *tabsets* para incluir múltiplas visões de dados ou conteúdo de importância secundária. Eles são criados adicionando a classe .tabset a uma linha ou coluna.
+
+```{r}
+#| eval: false
+
+Primeiro Exemplo:
+  
+## Row {height=50%}
+
+## Row {.tabset}
+code chunks
+#| title: "Gráfico 1"
+
+code chunks 
+#| title: "Gráfico 2"
+
+Segundo Exemplo:
+  
+## Row {height=30%}
+
+### Column {.tabset}
+code chunks
+#| title: "Gráfico 1"
+
+code chunks 
+#| title: "Gráfico 2"
+
+
+### Column
+
+```
+
+[Exemplo de resultados de tabsets em Linhas](https://quarto.org/docs/dashboards/images/chart-focal-left.png)
+
+[Exemplo de resultado de tabsets em Colunas](https://quarto.org/docs/dashboards/images/chart-focal-left.png)
+
+9. Personalização: Tal como tudo em Quarto HTML é tudo personaçizável recorrendo a temas que são CSS e SASS. Apesar de úteis para embelezar um produto, a sua utilização é mais avançada que a proposta neste curso.
+
+Poderão ter um exemplo de alterações deste género no ficheiro custom.scss na pasta themes se quiserem explorar.
+
+Para vos apoiar na vossa jornada em Quarto Dashboard, diponibilizamos um exemplo entitulado Module_7_Dashboard.qmd para poderem ver como é construído e explorarem as alterações que podem fazer.
+
 
 # GIT E GITHUB - INTRO
 

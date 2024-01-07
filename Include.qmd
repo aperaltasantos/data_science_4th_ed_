@@ -21,7 +21,6 @@ lang: pt
 execute:
   warning: false
   echo: TRUE
-bibliography: references2.bib 
 ---
 
 ## Secção INTERNA

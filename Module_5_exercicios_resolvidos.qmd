@@ -111,6 +111,8 @@ temperature_data <- import("datasets/Core_Temperature.xlsx") |>
 
 Deve criar uma Tabela 1 comparando a distribuição das variáveis de confundimento (Age, FEMALE, BMI, CharlsonScore, SurgeryType, CHF) pelos pacientes que tiveram ISC (AnyInfection).
 
+1. O nome do objeto deve ser table 1
+
 ```{r}
 # Criar uma tabela resumo de variáveis selecionadas dividida pelo estado da doença cardíaca
 # O pacote gtsummary é utilizado para criar tabelas prontas para publicação

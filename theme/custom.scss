@@ -1,0 +1,62 @@
+/*-- scss:defaults --*/
+
+// fonts
+@import 'https://fonts.googleapis.com/css2?family=Open+Sans&display=swap';
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&display=swap');
+
+$font-family-sans-serif: "Open Sans";
+
+// colors
+
+$navbar-bg: #0e2635;
+$navbar-fg: #F0F0F0;
+
+$link-color: #ae8b2d;
+$hover-color: lighten($link-color, 40%);
+
+/*-- scss:rules --*/
+.card-header {
+  background-color: #F0F0F0;
+  font-size: 12px;
+}
+
+.nav-item {
+  color: #ae8b2d;
+  font-size: 8px;
+}
+
+.nav-link{
+  color: #F0F0F0;
+  font-size: 8px;
+}
+
+
+div.callout-note.callout {
+  border-left-color: #0e2635;
+  font-size: 8px;
+}
+
+div.callout-note.callout-style-default>.callout-header {
+  background-color: #9ea8ae;
+}
+
+thead, tbody, tfoot, tr, td, th {
+  font-size: 8px;
+}
+
+.bslib-value-box .value-box-title {
+  font-size: 0.8rem;
+}
+
+.quarto-dashboard .bslib-value-box .value-box-value {
+  font-size: clamp(.1em,15cqw,5em);
+}
+
+p {
+  font-size: .8rem;
+}
+
+ol, ul, dl {
+  font-size: .8rem;
+}
