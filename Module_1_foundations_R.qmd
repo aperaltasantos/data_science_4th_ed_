@@ -121,7 +121,7 @@ outros e partilhar seu trabalho.
 
 ![Criar um projecto](images/projecto.png)
 
-### Organização
+### Organização do projecto
 
 O projecto deve seguir um padrão comum em projetos de análise de dados,
 especialmente projetos que utilizam R.
@@ -159,6 +159,49 @@ Este é dos erros mais comuns de utilizadores inexperientes!
 Só assim é que estamos a trabalhar no projecto e as alterações são
 guardadas.
 :::
+
+## Organização do R Studio
+
+O RStudio é em várias áreas principais, conhecidas como  paineis, cada um com sua própria função específica:
+
+![Paineis do R Studio](images/r_studio.png)
+
+**1. Painel  Consola**
+
+- *Localização*: Normalmente na parte inferior (ou superior que é a minha preferencia) esquerdo.
+
+- *Função*: Onde o código R é executado interativamente, pode escrever os comandos R diretamente aqui e ver os resultados imediatamente. É também onde as mensagens do sistema e erros são exibidos.
+
+**2. Painel  Script**
+
+- *Localização*: Geralmente na parte superior (ou inferior que é a minha preferencia) esquerda.
+
+- *Função*: Este painel é um editor de texto onde você pode escrever e editar scripts R (.R). Os scripts podem ser guardados e organizados em projetos.
+
+**3. Painel  Environment/History**
+
+- *Localização*: Normalmente na parte superior direita.
+
+- *Função*: Este painel tem duas abas principais:
+
+- *Environment*: Mostra os objetos (datasets, variáveis, funções)  carregados na memória do R.
+
+- *History*: Mantém um registro dos comandos previamente escritos na consola.
+
+**4. Painel de Arquivos/Plots/Packages/Help/Viewer**
+
+- *Localização*: Geralmente na parte inferior direita.
+
+- *Função*: Este painel multifuncional contém várias abas:
+
+  - *Files*: Permite explorar os ficheiros e pastas.
+  
+  - *Help*: Fornece acesso à documentação e ajuda de funções e pacotes R.
+  
+  - *Viewer*: Onde se vê o resultado dos outputs. 
+
+
+O RStudio é altamente personalizável, permitindo organizar os painéis de acordo com as preferências ou as necessidades do projeto. 
 
 ## Nomes de ficheiros
 
