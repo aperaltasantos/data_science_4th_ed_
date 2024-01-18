@@ -59,12 +59,12 @@ Os alunos podem trabalhar com um conjunto de dados de seu interesse ou utilizar 
    - Desenvolva visualizações de dados usando ggplot2, podendo incluir dados espaciais.
    - Deve apresentar pelo menos 3 figuras diferentes.
 
-5. **Modelos Estatísticos (Módulo 5)**
+5. **Modelos Estatísticos (Módulo 5 e 6)**
    - Desenvolva uma tabela sumária de dados.
    - Elabore um modelo de regressão, apresentando os resultados em uma tabela e num gráfico.
    - OPCIONAL: Pode desenvolver um modelo de machine learning como alternativa (Módulo 6).
 
-6. **Integração e Automação (Módulo 5)**
+6. **Integração e Automação (Módulo 7)**
    - Desenvolva um dashboard com os resultados obtidos.
    - Apresente os resultados em HTML e docx.
 
