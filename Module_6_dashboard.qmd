@@ -1,0 +1,8 @@
+--- 
+title: "Palmer Penguins"
+author: "Cobblepot Analytics"
+format: 
+  dashboard:
+    logo: images/ensp_logo1.png
+    nav-buttons: [linkedin, twitter]
+---

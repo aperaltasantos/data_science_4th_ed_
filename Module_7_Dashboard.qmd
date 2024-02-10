@@ -1,12 +1,11 @@
 ---
-title: "Urgências/CSP Dashboard"
+title: "Urgências Dashboard"
 format: 
   dashboard:
-    nav-buttons: [github]
-    github: https://github.com/aperaltasantos
+    nav-buttons: [linkedin, twitter]
     scrolling: true 
-logo: images/ensp.png
-theme: [sandstone, theme/custom.scss]
+logo: images/ensp_logo1.png
+theme: [lumen, theme/custom.scss]
 fig-width: 10
 fig-height: 5
 fig-asp: 0.5

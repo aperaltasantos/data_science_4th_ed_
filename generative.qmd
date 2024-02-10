@@ -1,0 +1,76 @@
+---
+title: "Untitled"
+editor: visual
+---
+
+```{r}
+library(generativeart)
+library(tidyverse)
+
+# Set the seed for reproducibility
+set.seed(123)
+
+# Custom function to draw a shell-like pattern
+create_shell_pattern <- function(){
+  # Define the number of lines and the angle step for the spiral
+  num_lines <- 200
+  angle_step <- 0.1
+  
+  # Create a dataframe to hold the line data
+  lines_data <- tibble(start_x = double(),
+                       start_y = double(),
+                       end_x = double(),
+                       end_y = double())
+  
+  # Loop to create the lines
+  for (i in seq_len(num_lines)) {
+    # Calculate the radius and angle for the current line
+    radius <- sqrt(i)
+    angle <- i * angle_step
+    
+    # Start points
+    start_x <- cos(angle) * radius
+    start_y <- sin(angle) * radius
+    
+    # End points with some randomness
+    end_x <- cos(angle + angle_step) * (radius + runif(1, 0.5, 1.5))
+    end_y <- sin(angle + angle_step) * (radius + runif(1, 0.5, 1.5))
+    
+    # Add the line data to the dataframe
+    lines_data <- lines_data %>% 
+      add_row(start_x = start_x, start_y = start_y, end_x = end_x, end_y = end_y)
+  }
+  
+  # Draw the lines
+  ggplot(lines_data, aes(x = start_x, y = start_y, xend = end_x, yend = end_y)) +
+    geom_segment() +
+    theme_void() +
+    xlim(c(-sqrt(num_lines), sqrt(num_lines))) +
+    ylim(c(-sqrt(num_lines), sqrt(num_lines)))
+}
+
+# Use the generative art package to create the art and save it
+generativeart::create_artsy(
+  code = create_shell_pattern,
+  width = 1000, 
+  height = 1000,
+  filename = "/mnt/data/my_shell_pattern.png"
+)
+
+
+my_formula <- list(
+  x = quote(runif(1, -1, 1) * x_i^2 - sin(y_i^2)),
+  y = quote(runif(1, -1, 1) * y_i^3 - cos(x_i^2))
+)
+
+generativeart::generate_img(formula = my_formula, 
+                            nr_of_img = 5, 
+                            polar = TRUE, 
+                            color = "black", 
+                            background_color = "white"
+                            )  
+
+
+
+```
+
