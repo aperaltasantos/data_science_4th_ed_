@@ -1,8 +1,12 @@
 ---
 title: "Module 7: Dashboard"
+subtitle: "Boas práticas no desenvolvimento de dashboards"
 author: "A. Peralta-Santos"
+affiliation: 
+    - Escola Nacional de Saúde Pública
 date: today
 date-format: long
+lang: pt
 format:
   html:
     smooth-scroll: true
