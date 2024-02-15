@@ -4,6 +4,7 @@ editor: visual
 ---
 
 ```{r}
+# devtools::install_github("cutterkom/generativeart")
 library(generativeart)
 library(tidyverse)
 
@@ -48,14 +49,26 @@ create_shell_pattern <- function(){
     xlim(c(-sqrt(num_lines), sqrt(num_lines))) +
     ylim(c(-sqrt(num_lines), sqrt(num_lines)))
 }
+# set the paths
+IMG_DIR <- "outputfigures/"
+IMG_SUBDIR <- ""
+IMG_SUBDIR2 <- ""
+IMG_PATH <- paste0(IMG_DIR, IMG_SUBDIR)
 
+LOGFILE_DIR <- "logfile/"
+LOGFILE <- "logfile.csv"
+LOGFILE_PATH <- paste0(LOGFILE_DIR, LOGFILE)
+
+# create the directory structure
+setup_directories(IMG_DIR, IMG_SUBDIR, IMG_SUBDIR2, LOGFILE_DIR)
 # Use the generative art package to create the art and save it
-generativeart::create_artsy(
-  code = create_shell_pattern,
-  width = 1000, 
-  height = 1000,
-  filename = "/mnt/data/my_shell_pattern.png"
-)
+# not used
+# generativeart::create_artsy(
+#   code = create_shell_pattern,
+#   width = 1000, 
+#   height = 1000,
+#   filename = "/mnt/data/my_shell_pattern.png"
+# )
 
 
 my_formula <- list(
@@ -73,4 +86,3 @@ generativeart::generate_img(formula = my_formula,
 
 
 ```
-

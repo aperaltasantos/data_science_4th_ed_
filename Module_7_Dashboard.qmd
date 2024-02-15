@@ -2,7 +2,11 @@
 title: "Urgências Dashboard"
 format: 
   dashboard:
-    nav-buttons: [linkedin, twitter]
+    nav-buttons:
+      - icon: linkedin
+        href: https://www.linkedin.com/in/aperaltasantos/
+      - icon: twitter
+        href: https://twitter.com/andre_peralta
     scrolling: true 
 logo: images/ensp_logo1.png
 #theme: [lumen, theme/custom.scss]
@@ -38,6 +42,8 @@ required_packages <- c("janitor",
                        "gt",
                        "skimr",
                        "sysfonts",
+                       "ggiraph",
+                       "echarts4r",
                        "DataExplorer"
                        )      
 
@@ -101,7 +107,8 @@ geo <- import("datasets/linkage_geo.csv") |>
   )
 
 maps <- st_read("datasets/map_json_portugal/Cont_Conc_CAOP2022.shp", quiet = T) |> 
-  select(Concelho, geometry) 
+  select(Concelho, geometry) |> 
+  st_transform(4236) 
 
 maps <- maps |> 
   left_join(geo, by= join_by("Concelho"=="geo")) |> 
@@ -109,7 +116,7 @@ maps <- maps |>
     geometry= st_union(geometry),
     .by=ars
   ) |> 
-  st_transform(4236) |> 
+  st_make_valid() |> 
   st_as_sf()
 
 time_period <- max(csh$Período)
@@ -217,151 +224,126 @@ list(
 #| title: Consultas Gripe - Norte
 #| message: false
 #| warning: false
-ggplotly(csp |> 
-           filter(
-             ARS=="Norte",
-             Período>=max(csp$Período)-30
-           ) |> 
-           arrange(Período) |> 
-  ggplot(aes(
-    x=Período,
-    y=`Nº Consultas Gripe nos CSP`
-  ))+
-     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
-  labs(title = "Nº Consultas Gripe nos CSP da ARS Norte",
-         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
-         y = "Nº Consultas Gripe nos CSP",
-         x = "Data", 
-         caption = "Fonte: Portal de Transparência, Portugal",
-       colour = "") +
-  coord_cartesian(expand = FALSE)+
-  theme_minimal() +
-  theme(legend.position="right",
-        legend.title=element_blank(),
-        plot.title = element_text(face = "bold", size = 12)
-        )
-  )
+
+
+data <- csp  |> 
+  filter(
+    ARS=="Norte",
+    Período >= max(Período) - 30
+  ) |> 
+  arrange(Período)
+  
+data |>   e_charts(Período) |>
+  e_line(`Nº Consultas Gripe nos CSP`, smooth = TRUE, symbol = 'none') |>
+  e_title(
+    "Nº Consultas Gripe nos CSP da ARS Norte",
+    subtext = paste0(year(min(data$Período)), "-", year(max(data$Período)))
+  ) |>
+  e_x_axis(name = "Data") |>
+  e_y_axis(name = "Nº Consultas Gripe nos CSP") |>
+  e_tooltip(trigger = "axis") |>
+  e_legend(show = FALSE) |> # Assuming no legend is necessary as there's only one line
+  e_theme("light")
 ```
 
 ```{r}
 #| title: Lisboa e Vale do Tejo
 #| message: false
 #| warning: false
+# Assuming 'csp' is your dataset and already loaded
+data <- csp  |> 
+  filter(
+    ARS == "Lisboa e Vale do Tejo",
+    Período >= max(Período) - 30
+  ) |> 
+  arrange(Período)
+  
+data |>   e_charts(Período) |>
+  e_line(`Nº Consultas Gripe nos CSP`, smooth = TRUE, symbol = 'none') |>
+  e_title(
+    "Nº Consultas Gripe nos CSP da ARS Lisboa e Vale do Tejo",
+    subtext = paste0(year(min(data$Período)), "-", year(max(data$Período)))
+  ) |>
+  e_x_axis(name = "Data") |>
+  e_y_axis(name = "Nº Consultas Gripe nos CSP") |>
+  e_tooltip(trigger = "axis") |>
+  e_legend(show = FALSE) |> # Assuming no legend is necessary as there's only one line
+  e_theme("light") # Choose a theme that matches `theme_minimal()`
 
-ggplotly(csp |> 
-           filter(
-             ARS=="Lisboa e Vale do Tejo",
-             Período>=max(csp$Período)-30
-           ) |> 
-           arrange(Período) |> 
-  ggplot(aes(
-    x=Período,
-    y=`Nº Consultas Gripe nos CSP`
-  ))+
-     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
-  labs(title = "Nº Consultas Gripe nos CSP da ARS Lisboa e Vale do Tejo",
-         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
-         y = "Nº Consultas Gripe nos CSP",
-         x = "Data", 
-         caption = "Fonte: Portal de Transparência, Portugal",
-       colour = "") +
-  coord_cartesian(expand = FALSE)+
-  theme_minimal() +
-  theme(legend.position="right",
-        legend.title=element_blank(),
-        plot.title = element_text(face = "bold", size = 12)
-        )
-  )
 ```
 
 ```{r}
 #| title: Centro
 #| message: false
 #| warning: false
-ggplotly(csp |> 
-           filter(
-             ARS=="Centro",
-             Período>=max(csp$Período)-30
-           ) |> 
-           arrange(Período) |> 
-  ggplot(aes(
-    x=Período,
-    y=`Nº Consultas Gripe nos CSP`
-  ))+
-     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
-  labs(title = "Nº Consultas Gripe nos CSP da ARS Centro",
-         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
-         y = "Nº Consultas Gripe nos CSP",
-         x = "Data", 
-         caption = "Fonte: Portal de Transparência, Portugal",
-       colour = "") +
-  coord_cartesian(expand = FALSE)+
-  theme_minimal() +
-  theme(legend.position="right",
-        legend.title=element_blank(),
-        plot.title = element_text(face = "bold", size = 12)
-        )
-  )
+data <- csp  |> 
+  filter(
+    ARS=="Centro",
+    Período >= max(Período) - 30
+  ) |> 
+  arrange(Período)
+  
+data |>   e_charts(Período) |>
+  e_line(`Nº Consultas Gripe nos CSP`, smooth = TRUE, symbol = 'none') |>
+  e_title(
+    "Nº Consultas Gripe nos CSP da ARS Centro",
+    subtext = paste0(year(min(data$Período)), "-", year(max(data$Período)))
+  ) |>
+  e_x_axis(name = "Data") |>
+  e_y_axis(name = "Nº Consultas Gripe nos CSP") |>
+  e_tooltip(trigger = "axis") |>
+  e_legend(show = FALSE) |> # Assuming no legend is necessary as there's only one line
+  e_theme("light")
 ```
 
 ```{r}
 #| title: Alentejo
 #| message: false
 #| warning: false
-ggplotly(csp |> 
-           filter(
-             ARS=="Alentejo",
-             Período>=max(csp$Período)-30
-           ) |> 
-           arrange(Período) |> 
-  ggplot(aes(
-    x=Período,
-    y=`Nº Consultas Gripe nos CSP`
-  ))+
-     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
-  labs(title = "Nº Consultas Gripe nos CSP da ARS Alentejo",
-         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
-         y = "Nº Consultas Gripe nos CSP",
-         x = "Data", 
-         caption = "Fonte: Portal de Transparência, Portugal",
-       colour = "") +
-  coord_cartesian(expand = FALSE)+
-  theme_minimal() +
-  theme(legend.position="right",
-        legend.title=element_blank(),
-        plot.title = element_text(face = "bold", size = 12)
-        )
-  )
+
+
+data <- csp  |> 
+  filter(
+    ARS=="Alentejo",
+    Período >= max(Período) - 30
+  ) |> 
+  arrange(Período)
+  
+data |>   e_charts(Período) |>
+  e_line(`Nº Consultas Gripe nos CSP`, smooth = TRUE, symbol = 'none') |>
+  e_title(
+    "Nº Consultas Gripe nos CSP da ARS Alentejo",
+    subtext = paste0(year(min(data$Período)), "-", year(max(data$Período)))
+  ) |>
+  e_x_axis(name = "Data") |>
+  e_y_axis(name = "Nº Consultas Gripe nos CSP") |>
+  e_tooltip(trigger = "axis") |>
+  e_legend(show = FALSE) |> # Assuming no legend is necessary as there's only one line
+  e_theme("light")
 ```
 
 ```{r}
 #| title: Algarve
 #| message: false
 #| warning: false
-ggplotly(csp |> 
-           filter(
-             ARS=="Algarve",
-             Período>=max(csp$Período)-30
-           ) |> 
-           arrange(Período) |> 
-  ggplot(aes(
-    x=Período,
-    y=`Nº Consultas Gripe nos CSP`
-  ))+
-     geom_line(linewidth=1.15) + #nos geom de linha o argumento size também funciona para a grossura mas está a mudar para linewidth
-  labs(title = "Nº Consultas Gripe nos CSP da ARS Algarve",
-         subtitle = paste0(year(min(csp$Período)),"-",year(max(csp$Período))),
-         y = "Nº Consultas Gripe nos CSP",
-         x = "Data", 
-         caption = "Fonte: Portal de Transparência, Portugal",
-       colour = "") +
-  coord_cartesian(expand = FALSE)+
-  theme_minimal() +
-  theme(legend.position="right",
-        legend.title=element_blank(),
-        plot.title = element_text(face = "bold", size = 12)
-        )
-  )
+data <- csp  |> 
+  filter(
+    ARS=="Algarve",
+    Período >= max(Período) - 30
+  ) |> 
+  arrange(Período)
+  
+data |>   e_charts(Período) |>
+  e_line(`Nº Consultas Gripe nos CSP`, smooth = TRUE, symbol = 'none') |>
+  e_title(
+    "Nº Consultas Gripe nos CSP da ARS Algarve",
+    subtext = paste0(year(min(data$Período)), "-", year(max(data$Período)))
+  ) |>
+  e_x_axis(name = "Data") |>
+  e_y_axis(name = "Nº Consultas Gripe nos CSP") |>
+  e_tooltip(trigger = "axis") |>
+  e_legend(show = FALSE) |> # Assuming no legend is necessary as there's only one line
+  e_theme("light")
 ```
 
 #### Row {height="40%"}
@@ -394,6 +376,7 @@ ggplotly(csp |>
         plot.title = element_text(face = "bold", size = 12),
         axis.text.y = element_text(face = "bold", size = 8)
         ))
+
 ```
 
 ### Column {width="40%"}
