@@ -1,8 +1,12 @@
 ---
-title: "Module 7: Dashboard"
+title: "Módulo 7 | Dashboards "
+subtitle: "Boas práticas no desenvolvimento de dashboards"
 author: "A. Peralta-Santos"
+affiliation: 
+    - Escola Nacional de Saúde Pública
 date: today
 date-format: long
+lang: pt  
 format:
   html:
     smooth-scroll: true
@@ -19,7 +23,7 @@ project:
   output-dir: outputs/documents
 ---
 
-# DASHBOARD
+# DASHBOARDS
 
 > A dashboard is a visual display of the most important information needed to achieve one or more objectives; consolidated and arranged on a single screen so the information can be monitored at a glance. [^1]
 
@@ -136,11 +140,25 @@ A Direção Regional de Estatisticas da Madeira criou um [dashabord](https://app
 
 ### Maus exemplos
 
-<https://empregocientificoedocente.dgeec.mec.pt/>
+O Portal do SNS tem um [dashboard](https://www.sns.gov.pt/monitorizacao-do-sns/medicamentos-e-produtos-de-saude-2/) sobre a utilização de medicamentos biossimilares. Não é muito claro quais são os KPI a monitorizar e a evolução temporal esta em separadores o que torna dificil avaliar a evolução da despesa.
 
-<https://www.sns.gov.pt/monitorizacao-do-sns/medicamentos-e-produtos-de-saude-2/>
+![](images/mau_exemplo-01.png)
 
 ## Dashboard checklist
+
+### Inputs
+
+-   Qualidade dos dados estável
+
+-   Indicadores e métricas bem defenidos
+
+-   Automatização da atualização de dados
+
+### Outputs
+
+-   Paleta de cores definida (3 a 4 cores dominantes)
+
+-   KPI na primeira linha (ideal 3, no máximo 6)
 
 -   Data da última atualização dos dados
 
@@ -148,4 +166,4 @@ A Direção Regional de Estatisticas da Madeira criou um [dashabord](https://app
 
 -   Exportação de dados e print disponíveis
 
--   KPI na primeira linha (ideal 3, no máximo 6)
+## FIM
