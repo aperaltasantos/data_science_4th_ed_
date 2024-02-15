@@ -5,7 +5,7 @@ format:
     nav-buttons: [linkedin, twitter]
     scrolling: true 
 logo: images/ensp_logo1.png
-theme: [lumen, theme/custom.scss]
+#theme: [lumen, theme/custom.scss]
 fig-width: 10
 fig-height: 5
 fig-asp: 0.5
