@@ -29,38 +29,6 @@ editor:
 project:
   output-dir: outputs/documents
 ---
-# Setup
-
-```{r}
-#| warning: false
-#| message: false
-#| error: false
-
-
-rm(list = ls(all.names = TRUE)) 
-# Packages
-required_packages <- c(
-                       "assertr",
-                       "data.validator",
-                       "janitor",
-                       "tidyverse",
-                       "rio"
-                       # colocar aqui se foram utilizados mais pacotes
-                       )      
-
-for (pkg in required_packages) {
-  # install packages if not already present
-  if (!pkg %in% rownames(installed.packages())) {
-    install.packages(pkg)
-  }
-  
-  # load packages to this current session 
-  library(pkg, character.only = TRUE)
-}
-remove(required_packages)
-remove(pkg)
-
-```
 
 # Exercicio visualização - Hypoxia 
 
@@ -68,51 +36,33 @@ Este é um estudo sobre a pressão arterial média intraoperatória em pacientes
 
 [^1]:*The Hypoxia MAP dataset was contributed by Dr. Amy Nowacki, Associate Professor, Cleveland Clinic. Please refer to this resource as: Amy S. Nowacki, “Hypoxia MAP Treatment Dataset”, TSHS Resources Portal (2022). Available at https://www.causeweb.org/tshs/hypoxia/.*
 
-Para os exercicios deve utilizar o dataset hypoxia em csv.
-
+Para os exercicios deve utilizar o dataset hypoxia
 ```{r}
-
+library(tidyverse)
+hypoxia <- read_csv("datasets/hypoxia.csv")
 ```
+
+
 
 ## Exercicio M4.1 Distribuições
 
 Compara a distribuição de idades entre homens e mulheres. O gráfico deve ter um título, caption, legenda. A distribuição estar preenchido por cor "#91bfdb" e "#ef8a62". Utiliza o tema classic.  
-
-```{r}
-#| fig-height: 5
-#| fig-width: 7.5
-#| 
-
-
-```
 
 
 ## Exercicio M4.2 Relação entre variáveis
 
 Explora a relaçao entre MinSao2 e o BMI. O gráfico deve ter um título, caption, legenda. Usa o theme minimal e adiciona uma linha tendência linear para explorar a relação.
 
-```{r}
-#| fig-height: 5
-#| fig-width: 7.5
-#|
-```
-
-
 ## Exercicio M4.3 Mapa
 
 Cria um mapa usado o shapefile comm_pt, e as caracteristicas da base de dados "mortalidade_coracao_2021.csv" na pasta datasets.O mapa deve conter a mortalidade por doenças cardiovasculares com uma escala de 5 cores. O gráfico deve ter um título, caption, legenda.
 
 ```{r}
-
+library(readr)
+mortalidade_coracao_2021 <- read_delim("datasets/mortalidade_coracao_2021.csv", 
+    delim = ";", 
+    escape_double = FALSE, 
+    trim_ws = TRUE)
 ```
-
-
-```{r}
-#| fig-height: 10
-#| fig-width: 7
-
-```
-
-
 
 # FIM

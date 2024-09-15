@@ -26,7 +26,6 @@ editor:
     wrap: 72
 ---
 
-
 # SETUP
 
 Limpar o ambiente
@@ -42,7 +41,8 @@ rm(list = ls(all.names = TRUE))
 
 Instalar e carregar bibliotecas
 
-Sempre que se inicia uma nova sessão, as bibliotecas têm de ser carregadas.
+Sempre que se inicia uma nova sessão, as bibliotecas têm de ser
+carregadas.
 
 ```{r}
 #| code-fold: true
@@ -76,9 +76,10 @@ remove(pkg)
 
 ```
 
-# IMPORTAÇÃO DADOS 
+# IMPORTAÇÃO DADOS
 
-Para esta parte da aula não será tão importante alguns passos de data cleaning e data wrangling.
+Para esta parte da aula não será tão importante alguns passos de data
+cleaning e data wrangling.
 
 Carregar e limpar os dados
 
@@ -132,38 +133,56 @@ hypoxia <- import("datasets/hypoxia.xlsx")|>
 
 # ANÁLISE EXPLORATÓRIA DE DADOS (EDA)
 
-A Análise Exploratória de Dados (EDA, do inglês "Exploratory Data Analysis") é uma etapa fundamental e dinâmica no processo de análise de dados. Mais do que um conjunto de procedimentos rígidos, a EDA é um processo criativo e iterativo de exploração e compreensão dos dados.
+A Análise Exploratória de Dados (EDA, do inglês "Exploratory Data
+Analysis") é uma etapa fundamental e dinâmica no processo de análise de
+dados. Mais do que um conjunto de procedimentos rígidos, a EDA é um
+processo criativo e iterativo de exploração e compreensão dos dados.
 
 ![Análise Exploratória de Dados](images/eda.png)
 
-> "Não existem perguntas estatísticas rotineiras, apenas rotinas estatísticas questionáveis." — Sir David Cox
+> "Não existem perguntas estatísticas rotineiras, apenas rotinas
+> estatísticas questionáveis." — Sir David Cox
 
-A EDA é motivada pela curiosidade e guiada pelos dados disponíveis, sendo essencial na avaliação da qualidade dos dados e na geração de insights valiosos.
+A EDA é motivada pela curiosidade e guiada pelos dados disponíveis,
+sendo essencial na avaliação da qualidade dos dados e na geração de
+insights valiosos.
 
 ### Processo Iterativo de EDA
 
-1. **Formulação de Perguntas a Partir dos Dados**: Levante questionamentos baseados nos dados disponíveis. Este passo é crucial para direcionar a  análise.
+1.  **Formulação de Perguntas a Partir dos Dados**: Levante
+    questionamentos baseados nos dados disponíveis. Este passo é crucial
+    para direcionar a análise.
 
-2. **Exploração dos dados**:
-   - **Visualizações**: Use gráficos e visualizações de dados para avaliar tendências, padrões e anomalias.
-   - **Transformações de Dados**: Manipule e transforme os dados para melhor compreensão e análise.
-   - **Modelos**: Aplique modelos estatísticos simples para testar hipóteses e explorar relações.
+2.  **Exploração dos dados**:
 
-3. **Reflexão e Aprofundamento**: Reflita sobre o que foi aprendido com as análises iniciais. Use esses conhecimento para melhorar as perguntas existentes ou formular novas.
+    -   **Visualizações**: Use gráficos e visualizações de dados para
+        avaliar tendências, padrões e anomalias.
+    -   **Transformações de Dados**: Manipule e transforme os dados para
+        melhor compreensão e análise.
+    -   **Modelos**: Aplique modelos estatísticos simples para testar
+        hipóteses e explorar relações.
 
+3.  **Reflexão e Aprofundamento**: Reflita sobre o que foi aprendido com
+    as análises iniciais. Use esses conhecimento para melhorar as
+    perguntas existentes ou formular novas.
 
 **Pré-requisitos**
 
-- **Conhecimento dos Dados**: Conheça o dataset em profundidados entenda as variáveis, as unidades de medida e o contexto dos dados.
+-   **Conhecimento dos Dados**: Conheça o dataset em profundidados
+    entenda as variáveis, as unidades de medida e o contexto dos dados.
 
-- **Consulta aos Metadados**: Se os dados forem desconhecidos ou complexos, consulte os metadados para uma compreensão detalhada das variáveis e da estrutura dos dados. Se não existirem metadados fale com alguem que conheça o dataset e o processo de geração de dados. 
+-   **Consulta aos Metadados**: Se os dados forem desconhecidos ou
+    complexos, consulte os metadados para uma compreensão detalhada das
+    variáveis e da estrutura dos dados. Se não existirem metadados fale
+    com alguem que conheça o dataset e o processo de geração de dados.
 
+## Exploração inicial
 
-## Exploração inicial 
-
-Estas primeiras funções não dirão muito mas permitem ter uma melhor compreensão ds dados que temos á frente.
+Estas primeiras funções não dirão muito mas permitem ter uma melhor
+compreensão ds dados que temos á frente.
 
 Números de linhas
+
 ```{r}
 nrow(inpatient_hospital)
 ```
@@ -175,15 +194,19 @@ Número de Colunas
 ```{r}
 ncol(inpatient_hospital)
 ```
+
 Temos `r ncol(inpatient_hospital)` observações.
 
 ```{r}
 # esta função resume as duas questões anteriores
 dim(inpatient_hospital)
 ```
-Para além do número de registos, podemos querer saber o nome e o tipo de variável importados.
+
+Para além do número de registos, podemos querer saber o nome e o tipo de
+variável importados.
 
 Nome das colunas
+
 ```{r}
 
 colnames(inpatient_hospital)
@@ -193,13 +216,13 @@ length(inpatient_hospital)
 
 Nos dados originais temos 7 variáveis:
 
-- periodo
-- regiao
-- instituicao
-- tipo de especialidade
-- localização geográfica
-- dias de internamento
-- doentes saidos
+-   periodo
+-   regiao
+-   instituicao
+-   tipo de especialidade
+-   localização geográfica
+-   dias de internamento
+-   doentes saidos
 
 Tipo de Variável
 
@@ -213,22 +236,25 @@ Com os dados do str sabemos que:
 
 Temos 4 variáveis nominais:
 
-- periodo
-- regiao
-- instituicao
-- localização geográfica
-- tipo de especialidade
+-   periodo
+-   regiao
+-   instituicao
+-   localização geográfica
+-   tipo de especialidade
 
 Temos duas variáveis numéricas:
 
-- doentes saidos
-- dias de internamentos
+-   doentes saidos
+-   dias de internamentos
 
-Embora as variáveis numéricas façam sentido, nas nominais podemos querer alterar algumas coisas:
+Embora as variáveis numéricas façam sentido, nas nominais podemos querer
+alterar algumas coisas:
 
-- Mudar periodo para data
-- Mudar a regiao, instituicao e tipo de especialidade para fatores para análises estatísticas subsequentes
-- Para já não temos questões relativas à localização geográfica, por isso podemos remover esta variável
+-   Mudar periodo para data
+-   Mudar a regiao, instituicao e tipo de especialidade para fatores
+    para análises estatísticas subsequentes
+-   Para já não temos questões relativas à localização geográfica, por
+    isso podemos remover esta variável
 
 ```{r}
 inpatient_hospital_lite <- inpatient_hospital |> 
@@ -253,19 +279,20 @@ str(inpatient_hospital_lite)
 
 Agora já temos um melhor conhecimento sobre os dados:
 
-- Uma variável de Data
-- 3 variáveis são fatores
-  - Regiao com 5 valores possíveis
-  - Intituicão com 51 valores possíveis
-  - Tipo de especialidade com 2 valores posssíveis
+-   Uma variável de Data
+-   3 variáveis são fatores
+    -   Regiao com 5 valores possíveis
+    -   Intituicão com 51 valores possíveis
+    -   Tipo de especialidade com 2 valores posssíveis
 
-## Visualizar os dados 
+## Visualizar os dados
 
-Uma boa prática numa primeira fase é visualizar pequenas porções dos dados para ver possíveis problemas imediatamente.
+Uma boa prática numa primeira fase é visualizar pequenas porções dos
+dados para ver possíveis problemas imediatamente.
 
 ### Função head() e tail()
 
-Estas funções expõe n linhas dos dados. 
+Estas funções expõe n linhas dos dados.
 
 Por default, são 5 linhas
 
@@ -283,13 +310,14 @@ tail(inpatient_hospital_lite)
 
 Pelos dados do Head e do Tail verificamos que os dados:
 
-- Estão orientados de forma ascendente pelo período
-- Parecem ir das Especialidade Cirúrgicas para as Médicas
-- Os valores da variável dias de internamento parecem ser maiores 
+-   Estão orientados de forma ascendente pelo período
+-   Parecem ir das Especialidade Cirúrgicas para as Médicas
+-   Os valores da variável dias de internamento parecem ser maiores
 
 ### GT (preview)
 
-Um dos maiores pacotes para geração de tabelas permite de forma simples fazer o mesmo que as funções head e tail numa tabela.
+Um dos maiores pacotes para geração de tabelas permite de forma simples
+fazer o mesmo que as funções head e tail numa tabela.
 
 ```{r}
 
@@ -300,7 +328,10 @@ inpatient_hospital_lite |>
 
 ### Summary
 
-A função mais conhecia para a estatística descritiva no R, é o summary(), que dá a amplitude dos dados, a média e mediana dos dados, porém não mede o tamanho amostral total, o tipo de distribição nem disperção dos dados. 
+A função mais conhecia para a estatística descritiva no R, é o
+summary(), que dá a amplitude dos dados, a média e mediana dos dados,
+porém não mede o tamanho amostral total, o tipo de distribição nem
+disperção dos dados.
 
 ```{r}
 
@@ -310,17 +341,19 @@ summary(inpatient_hospital_lite)
 
 Com mais esta função aprofundamos mais o nosso conhecimento dos dados:
 
-- A data vai de janeiro de 2015 a janeiro de 2022 e parece ser mensal que o ponto médio é julho de 2018
+-   A data vai de janeiro de 2015 a janeiro de 2022 e parece ser mensal
+    que o ponto médio é julho de 2018
 
-- Existem mais registos de LVT e Norte (possivel razão?)
+-   Existem mais registos de LVT e Norte (possivel razão?)
 
-- Parecem haver 170 registos por hospital
+-   Parecem haver 170 registos por hospital
 
-- Existem mais registos de Especialidades Médicas do que de Cirúrgicas
+-   Existem mais registos de Especialidades Médicas do que de Cirúrgicas
 
-- Os doentes saídos têm 2 valores em falta
+-   Os doentes saídos têm 2 valores em falta
 
-- As distribuições das variáveis dos doentes saidos e dos dias de internamento têm uma variabilidade
+-   As distribuições das variáveis dos doentes saidos e dos dias de
+    internamento têm uma variabilidade
 
 ### Ver os números por hospital
 
@@ -342,27 +375,29 @@ head(inp_hosp_lite_count)
 
 Quais são algumas considerações que podemos fazer sobre estes dados?
 
+## Variação
 
-## Variação 
-
-A variação é a tendência dos dados variarem por medições consecutivas ou por sujeitos ou tempos.
+A variação é a tendência dos dados variarem por medições consecutivas ou
+por sujeitos ou tempos.
 
 Vamos explorar questões iniciais:
 
-- Qual é a variação de doentes saídos por hospital
-- Qual a diferença da distribuição de dados entre 2015 e 2022
-- Qual é a variação dos dados por Tipo de Especialidade.
+-   Qual é a variação de doentes saídos por hospital
+-   Qual a diferença da distribuição de dados entre 2015 e 2022
+-   Qual é a variação dos dados por Tipo de Especialidade.
 
-Como a variável doentes de doentes saidos é numérica podemos explorar a sua distribuição através do uso de histogramas.
-Em módulos futuros iremos explorar como fazer código e como melhorar gráficos apresentados.
+Como a variável doentes de doentes saidos é numérica podemos explorar a
+sua distribuição através do uso de histogramas. Em módulos futuros
+iremos explorar como fazer código e como melhorar gráficos apresentados.
 
-O objetivo desta fase é explorar os valores mais típicos e procurar valores inesperados. 
+O objetivo desta fase é explorar os valores mais típicos e procurar
+valores inesperados.
 
 Perguntas desta fase podem ser:
 
-- Quais são os valores mais comuns? Razões para isso?
-- Quais valores são mais raros? Porquê serão? 
-- É possível observar algum padrão incomum?
+-   Quais são os valores mais comuns? Razões para isso?
+-   Quais valores são mais raros? Porquê serão?
+-   É possível observar algum padrão incomum?
 
 Qual é a variação de doentes saídos por hospital
 
@@ -374,6 +409,7 @@ p1 <- inpatient_hospital_lite |>
   
 p1
 ```
+
 Qual a diferença da distribuição de dados entre 2015 e 2022
 
 ```{r}
@@ -397,7 +433,8 @@ p1
 
 ```
 
-Os dados de 2021 aparentem ter uma maior frequência de valores mais baixos que 2015.
+Os dados de 2021 aparentem ter uma maior frequência de valores mais
+baixos que 2015.
 
 Qual é a variação dos dados por Tipo de Especialidade
 
@@ -420,14 +457,15 @@ p1
 
 ```
 
-As Especialidades Médicas aparentem ter uma distribuição mais equilibrada de valores e os valores mais elevados parecem advir de valores de Especialidades Cirúrgicas.
+As Especialidades Médicas aparentem ter uma distribuição mais
+equilibrada de valores e os valores mais elevados parecem advir de
+valores de Especialidades Cirúrgicas.
 
 Outras questões?
 
-- Existem padrões diferentes nos hospitais centrais e periféricos?
+-   Existem padrões diferentes nos hospitais centrais e periféricos?
 
-- Existem diferenças entre os dados de Dezembro e de Junho?
-
+-   Existem diferenças entre os dados de Dezembro e de Junho?
 
 ## Valores omissos
 
@@ -441,10 +479,10 @@ inpatient_hospital_na <- inpatient_hospital_lite |>
 inpatient_hospital_na 
 ```
 
-Pela tabela podemos ver que a Unidade Local de Saúde da Guarda, EPE não reportou dados de doentes saidos. 
+Pela tabela podemos ver que a Unidade Local de Saúde da Guarda, EPE não
+reportou dados de doentes saidos.
 
-Será porque foram 0?
-Sera porque não reportaram dados?
+Será porque foram 0? Sera porque não reportaram dados?
 
 ```{r}
 inpatient_hospital_zero <- inpatient_hospital_lite |> 
@@ -457,11 +495,13 @@ Não existem valore codificados para 0, sendo que o valor mínimo é de 3.
 
 ## Valores incomuns (outliers)
 
-Para efeitos de deteção de outliers foram consideradas todas as observações fora da equação abaixo.
+Para efeitos de deteção de outliers foram consideradas todas as
+observações fora da equação abaixo.
 
 $$ I=[q0.25−1.5⋅IQR;q0.75+1.5⋅IQR] $$
 
-Tendo em conta os dados dos histogramas acima, vamo-nos focar nos dados de Especialidade Cirúrgica.
+Tendo em conta os dados dos histogramas acima, vamo-nos focar nos dados
+de Especialidade Cirúrgica.
 
 ```{r}
 
@@ -496,9 +536,11 @@ inpatient_hospital_outliers <- inpatient_hospital_lite |>
 
 nrow(inpatient_hospital_outliers)
 ```
+
 Existem 158 valores que são outliers.
 
-Vamos olhar para os valores superiores e ver que hospitais reportam estes valores.
+Vamos olhar para os valores superiores e ver que hospitais reportam
+estes valores.
 
 ```{r}
 q25 <- 1578
@@ -516,19 +558,20 @@ inpatient_hospital_outliers_nome
 
 Existem 6 hospitiais que reportam valores outliers severos superiores.
 
-1. Centro Hospitalar Universitário do Porto, EPE
-2. Centro Hospitalar Universitário Lisboa Central, EPE 
-3. Centro Hospitalar e Universitário de Coimbra, EPE
-4. Centro Hospitalar Universitário de São João, EPE 
-5. Hospital de Braga, EPE
-6. Centro Hospitalar Universitário de Lisboa Norte, EPE
+1.  Centro Hospitalar Universitário do Porto, EPE
+2.  Centro Hospitalar Universitário Lisboa Central, EPE
+3.  Centro Hospitalar e Universitário de Coimbra, EPE
+4.  Centro Hospitalar Universitário de São João, EPE
+5.  Hospital de Braga, EPE
+6.  Centro Hospitalar Universitário de Lisboa Norte, EPE
 
 ## Covariação
 
-A variação é o comportamento em relação a uma variável.
-A covariação é a tendência dos valores de uma varíavel estarem relacionados
+A variação é o comportamento em relação a uma variável. A covariação é a
+tendência dos valores de uma varíavel estarem relacionados
 
-Nesta aula iremos apenas uma forma de o fazer graficamente com um scatterplot com os dados de 2016.
+Nesta aula iremos apenas uma forma de o fazer graficamente com um
+scatterplot com os dados de 2016.
 
 ```{r}
 
@@ -538,7 +581,9 @@ ggplot(data = inpatient_hospital_lite |> filter(periodo<"2016-01-01"),
   theme_minimal()
 
 ```
-Parece existir uma tendência positiva entre os doentes saidos e os dias de internamentos.
+
+Parece existir uma tendência positiva entre os doentes saidos e os dias
+de internamentos.
 
 # FERRAMENTAS DE EXPLORAÇÃO RÁPIDA
 
@@ -548,11 +593,11 @@ Para um EDA mais eficiente existem já pacotes criados como o Skimr.
 
 Este pacote calcula logo:
 
-- Número de dados em falta
-- Média
-- Mediana
-- Desvio-Padrão
-- Q0, Q25, Q50, Q75 e Q100
+-   Número de dados em falta
+-   Média
+-   Mediana
+-   Desvio-Padrão
+-   Q0, Q25, Q50, Q75 e Q100
 
 ```{r}
 
@@ -582,9 +627,11 @@ inpatient_hospital_lite |>
 
 ## DataExplorer
 
-O pacote Data Explorer tem uma função entitulada create_report que cria uma html baseado num dataset.
+O pacote Data Explorer tem uma função entitulada create_report que cria
+uma html baseado num dataset.
 
-É possível definir uma variável de reposta, como um outcome que estejamos a procura de modelar.
+É possível definir uma variável de reposta, como um outcome que
+estejamos a procura de modelar.
 
 ```{r}
 
@@ -597,8 +644,7 @@ create_report(
               )
 ```
 
+As ferramentas apenas automatizam algum código, dependo do utilizador
+para a interpretação dos dados.
 
-As ferramentas apenas automatizam algum código, dependo do utilizador para a interpretação dos dados.
-
- 
 # FIM

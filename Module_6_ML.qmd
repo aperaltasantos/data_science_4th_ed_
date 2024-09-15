@@ -1,0 +1,2210 @@
+---
+title: "Módulo 6 | Aprendizagem automática com R"
+subtitle: "Introdução ao R"
+author: "Manuel Ribeiro"
+affiliation: 
+    - Instituto Superior Técnico
+date: today
+date-format: long
+lang: pt  
+format: 
+  html:
+    smooth-scroll: true
+    toc: true
+    toc-location: right
+    embed-resources: true
+    number-sections: true
+    code_download: true
+    code-fold: show
+    fig_caption: true
+    force_captions: true
+    subtitle: ""
+    urlcolor: darkblue
+    linkcolor: darkblue
+    fig_width: 12
+    fig_height: 8
+    code-copy: true
+    always_allow_html: true
+theme:
+  light: flatly
+  dark: darkly
+execute:
+  warning: false
+  echo: true
+  message: false
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+
+```{=html}
+<style type="text/css">
+   .main-container {max-width: 100%;}
+   .row {display: flex;}
+   .column {flex: 50%;}
+</style>
+```
+
+```{r setup, echo = F, message=F, warnings = F, include=FALSE}
+knitr::opts_chunk$set(echo = F,  message=F, warnings = F)
+```
+
+```{r, echo = F, message=F, warning=F}
+library(crayon) # para palete de cores
+library(dplyr) # para pipeline
+library(kableExtra) # para tabelas
+```
+
+# INTRODUÇÃO
+
+## Machine Learning
+
+A aprendizagem automática (Machine Learning) refere-se ao desenvolvimento de algoritmos que permitem aos computadores aprenderem a partir de dados, sem serem explicitamente programados para realizar uma tarefa específica. 
+
+Estes algoritmos ajustam-se a padrões nos dados para fazer previsões ou tomar decisões com base em novos dados. A aprendizagem automática é utilizada em várias aplicações, como reconhecimento de voz, diagnósticos médicos, recomendação de produtos, entre outros.
+
+### Aprendizagem Supervisionada
+
+Na aprendizagem supervisionada, o algoritmo é treinado com um conjunto de dados rotulado, ou seja, para cada entrada, existe uma saída esperada (label). O objetivo é que o modelo consiga aprender a relação entre as variáveis de entrada (features) e a variável de saída (target), de modo a fazer previsões corretas para novos dados.
+
+Problemas de Regressão
+
+Em problemas de regressão, a variável alvo (target) é contínua, como prever preços de casas, salários ou temperatura. O objetivo do modelo é prever valores numéricos.
+
+Exemplo:
+
+	•	Prever o preço de uma casa com base em características como tamanho, localização, número de quartos, etc.
+
+Problemas de Classificação
+
+Nos problemas de classificação, a variável alvo é discreta, como categorizar emails como “spam” ou “não spam”, ou classificar um paciente como tendo ou não uma doença. O objetivo do modelo é prever a classe correta para novas observações.
+
+Exemplo:
+
+	•	Classificar se um email é spam ou não com base nas suas características.
+
+### Aprendizagem Não-Supervisionada
+
+A aprendizagem não-supervisionada trabalha com dados não rotulados. O objetivo é descobrir padrões ou estruturas escondidas nos dados sem ter uma saída pré-definida. Técnicas comuns incluem:
+
+	•	Clustering (agrupamento): Agrupa observações semelhantes em clusters (grupos).
+	•	Redução de Dimensionalidade: Simplifica o número de variáveis enquanto mantém o máximo de informação possível.
+
+Exemplo:
+
+	•	Agrupar clientes com base nos seus padrões de compra.
+
+### Bibliografia
+
+Vamos usar packages *open-source*. 
+
+Há vários bons recursos sobre os tópicos da aula. Sugiro estes:
+
+-   Gareth James et al (2023) "An Introduction to Statistical Learning with Applications in R". Springer. Disponivel online:
+    https://www.statlearning.com/ . Bem explicado, muitos exemplos R. Algum (pouco) formalismo estatistico.
+
+-   Josh Starmer. (2024, Junho 15). StatQuest \[Videos\]. YouTube.
+    https://www.youtube.com/@statquest/videos . Estatística e aprendizagem automática apresentados de forma simples, clara e rigorosa.
+
+# Aprendizagem Supervisionada
+
+A evolução da indústria da computação e da tecnologia criaram condições impares para acesso a grande volumes de dados na generalidade das áreas de ciências e indústria. Como resultado surgiu a necessidade de desenvolver ferramentas capazes de nos ajudar a processar esses dados para os compreender, detectar padrões, fazer previsões.
+
+```{r industria, eval = F, echo = F, fig.cap="Mariomassone. (2015). European grey wolf, Prague Zoo [Photograph]. https://en.wikipedia.org/wiki/Gray_wolf "}
+knitr::include_graphics("images/ml-evolucao.png")
+```
+
+::: {.callout-tip title="Aprendizagem automática"}
+É uma área da computação que permite ao computador aprender sem ser explicitamente programado.
+:::
+
+
+Esquema com a visão geral da aprendizagem supervisionada[^module_6_ml-1]
+
+[^module_6_ml-1]: Adapt. de Kilian Weinberger 2017
+
+```{r visao-learn, echo=FALSE, fig.align='left', fig.cap="Visão tradicional vs aprendizagem supervisionada", out.width = '50%'}
+knitr::include_graphics("images/overview2.png")
+```
+
+O processo de aprendizagem supervisionada evolui com o treino. Os
+algoritmos aprendem (ou treinam) uma função $f$ com o dataset de treino, que tem dados de input ($x$) e de output ($y$), para depois fazerem previsões (com novos dados de input $x$).
+
+```{r fxy, echo=FALSE, eval = F, fig.align = "left", fig.cap="Algoritmo como função que estabelece a ligação entre x e y", out.width = '30%'}
+knitr::include_graphics("images/xyz.png")
+```
+
+```{r suplearn_schema, eval = T, echo=FALSE,fig.cap="Pipeline clássico em aprendizagem automática supervisionada", out.width = '60%', fig.align='left'}
+knitr::include_graphics("images/suplearn_schema.png")
+```
+
+Quanto mais treinam, melhor desempenham a tarefa de fazer previsões. O treino faz-se com técnicas de validação cruzada.
+
+### Regressão
+
+Quando $y$ é quantitativa estamos perante um problema de regressão.
+
+Suponha que queremos usar um algoritmo de aprendizagem automática para prever a pressão arterial sistólica esperada de pacientes, a partir da sua idade. Para um algoritmo ser capaz de aprender e prever com exatidão, precisa aprender com exemplos.
+
+A base de dados do hospital fornece um conjunto de exemplos de doentes para os quais se registaram os dados:
+
+-   $y$, pressão arterial sistólica.
+-   $x_1$, idade do paciente.
+-   $x_2$, peso do paciente.
+
+Os dados destes doentes servirão para aprender uma função para prever a pressão em novos doentes.
+
+```{r press-sist, echo = F, warning = F, message=F, out.width = '70%'}
+
+library(ggplot2)
+
+# pressao = c(132, 143, 153, 162, 154, 168, 137, 149, 159, 128, 166)
+# idade = c(52, 59, 67, 73, 64, 74, 54, 61, 65, 46, 72)
+# peso = c(78, 83, 88, 96, 89, 100,  85, 85, 94, 76, 98)
+
+
+pressao = c(132, 143, 153, 162, 154, 168)
+idade = c(52, 59, 67, 73, 64, 74)
+peso = c(78, 83, 88, 96, 89, 100)
+id <- 1:6
+  
+dt = data.frame(id, pressao, idade, peso)
+breaks = c(seq(50, 76, by=3))
+# and labels
+# labels = c(as.character(breaks[-4]), 14.2)
+labels = c(as.character(breaks))
+
+s1 <- ggplot(dt, aes(idade,+pressao))+
+  geom_point(size =3) +
+  scale_x_continuous(limits = c(50, 76), breaks = breaks, labels = labels) +
+  xlab("Idade (anos)") + 
+  ylab("Pressão arterial sistólica (mmHg)")
+
+s1
+```
+
+```{r datapress, echo=FALSE}
+head(dt) %>% knitr::kable() 
+```
+
+Neste dataset, a idade e o peso são preditores $\mathbf{x}$ (ou
+*features*, *input features*) e a pressão arterial é a resposta $y$ (ou *outcome*, *output*). Poderiamos experimentar treinar uma regressão linear ($f$) para mapear a relação entre os preditores e a resposta.
+
+### Classificação
+
+Quando $y$ é qualitativa, categórica (ordinal ou nominal) estamos
+perante um problema de classificação.
+
+Imagine que o registo oncológico forneceu-nos o dataset seguinte para treinarmos uma função capaz de prever (com muita precisão) se um tumor ($y$) é maligno ou benigno a partir do seu tamanho e da idade do paciente ($\mathbf{x}$):
+
+```{r exemplo-tumor, echo = F, warning = F, message=F, out.width = '70%'}
+
+library(ggplot2)
+
+set.seed(10347)
+x1 <- rnorm(mean = 2, 3)
+set.seed(34212)
+x2 <- rnorm(mean = 5, 3)
+set.seed(99211)
+y1 <- rnorm(mean = 55, sd = 5, 3)
+set.seed(38291)
+y2 <- rnorm(mean = 54, sd = 4, 3)
+
+id <- 1:6
+tamanho <-round(c(x1,x2),1)
+idade <-round(c(y1, y2),1)
+tumor <- c(1, 1, 1, 2, 2, 2)
+
+dftipo <- data.frame(id, tamanho,idade,tumor) 
+dftipo$tumor <- factor(tumor, labels = c("Benigno", "Maligno"))
+
+s2 <-ggplot(dftipo, aes(tamanho, idade))+
+  geom_point(aes(color=tumor), size = 3) + 
+  # geom_point(aes(x = 4, y = 5), size = 3) + 
+  # annotate(geom = "text", x = 5, y = 5, label = "?", 
+  #          color = "grey22", size = 6) +
+  scale_color_manual(name = "Tumor", values = c("blue", "red")) +
+  xlab("Tamanho") + 
+  ylab("Idade") 
+  # theme(legend.position = "top")
+
+s2
+```
+
+```{r datatumor, echo=FALSE}
+head(dftipo) %>% knitr::kable() 
+```
+
+A resposta (tipo de tumor) é uma variável do tipo categórica (neste caso com duas categorias, "Benigno" ou "Maligno"), estamos perante um problema de classificação.
+
+### Bias-variance trade-off
+
+Entre as funções e algoritmos usados em aprendizagem, nenhuma é
+melhor que outras. Num dataset particular, um algoritmo pode
+funcionar melhor, mas outro algoritmo pode ser melhor noutro dataset semelhante.
+
+::: {.callout-important title="Bias-Variance trade-off"}
+É um dos desafios mais importantes em aprendizagem automática. O sucesso de qualquer método de aprendizagem depende da escolha correta de um algoritmo com flexibilidade adequada. Neste contexto é essencial compreender os conceitos de viés e de variância.
+:::
+
+Para o processo de aprendizagem especificamos uma função que nos pareça apropriada e treinamos a função com os dados. O treino é acompanhado por uma medida de erro, que reflete o desempenho da função. Vamos falar de duas frequentemente usadas em problemas de regressão e de classificação (respectivamente):
+
+a.  MSE (*Mean Squared Error*, Erro Quadrático Médio)
+b.  ER (*Error Rate*, Taxa de Erro)
+
+Estas medidas de desempenho são usadas para escolher o algoritmo que erra menos. A escolha deve recair num que capte a informação relevante dos dados e não capte o ruído associado. Encontrar a região ou o ponto certo (*sweet spot*) passa por encontrar o ponto onde o viés e a variância da função minimizam o valor de MSE\|ER - *bias-variancetradeoff*.
+
+::: {.callout-important title="Ajustamento"}
+Quando não capta a informação relevante (variância) dos dados diz-se que a função está sub-ajustada (*underfitted*). Quando a função é demasiado especifica (ou complexa) e por isso não conseguirá prever com precisão a resposta em dados de teste, diz-se que a função está sobre-ajustada (*overfitted*).
+:::
+
+Nas sub-secções seguintes vamos ver estes conceitos com um exemplo de regressão e outro de classificação.
+
+#### Regressão
+
+Suponha que queremos prever a intensidade da dor (medida numa escala quantitativa) causada por uma doença especifica, a partir da idades dos doentes. Temos um dataset com 40 doentes de diferentes idades ($x$), onde se registou a intensidade da dor ($y$) e vamos treinar um função que mapeie a relação entre a idade (preditor) e a intensidade (resposta). Os dados estão projectados no gráfico de dispersão seguinte:
+
+```{r fgen-poly, echo = F, warning=F, message=F, fig.cap="Gráfico de dispersão"}
+
+f = function(x) {
+  x^4
+}
+
+get_sim_data = function(f, sample_size = 100) {
+  x = runif(n = sample_size, min = 0, max = 1)
+  y = f(x) + rnorm(n = sample_size, mean = 0, sd = 0.1)
+  data.frame(x, y)
+}
+```
+
+```{r splitdata-poly, echo = F, warning=F, message=F}
+require(gridExtra)
+
+# dataset de dados simulados f(x) = x^2 + er, er ~ N(0,0.09)
+set.seed(101330)
+sim_data = get_sim_data(f, sample_size = 34)
+
+# datasets
+set.seed(992030)
+idtt <-  sample(1:34,17)
+sim_treino <- sim_data[idtt,]
+sim_teste <- sim_data[-idtt,] 
+
+sim_data$dataset <- "treino"
+sim_data[-idtt,"dataset"]<- "teste"
+
+# plot inicial
+ggplot(sim_data, aes(x=x, y=y)) +
+  geom_point(size = 2) +
+  coord_fixed(xlim = c(0,1), ylim=c(-.5,1))+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+
+```
+
+Vamos fingir por momentos que somos Deus, e sabemos que a verdadeira relação entre a idade e a intensidade da dor tem esta forma: $$f(x)=x^4+ \epsilon$$ 
+
+O gráfico da função é assim:
+
+```{r plot-deus, echo = F}
+# plot inicial
+ggplot(sim_data, aes(x=x, y=y)) +
+  geom_point(size = 2) +
+  stat_smooth(method='lm', se = F, formula = y~poly(x,4), colour = "red") +
+  coord_fixed(xlim = c(0,1), ylim=c(-.5,1))+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+
+```
+
+Vemos que os pontos não se sobrepõem exatamente à linha (função). 
+Isto acontece porque há outros factores que não controlamos e que interferem na relação (ruído).
+
+Vamos agora "voltar à Terra", imaginar que não sabemos a formula que exprime a relação entre a idade e a intensidade da dor.
+
+Vamos usar os dados para aprender uma função capaz de prever a forma da relação. A primeira coisa que vamos fazer é dividir (aleatoriamente) o dataset em 2 partições, treino e teste (ou validação):
+
+```{r plotsplit-poly, echo = F, warning=F, message=F}
+# plot inicial
+ggplot(sim_data, aes(x=x, y=y, colour = dataset)) +
+  geom_point(size = 2) +
+  coord_fixed(xlim = c(0,1), ylim=c(-.5,1))+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+```
+
+E vamos treinar 3 polinómios com os dados de treino que depois usaremos os dados de teste para medir o erro ou precisão:
+
+-   A: Polinómio de grau 1
+-   B: Polinomio de grau 3
+-   C: Polinómio de grau 12
+
+Estes polinómios distinguem-se pelo número de parametros a estimar. O que pretendemos é encontrar a função que minimiza o MSE. Vejamos os resultados obtidos:
+
+```{r plot-tr-polys, echo = F, warning=F, message=F}
+# fit
+fit_1 = lm(y ~ poly(x, degree = 1), data = sim_treino)
+fit_2 = lm(y ~ poly(x, degree = 3), data = sim_treino)
+fit_3 = lm(y ~ poly(x, degree = 12), data = sim_treino)
+
+minx <- range(sim_data$x)[1]
+maxx <- range(sim_data$x)[2]
+
+m1 <- data.frame(x = seq(minx,maxx,length = 1000), y = predict(fit_1, newdata = data.frame(x=seq(minx,maxx,length = 1000))))
+
+m2 <- data.frame(x = seq(minx,maxx,length = 1000), y = predict(fit_2, newdata = data.frame(x=seq(minx,maxx,length = 1000))))
+
+m3 <- data.frame(x = seq(minx,maxx,length = 1000), y = predict(fit_3, newdata = data.frame(x=seq(minx,maxx,length = 1000))))
+
+# treino
+p1 <- ggplot(sim_data, aes(x=x, y=y)) +
+  ggtitle("A - Poly(1)") +
+  geom_point(data = sim_treino, aes(x=x, y=y), size = 2, colour = "#00BFC4") +
+  geom_line(data= m1, aes(x = x, y = y),colour="black") +
+  coord_fixed(xlim = c(0,1), ylim=c(-.5,1))+
+  theme(plot.margin=grid::unit(c(0,0,0,0), "mm"),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+
+p2 <- ggplot(sim_data, aes(x=x, y=y)) +
+  ggtitle("B - Poly(3)") +
+  geom_point(data = sim_treino, aes(x=x, y=y),size = 2, colour = "#00BFC4") +
+  geom_line(data= m2, aes(x = x, y = y), colour="black") +
+   coord_fixed(xlim = c(0,1), ylim=c(-.5,1))+
+  theme(plot.margin=grid::unit(c(0,0,0,0), "mm"),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+
+p3 <- ggplot(sim_data, aes(x=x, y=y)) +
+  ggtitle("C - Poly(12)") +
+  geom_point(data = sim_treino, aes(x=x, y=y), size = 2, colour = "#00BFC4") +
+  geom_line(data= m3, aes(x = x, y = y), colour="black") +
+   coord_fixed(xlim = c(0,1), ylim=c(-.5,1))+
+  theme(plot.margin=grid::unit(c(0,0,0,0), "mm"),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+
+# teste
+p4 <- ggplot(sim_data, aes(x=x, y=y)) +
+  ggtitle("A' - Poly(1)") +
+  geom_point(data = sim_teste, aes(x=x, y=y),size = 2, colour = "#F8766D") +
+  geom_line(data= m1, aes(x = x, y = y), colour="black") +
+   coord_fixed(xlim = c(0,1), ylim=c(-.5,1))+
+  theme(plot.margin=grid::unit(c(0,0,0,0), "mm"),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+
+
+p5 <- ggplot(sim_data, aes(x=x, y=y)) +
+  ggtitle("B' - Poly(3)") +
+  geom_point(data = sim_teste, aes(x=x, y=y), size = 2, colour = "#F8766D")+
+  geom_line(data= m2, aes(x = x, y = y), colour="black")+
+   coord_fixed(xlim = c(0,1), ylim=c(-.5,1))+
+  theme(plot.margin=grid::unit(c(0,0,0,0), "mm"),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+
+p6 <- ggplot(sim_data, aes(x=x, y=y)) +
+  ggtitle("C' - Poly(12)") +
+  geom_point(data = sim_teste, aes(x=x, y=y), size = 2, colour = "#F8766D")+
+  geom_line(data= m3, aes(x = x, y = y), colour="black")+
+   coord_fixed(xlim = c(0,1), ylim=c(-.5,1))+
+  theme(plot.margin=grid::unit(c(0,0,0,0), "mm"),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+```
+
+```{r plot-arrange-tr-polys, echo = F}
+grid.arrange(p1, p2, p3, ncol=3)
+```
+
+A primeira função (A) ajusta uma recta aos dados de treino. As segunda (B) e terceira (C) ajustam-se melhor. Indo de A para C observamos que as funções se tornam cada vez mais flexiveis, i.e., "captam" cada vez melhor a variabilidade, aproximando cada vez mais a linha aos dados de treino.
+
+::: {.callout-warning title="Quiz"}
+Olhando para os gráficos (A,B,C), qual das funções parece melhor para prever?
+:::
+
+O erro de treino, $\varepsilon$, é dado pela distância vertical entre oponto e a linha. 
+
+$$
+\varepsilon = \text{valor observado}-\text{valor previsto}
+$$ 
+
+A média do somatório do quadrado dos erros de treino dá-nos o MSE. 
+
+$$
+\text{MSE} = \frac{1}{n}\sum\varepsilon^2
+$$
+
+Aqui, o MSE é de treino pois é quantificado nos dados de treino. No gráfico seguinte vemos o MSE de treino estimado para as três funções.
+
+```{r plot-mse-tr-polys, echo = F,out.width="70%"}
+
+mse1 <- round(mean((predict(fit_1, newdata = sim_treino) - sim_treino$y)^2),5)
+mse2 <- round(mean((predict(fit_2, newdata = sim_treino) - sim_treino$y)^2),5)
+mse3 <- round(mean((predict(fit_3, newdata = sim_treino) - sim_treino$y)^2),5)
+
+dfet <- data.frame(Flex = c(1,2,3), Algoritmo = c("A","B", "C"), MSE = c(mse1, mse2, mse3))
+# dfet %>% knitr::kable() 
+
+ggplot(dfet, aes(x = Flex, y = MSE), group = Algoritmo) +
+  # geom_bar(stat = "identity", position = "dodge")
+  geom_line() +
+  geom_point(aes(colour=Algoritmo), size = 5) +
+  theme(plot.margin=grid::unit(c(0,0,0,0), "mm")) +
+  # theme(axis.title.x=element_blank(),
+  #       axis.text.x=element_blank(),
+  #       axis.ticks.x=element_blank(),
+  #       axis.text.y=element_blank(),
+  #       axis.ticks.y=element_blank(),
+  #       ) +
+  scale_x_discrete(labels=c('A', 'B', 'C'))
+```
+
+O MSE baixa à medida que a função é mais complexa (tem mais parâmetros).
+
+O polinómio A nunca conseguirá captar a forma curva da relação entre idade e intensidade da dor (*underfitted*). Tem um viés elevado. O polinómio C tem o viés menor, pois a aproximação aos pontos é a elevada (entre as 3 funções).
+
+::: {.callout-important title="Viés"}
+Viés refere-se ao erro introduzido por aproximarmos um problema complexo com uma função demasiado simples.
+:::
+
+Será razoável perguntar nesta altura, porque não escolhemos a função mais flexivel se esta capta melhor a variabilidade? A resposta é simples: não estamos interessados em prever a intensidade da dor nos pacientes para os quais já conhecemos a intensidade da dor. Estamos sim interessados em prever a intensidade da dor em pacientes futuros.
+
+Então como se comportarão então as funções ajustadas com novos dados?
+
+Vamos obter uma estimativa com os dados de teste:
+
+```{r plot-arrange-ts-polys, echo = F, warning=F, message=F}
+grid.arrange(p4, p5, p6, ncol=3)
+
+# grid.arrange(p1, p4, ncol=2)
+# grid.arrange(p2, p5, ncol=2)
+# grid.arrange(p3, p6, ncol=2)
+
+sse1 <- sum((predict(fit_1, newdata = sim_teste) - sim_teste$y)^2)
+sse2 <- sum((predict(fit_2, newdata = sim_teste) - sim_teste$y)^2)
+sse3 <- sum((predict(fit_3, newdata = sim_teste) - sim_teste$y)^2)
+```
+
+O MSE de teste devolve o seguinte resultado:
+
+```{r plot-mse-ts-polys, echo = FALSE, out.width="70%"}
+
+mse4 <- round(mean((predict(fit_1, newdata = sim_teste) - sim_teste$y)^2),5)
+mse5 <- round(mean((predict(fit_2, newdata = sim_teste) - sim_teste$y)^2),5)
+mse6 <- round(mean((predict(fit_3, newdata = sim_teste) - sim_teste$y)^2),5)
+
+dfets <- data.frame(Flex = c(1,2,3), Algoritmo = c("A","B", "C"), MSE = c(mse4, mse5, mse6))
+# dfet %>% knitr::kable() 
+
+ggplot(dfets, aes(x = Flex, y = MSE), group = Algoritmo) +
+  # geom_bar(stat = "identity", position = "dodge")
+  geom_line() +
+  geom_point(aes(colour=Algoritmo), size = 5) +
+  # theme(axis.title.x=element_blank(),
+  #       axis.text.x=element_blank(),
+  #       axis.ticks.x=element_blank(),
+  #       axis.text.y=element_blank(),
+  #       axis.ticks.y=element_blank(),
+  #       ) +
+  scale_x_discrete(labels=c("A'", "B'", "C'"))
+```
+
+Com dados novos o polinómio grau três (B) é o que apresenta menor MSE.
+
+Consegue captar a informação mais importante, a forma curva da relação e representa um bom compromisso entre tem um viés e a variáncia (*bias-variance trade-off*). O polinómio de grau um (A) apresenta um MSE superior porque terá um viés elevado.
+
+Finalmente, o polinómio de grau 12 (C) apresenta o MSE mais elevado porque terá maior variância.
+
+::: {.callout-important title="Variância"}
+A variância refere-se ao quanto teria de mudar a função, se a
+ajustássemos a um novo dataset de treino.
+:::
+
+Regra geral, à medida que a função se torna mais flexivel, o viés
+diminui e a variância aumenta. Até certo ponto, o viés diminui e o MSE de teste também. Mas a partir de certo ponto, aumentar a flexibilidade já não reduz o viés de forma relevante, mas tende a aumentar muito a variância, e leva a que o MSE de teste comece a subir. O algoritmo entra em sobre-ajustamento (overfitting). Nos dados de treino o MSE é cada vez mais baixo.
+
+```{r img-biasvar, echo=FALSE, fig.cap="Fonte: Hastie, Trevor et al. *The Elements of Statistical Learning*. New York :Springer, 2008 ", out.width = '70%'}
+knitr::include_graphics("images/train_test_error.png")
+```
+
+#### Classificação {#sec-classificacao}
+
+No caso de problemas de classificação, lidamos com respostas ($y$) qualitativas. Uma medida de erro usual para os classificadores é a taxa de erro: 
+
+$$
+\begin{split}
+\mathrm{ER} &=\frac{1}{n}\cdot\sum I, \quad I=\begin{cases}
+      0, & y_i =  \hat{f}(x_i) \\
+      1, & y_i\ne \hat{f}(x_i)
+    \end{cases} \\
+\end{split}
+$$
+
+```{r ndata-knn, echo = F}
+n = 120
+```
+
+Para prever se um tumor é maligno ou benigno ($y$) a partir do seu tamanho e da idade do paciente ($\mathbf{x}$) vamos usar um dataset ($n= `r n`$) e treinar um algoritmo de classificação simples (e surpreendentemente eficaz), o $k$-NN (k-vizinhos mais próximos).
+
+```{r gendata-knn, echo = F}
+
+n0 = ceiling(n/2) - 14
+n1 = n - n0
+
+set.seed(34121302)
+x0_ <- round(rnorm(n0, mean = 3, sd = 1),1)
+set.seed(19522208)
+x1_ <- round(rnorm(n1, mean = 5, sd = 1),1)
+x1 <- c(x0_,x1_)
+x1 <- as.numeric(scale(x1))
+
+set.seed(12123505)
+z0 <- round(rnorm(n0, mean = 2, sd = 1),1)
+set.seed(20231167)
+z1 <- round(rnorm(n1, mean = 4, sd = 1),1)
+x2 <- c(z0, z1)
+x2 <- as.numeric(scale(x2))
+
+y <- c(rep(0,n0), rep(1,n1))
+labcol <- c(rep("grey", n0),rep("blue", n1))
+df <- data.frame(y,x1, x2)
+
+dfx <- df[,c("x1","x2")]
+dfy <- as.factor(df[,"y"])
+
+ngrid = 5*n # dim grid (linhas + colunas)
+
+xrange <- seq(from = range(x1)[1]-1, to = range(x1)[2]+1, length = ngrid)
+zrange <- seq(from = range(x2)[1]-1, to = range(x2)[2]+1, length = ngrid)
+gridxz <- expand.grid(xrange,zrange)
+names(gridxz) <- c("x1","x2")
+
+dftipo2 <- data.frame(tamanho = df[,2], idade = df[,3], tumor = as.factor(df[,1]))
+dftipo2$tumor <- factor(dftipo2$tumor, labels = c("Benigno", "Maligno"))
+
+# distribuição respostas
+nabs <- table(dftipo2$tumor)
+nrel <- table(dftipo2$tumor)/nrow(dftipo2)
+
+# plot
+ggplot(dftipo2, aes(tamanho, idade))+
+  geom_point(aes(color=tumor), size = 3) + 
+  scale_color_manual(name = "Tumor", values = c("blue", "red")) +
+  xlab("Tamanho") + 
+  ylab("Idade") +
+  coord_fixed()+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+
+```
+
+O dataset tem uma distribuição 'equilibrada' entre tumores malignos ($n=`r nabs[2]`$, `r round(nrel[2]*100)`%) e benignos ($n=`r nabs[1]`$,`r round(nrel[1]*100)`%).
+
+```{r splitdata-knn, echo = F}
+
+# conjunto de validação
+# datasets treino e teste
+set.seed(211210)
+idtr <-  sample(1:n,ceiling(n/2))
+knn_treino <- dftipo2[idtr,]
+knn_teste <- dftipo2[-idtr,]
+```
+
+A estratégia do algoritmo passa por classificar um novo tumor na classe mais comum entre os $k$ vizinhos mais próximos. Como em todos os algoritmos de aprendizagem, vamos começar por dividir aleatoriamente o dataset em dados de treino ($n_{tr}= `r nrow(knn_treino)`$) e dados de teste ($n_{ts}=`r nrow(knn_teste)`$):
+
+```{r plotsplit-knn, echo = F}
+
+dftipo2$dataset <- "Treino"
+dftipo2[-idtr,"dataset"]<- "Teste"
+dftipo2$name <- paste0(dftipo2$tumor, "-", dftipo2$dataset)
+
+# legenda
+scale_map <- data.frame(name = c("Benigno-Teste", "Benigno-Treino","Maligno-Teste", "Maligno-Treino"),
+                        color = c("blue",  "blue","red", "red"),
+                        shape = c(3, 19, 3, 19))
+
+
+# plot inicial
+ggplot(dftipo2, aes(x=tamanho, y=idade, color = name, shape = name)) +
+  geom_point(size = 3) + 
+  scale_color_manual(values = scale_map$color, labels = scale_map$name,
+                     name = "Tumor") + 
+  scale_shape_manual(values = scale_map$shape, labels = scale_map$name,
+                     name = "Tumor") +
+  coord_fixed()+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+
+```
+
+Vamos treinar o algoritmo, com diferentes valores para $k$ e depois estimamos a exatidão (*accuracy*) ou o erro (1-*accuracy*) nos dados de teste. Nos gráficos seguintes, ilustram-se os resultados para $k=1$, $k=11$ e $k=41$.
+
+::: {.callout-note title="Hiperparâmetros"}
+Alguns modelos ou parâmetros não podem ser estimados directamente dos dados. Designam-se por hiperparâmetros e são "afinados" (*tuned*) por métodos de validação cruzada (sub-secção seguinte). O número de vizinhos num modelo $k$-NN é um desses parâmetros.
+:::
+
+Em cada gráfico, a região azul é a zona onde novas observações (dados de teste) serão classificadas como tumores benignos e a região vermelha a zona onde serão classificadas como tumores malignos. Designam-se por regiões de decisão e são delimitadas pela fronteira de decisão.
+
+O classificador $k$-NN com $k=1$ devolveu o resultado seguinte.
+
+```{r knn1, echo = F}
+library (class)
+
+k =1
+knnpred <- class::knn(train = knn_treino[,1:2],
+                      test = gridxz,
+                      cl = knn_treino[,3],
+                 k = k, prob=TRUE)
+prob <- attr(knnpred, "prob")
+prob <- ifelse(knnpred=="Maligno", 1, 0)
+
+prob01 <- matrix(prob, ngrid, ngrid)
+prob01df <- reshape2::melt(prob01)
+prob01df$value <- as.factor(prob01df$value)
+prob01df$value <- factor(prob01df$value, labels = c("Benigno", "Maligno"))
+prob01df[,1:2]<- gridxz
+prob01df[,4]<- k
+names(prob01df)[4] <-"k"
+```
+
+```{r plot-tr-knn1, echo = F}
+# dados treino
+pk1tr <- ggplot(prob01df, aes(x = Var1, y = Var2)) +
+  geom_raster(aes(fill=value), show.legend= F) +
+  scale_fill_manual(values = alpha(c( "blue","red"), .2)) +
+  geom_point(data = knn_treino, aes(x=tamanho, y=idade, color=tumor), size = 3) +
+  scale_color_manual(name = "Tumor (treino)", values = c("blue", "red")) +
+  xlab("Tamanho") +
+  ylab("Idade") +
+  coord_fixed()+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+pk1tr
+```
+
+A fronteira de decisão apresenta-se muito recortada, com forma
+não-linear.
+
+::: {.callout-warning title="Quiz"}
+Qual a taxa de erro nos dados de treino com classificador $1$-nn?
+:::
+
+Será que este classificador acertará muitas vezes quando classificar novas observações? Vamos projectar os dados de teste nas regiões definidas e ver quantas vezes os dados são mal classificados:
+
+```{r plot-ts-knn1, echo = F}
+# dados teste
+pk1te <- ggplot(prob01df, aes(x = Var1, y = Var2)) +
+  geom_raster(aes(fill=value), show.legend= F) +
+  scale_fill_manual(values = alpha(c( "blue","red"), .2)) +
+  geom_point(data = knn_teste, aes(x=tamanho, y=idade, color=tumor), size = 3, shape = 3) +
+  scale_color_manual(name = "Tumor (teste)", values = c("blue", "red")) +
+  xlab("Tamanho") +
+  ylab("Idade") +
+  coord_fixed()+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+pk1te
+
+# grid.arrange(pk1tr,pk1te, ncol = 2)
+```
+
+
+
+```{r txerro-knn1, echo = F, results = 'hide'}
+
+te_knn1 <- class::knn(train = knn_treino[,1:2],
+                      test = knn_teste[,1:2],
+                      cl = knn_treino[,3],
+                 k = k, prob=TRUE)
+
+err_knn1 <- 1 - round(mean(te_knn1 == knn_teste$tumor),2)
+
+f_knn1 <- as.numeric(table(te_knn1 == knn_teste$tumor)[1])
+v_knn1 <- as.numeric(table(te_knn1 == knn_teste$tumor)[2])
+knn1k <- k
+
+```
+
+
+
+O classificador cometeu erros de classificação em `r f_knn1` observações de teste (ER = `r err_knn1`). Vamos afinar classificador com $k=11$ e $k=41$ e avaliar os erros com dados de teste.
+
+O gráfico seguinte ilustra o resultado da projecção dos dados de teste (não usados para afinar o valor de $k$) nas regiões e fronteiras de decisão obtidas com $k=11$ e $k=41$.
+
+```{r knn11, echo = F}
+
+k =11
+knnpred <- class::knn(train = knn_treino[,1:2], test = gridxz, 
+                      cl = knn_treino[,3], k = k, prob=TRUE)
+prob <- attr(knnpred, "prob")
+prob <- ifelse(knnpred=="Maligno", 1,0)
+prob01 <- matrix(knnpred, ngrid, ngrid)
+prob01df2 <- reshape2::melt(prob01)
+prob01df2[,1:2]<- gridxz
+prob01df2[,4]<- k
+names(prob01df2)[4] <-"k"
+```
+
+```{r plot-tr-knn11, echo = F}
+# dados treino
+pk3tr <- ggplot(prob01df2, aes(x = Var1, y = Var2)) +
+  geom_raster(aes(fill=value), show.legend= F) +
+  scale_fill_manual(values = alpha(c( "blue","red"), .3)) +
+  geom_point(data = knn_treino, aes(x=tamanho, y=idade, color=tumor), size = 3) +
+  scale_color_manual(name = "Tumor (teste)", values = c("blue", "red")) +
+  xlab("Tamanho") +
+  ylab("Idade") +
+  coord_fixed()+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+       )
+```
+
+```{r plot-ts-knn11, echo = F}
+# dados teste
+pk3te <- ggplot(prob01df2, aes(x = Var1, y = Var2)) +
+  geom_raster(aes(fill=value), show.legend= F) +
+  scale_fill_manual(values = alpha(c( "blue","red"), .2)) +
+  geom_point(data = knn_teste, aes(x=tamanho, y=idade, color=tumor), size = 3, shape = 3) +
+  scale_color_manual(name = "Tumor (teste)", values = c("blue", "red")) +
+  xlab("Tamanho") +
+  ylab("Idade") +
+  coord_fixed()+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+# pk3te
+
+# grid.arrange(pk3tr,pk3te, ncol = 2)
+
+```
+
+```{r taxaerro-knn11, echo = F, results = 'hide'}
+te_knn3 <- class::knn(train = knn_treino[,1:2], test = knn_teste[,1:2],
+                      cl = knn_treino[,3], k = k, prob=TRUE)
+
+err_knn3 <- 1 - round(mean(te_knn3 == knn_teste$tumor),2)
+f_knn3 <- as.numeric(table(te_knn3 == knn_teste$tumor)[1])
+v_knn3 <- as.numeric(table(te_knn3 == knn_teste$tumor)[2])
+knn3k <- k
+```
+
+```{r knn41, echo = F }
+
+k =41
+
+knnpred <- class::knn(train = knn_treino[,1:2],
+                      test = gridxz,
+                      cl = knn_treino[,3],
+                 k = k, prob=TRUE)
+prob <- attr(knnpred, "prob")
+prob <- ifelse(knnpred=="Maligno", 1,0)
+prob01 <- matrix(prob, ngrid, ngrid)
+prob01df3 <- reshape2::melt(prob01)
+prob01df3$value <- as.factor(prob01df3$value)
+prob01df3$value <- factor(prob01df3$value, labels = c("Benigno", "Maligno"))
+prob01df3[,1:2]<- gridxz
+prob01df3[,4]<- k
+names(prob01df3)[4] <-"k"
+```
+
+```{r plot-tr-knn41, echo = F }
+
+# dados treino
+pktr5 <- ggplot(prob01df3, aes(x = Var1, y = Var2)) +
+  geom_raster(aes(fill=value), show.legend= F) +
+  scale_fill_manual(values = alpha(c( "blue"), .3)) +
+  geom_point(data = knn_treino, aes(x=tamanho, y=idade, color=tumor), size = 3) +
+  scale_color_manual(name = "Tumor (treino)", values = c("blue")) +
+  xlab("Tamanho") +
+  ylab("Idade") +
+  coord_fixed()+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        )
+```
+
+```{r plot-ts-knn41, echo = F}
+
+# dados teste
+pkts5 <- ggplot(prob01df3, aes(x = Var1, y = Var2)) +
+  geom_raster(aes(fill=value), show.legend= F) +
+  scale_fill_manual(values = alpha(c( "blue","red"), .3)) +
+  geom_point(data = knn_teste, aes(x=tamanho, y=idade, color=tumor), size = 3, shape = 3) +
+  scale_color_manual(name = "Tumor (treino)", values = c("blue", "red")) +
+  xlab("Tamanho") +
+  ylab("Idade") +
+  coord_fixed()+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+
+# grid.arrange(pk3tr,pk3te, ncol = 2)
+```
+
+```{r taxaerro-knn41, echo = F, results = 'hide'}
+
+te_knn5 <- class::knn(train = knn_treino[,1:2],test = knn_teste[,1:2],
+                      cl = knn_treino[,3], k = k, prob=TRUE)
+
+err_knn5 <- 1 - round(mean(te_knn5 == knn_teste$tumor),2)
+f_knn5 <- as.numeric(table(te_knn5 == knn_teste$tumor)[1])
+v_knn5 <- as.numeric(table(te_knn5 == knn_teste$tumor)[2])
+knn5k <- k
+```
+
+```{r teste-facets, echo = F}
+
+df_facet <- rbind(prob01df2,prob01df3)
+
+plt_facet <- ggplot(df_facet, aes(x = Var1, y = Var2)) +
+  geom_raster(aes(fill=value), show.legend= F) +
+  scale_fill_manual(values = alpha(c( "blue","red"), .3)) +
+  geom_point(data = knn_teste, aes(x=tamanho, y=idade, color=tumor), size = 1, shape = 3) +
+  scale_color_manual(name = "Tumor (teste)", values = c("blue", "red")) +
+  xlab("Tamanho") +
+  ylab("Idade") +
+  coord_fixed()+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+
+plt_facet + facet_wrap(~k, ncol = 2) 
+```
+
+Em relação a $1$-nn as regiões de decisão com $11$-nn e $41$-nn tendem a apresentar uma fronteira de decisão menos recortada, porque usam mais observações para classificar cada ponto da região. 
+
+Nos dados de teste projectados nestas regiões vêem-se algumas observações mal classificadas. A estimativa da taxa de erro de teste está ilustrada no gráfico seguinte. Os classificadores mais e menos flexiveis ($k= `r knn1k`$ e $k=`r knn5k`$, respectivamente) apresentam uma taxa mais elevada em relação ao classificador com $k$ "intermédio" ($k=`r knn3k`$). (ilustrado no gráfico seguinte).
+
+Este último responde melhor ao problema do *bias-variance trade-off* (compromisso entre o viés e a variância).
+
+```{r plot-terro-ts-knn, echo = FALSE, out.width="70%"}
+
+dfets <- data.frame(Flex = c(1,2,3), 
+                    k = c(as.factor(knn1k), 
+                          as.factor(knn3k),
+                          as.factor(knn5k)),
+                    ER = c(err_knn1, err_knn3, err_knn5))
+
+ggplot(dfets, aes(x = Flex, y = ER), group = k) +
+  # geom_bar(stat = "identity", position = "dodge")
+  geom_line() +
+  geom_point(aes(colour=k), size = 5) +
+  # theme(axis.title.x=element_blank(),
+  #       axis.text.x=element_blank(),
+  #       axis.ticks.x=element_blank(),
+  #       axis.text.y=element_blank(),
+  #       axis.ticks.y=element_blank(),
+  #       ) +
+  scale_x_discrete(labels=c(knn1k, knn3k,knn5k))
+```
+
+```{r taxaerro-table-knn, echo = F, eval = F}
+
+df_txer <- data.frame(k = c(knn1k, knn3k,knn5k), 
+                      Fa = c(f_knn1, f_knn3, f_knn5),
+                      Tr = c(v_knn1, v_knn3, v_knn5),
+                      ER = c(err_knn1, err_knn3, err_knn5))
+                      
+df_txer %>% knitr::kable() 
+```
+
+### Erro de generalização
+
+O valor esperado do erro de teste pode ser decomposto em 3 quantidades fundamentais: a variância e o viés (quadrado) da função, e a variância do erro aleatório (irredutível). A forma em U dos erros de teste que observámos nos dois exemplos são resultado de duas quantidades que competem entre si: o viés e a variância.
+
+```{r bias-var, echo=FALSE, fig.cap="Decomposição do erro de previsão", out.width = '70%', fig.align='left'}
+knitr::include_graphics('images/bias-var.png') 
+```
+
+A **variância da função**, Var($f$) refere-se à variação da função quando é ajustada a outro dataset. Quanto mais flexivel for a função, maior a variância esperada de $f$. O **viés da função**, Viés($f$), refere-se ao erro introduzido por aproximarmos um problema complexo com um modelo simples. A **variância do erro aleatório**, Var($\epsilon$), é algo que não controlamos, depende dos dados e não dos algoritmos de aprendizagem que escolhemos.
+
+### Validação {#sec-validacao}
+
+Que procedimentos temos para encontrar o ponto de equilíbrio?
+
+O ideal será termos dados teste para estimar o erro de teste.
+
+A partir de um dataset, separamos em 3 partes:
+
+1.  Dados treino,
+2.  Dados validação,
+3.  Dados teste
+
+\textcolor{red}{Ter estes três conjuntos de dados é um "luxo".}
+
+\textcolor{red}{São precisos milhões de observações!}
+
+Em datasets de menor dimensão, separamos o dataset em 2 partes:
+
+1.  Dados de treino e de validação,
+2.  Ajustamos os modelos nos dados de treino,
+3.  Medimos o erro nos dados de validação.
+
+O erro nos dados de validação é uma estimativa do erro de teste. Como vimos atrás, escolhe-se uma medida de erro que pode ser uma  das seguintes (ER para problemas de classificação e MSE para problemas de regressão):
+
+$$
+\begin{split}
+\mathrm{ER} &=\frac{1}{n}\cdot\sum_{i=1}^n I(y_i\ne \hat{y}_i), \quad I(y_i\ne\hat{y}_i)=\begin{cases}
+      0, & y_i = \hat{y_i} \\
+      1, & y_i\ne \hat{y_i}
+    \end{cases} \\
+    \mathrm{MSE} &= \frac{1}{n}\cdot\sum_{i=1}^n (y_i- \hat{y}_i)^2
+\end{split}
+$$
+
+E como podemos treinar e avaliar o desempenho de diferentes modelos? Os procedimentos habituais para estimar o erro designam-se por validação simples (que já usámos nos exemplos anteriores) ou validação cruzada:
+
+1.  Conjunto de validação
+2.  Validação cruzada (*Leave-one-out*)
+3.  Validação cruzada (*k-fold*)
+
+A **validação simples** (ou conjunto de validação) é fácil de
+implementar. Usámo-la nos *toy example*.
+
+![Esquema ilustrativo da técnica conjunto de
+validação[^module_6_ml-2]](valset.png){width="80%"}
+
+[^module_6_ml-2]: Fonte: James, Gareth et al. *An Introduction to
+    Statistical Learning with Applications in R*. New York :Springer,
+    2013
+
+[^module_6_ml-3]: Fonte: James, Gareth et al. *An Introduction to
+    Statistical Learning with Applications in R*. New York :Springer,
+    2013
+
+\color{blue}Vantagens:
+
+-   é simples e fácil de implementar
+
+\color{red}Desvantagens:
+
+-   Estimativa do erro de teste muito variável
+-   Com poucas observações tende a sobre-estimar o erro de teste
+-   'Desperdício' de observaçoes (% dados validação)
+
+No procedimento por **validação cruzada k-fold** dividimos o dataset de treino com $n$ observações em $k$ partições de dimensão igual (geralmente com $k\ll n$).
+
+![Esquema ilustrativo da técnica
+k-fold[^module_6_ml-4]](images/kfold.png){width="80%"}
+
+[^module_6_ml-4]: Fonte: James, Gareth et al. *An Introduction to
+    Statistical Learning with Applications in R*. New York :Springer,
+    2013
+
+[^module_6_ml-5]: Fonte: James, Gareth et al. *An Introduction to
+    Statistical Learning with Applications in R*. New York :Springer,
+    2013
+
+\color{blue}Vantagens (em relação ao conjunto de validação):
+
+-   Estimativa do erro tem menor risco de sobre-estimação
+
+Quando o $n$ é muito pequeno (e.g. $n=20$) podemos usar a **validação cruzada** com $k=n$, também designada por *Leave-one-out*.
+
+![Esquema ilustrativo da técnica
+LOOCV[^module_6_ml-6]](images/looc.png){width="80%"}
+
+[^module_6_ml-6]: Fonte: James, Gareth et al. *An Introduction to
+    Statistical Learning with Applications in R*. New York :Springer,
+    2013
+
+[^module_6_ml-7]: Fonte: James, Gareth et al. *An Introduction to
+    Statistical Learning with Applications in R*. New York :Springer,
+    2013
+
+\color{blue}Vantagens (em relação à validação cruzada):
+
+-   O resultado é sempre igual
+
+\color{red}Desvantagens:
+
+-   Tempo de processamento com $n$ grande (por isso só se usa quando $n$ pequeno).
+
+# Aprendizagem Não-supervisionada
+
+Esquema com a visão geral da aprendizagem não-supervisionada[^module_6_ml-8]
+
+[^module_6_ml-8]: Adapt. de Andrew Ng 2017
+
+Na aprendizagem supervisionada temos preditores (e.g. x1 e x2) uma resposta (e.g. classe 0 ou classe 1). O objectivo é aprender uma função capaz de prever a resposta com novas observações de x1 e x2.
+
+```{r nsup-intro1}
+
+set.seed(5000900)
+x01 <- rnorm(4, 3, .5)
+set.seed(5000901)
+x02 <- rnorm(4, 5, .3)
+set.seed(5000902)
+x11 <- rnorm(4, 3, .5)
+set.seed(5000903)
+x12 <- rnorm(4, 5, .3)
+
+x1 <- c(x01, x02)
+x2 <- c(x11, x12)
+Classe <- factor(c(1,1,1,1,0,0,0,0)) 
+
+df_nsup <- data.frame(x1, x2, Classe)
+
+ggplot(df_nsup, aes(x = x1, y = x2, colour = Classe)) +
+  geom_point(size = 4) + 
+  scale_color_manual(values=c("#E69F00", "#56B4E9")) +
+  ylim(2,7) +
+  xlim(1,6) +
+   coord_fixed() +
+  # theme(legend.position = "none")+
+  labs(title = "Supervisionada")
+  #       axis.title.x=element_blank(),
+  #       axis.title.y=element_blank())
+```
+
+Na aprendizagem não-supervisionada temos apenas variáveis de *input* (e.g x1 e x2), não há uma resposta *output*. O objectivo é encontrar relações ou estruturas nos dados.
+
+::: {.callout-warning title="Quiz"}
+Olhando para o gráfico seguinte, identifica alguma estrutura nos dados?
+:::
+
+Vejamos o seguinte exemplo: imaginemos que temos um dataset como o da figura seguinte, temos dados mas não nos dizem o que fazer com eles.
+
+Apesar disso, podemos analisar os dados, procurando relações ou
+estruturas subjacentes nos dados.
+
+```{r}
+ggplot(df_nsup, aes(x = x1, y = x2)) +
+  geom_point(size = 4, color = "darkgrey") + 
+  ylim(2,7) +
+  xlim(1,6) +
+  coord_equal(ratio = .8) +
+  theme(legend.position = "none") +
+  labs(title = "Não-supervisionada")
+```
+
+
+Se usarmos um algoritmo para aprendizagem não-supervisionada conhecido genericamente de *clustering*, o algoritmo irá identificar dois sub-grupos de dados (ou *clusters*), e dividir os dados em dois grupos:
+
+```{r nsup-intro3}
+ggplot(df_nsup, aes(x = x1, y = x2, group = Classe)) +
+  geom_point(size = 4, color = "darkgrey") + 
+  stat_ellipse(geom = "polygon",
+               aes(fill = Classe), 
+               alpha = 0.25) + 
+  ylim(2,7) +
+  xlim(1,6) +
+  coord_equal(ratio = .8) +
+  theme(legend.position = "none") +
+  labs(title = "Não-supervisionada")
+
+```
+
+Nesta aula vamos ver dois métodos de aprendizagem não-supervisionada:
+
+-   *análise em componentes principais (ACP)*, usada para visualização de dados ou pre-processamento em aprendizagem supervisionada.
+
+-   *clustering*, é uma família de métodos usada para encontrar
+    sub-grupos (clusters) nos dados.
+
+Se quisermos analisar uma tabela de dados com centenas de pacientes e dezenas ou centenas de variáveis ser-nos-á útil usar uma ferramenta capaz de reduzir a quantidade de informação (nr variáveis) sem perder informação relevante. Uma das ferramentas mais usadas para desempenhar essa tarefa é a ACP.
+
+Se quisermos identificar e classificar/agrupar as observações num número pequeno de classes (como no exemplo acima) podemos usar um algoritmo de *clustering*.
+
+### Análise de Componentes Principais (ACP)
+
+Vejamos um exemplo de aplicação com dados da COVID-19: para cada um dos 278 municipios de Portugal Continental, temos um dataset que contém as taxas de incidência cumulativa a 14 dias por 100 000 habitantes registadas durante 570 dias consecutivos entre Agosto 2020 e Março 2022.
+
+Na figura seguinte ilustra-se com as curvas das séries temporais (cada cor um municipio) a evolução das taxas de incidência ao longo do tempo (a curva preta representa a evolução média nacional).
+
+```{r nsup-functionaldata, echo=FALSE, fig.align = "left", fig.cap="Séries temporais dos 278 municipios. Adaptado de 'Understanding spatiotemporal patterns of COVID-19 incidence in Portugal: A functional data analysis from August 2020 to March 2022', M Ribeiro et al, 2024, PLoS ONE, 19(2): e0297772", out.width = '100%'}
+knitr::include_graphics("images/plos_serie.png")
+```
+
+A ACP foi realizada com as séries temporais para detetar padrões de evolução ao longo do tempo. Extraímos da ACP três curvas que contêm 72% da variação observada nas 278 curvas(!) correspondentes a três efeitos principais captados no periodo analisado:
+
+-   efeito global, comum a todos os municipios (PC1)
+-   efeito de prevenção, comum a municipios de incidencia baixa (PC2)
+-   efeito dos surtos, comum aos municipios de menor dimensão onde se registaram surtos (PC3)
+
+```{r nsup-acp, echo=FALSE, fig.align = "left", fig.cap="Primeiras três componentes principais. Adaptado de 'Understanding spatiotemporal patterns of COVID-19 incidence in Portugal: A functional data analysis from August 2020 to March 2022', M Ribeiro et al, 2024, PLoS ONE, 19(2): e0297772", out.width = '100%'}
+knitr::include_graphics("images/plos_Fig5.png")
+```
+
+A ACP permitiu caracterizar a evolução temporal das 278 curvas iniciais apenas com 3 curvas que captaram grande parte da variabilidade total (72%) observada nos dados originais.
+
+### Clustering
+
+Nesta mesma análise recorreu-se a um método de *clustering* (método de classificação hierarquica) para classificar os municipios de acordo com as semelhanças espaço-temporais das curvas.
+
+```{r nsup-cluster, echo=FALSE, fig.align = "left", fig.cap="M Ribeiro et al (2024) 'Understanding spatiotemporal patterns of COVID-19 incidence in Portugal: A functional data analysis from August 2020 to March 2022'. PLoS ONE, 19(2): e0297772", out.width = '100%'}
+knitr::include_graphics("images/plos_all.png")
+```
+
+Os resultados da análise com ACP e *clustering* permitiram revelar diferenças na dinâmica espaço-temporal entre:
+
+-   os municipios das regiões norte e litoral vs sul e interior
+-   efeitos ocorridos no outono-inverno 20-21 vs 21-22
+
+Embora possa parecer que estas análises complexas necessitem de muitas linhas de código para extrair as curvas principais ou para classificar todas as curvas, é possível escrever o algoritmo apenas com duas linhas de código. 
+
+# CASOS DE ESTUDO
+
+Vamos recorrer ao dataset `HeartDisease` (disponível na biblioteca `MLDataR`) para prever a existência de uma doença cardíaca a partir de dados sobre pressão sanguínea, frequência cardíaca máxima, história de angina de peito e outros preditores. 
+Os exemplos são dados de pacientes, anonimizados, disponibilizados pela British Heart Foundation.
+
+```{r MLDataR, echo=FALSE, fig.align = "left", fig.cap="https://github.com/StatsGary/MLDataR", out.width = '30%'}
+knitr::include_graphics("images/mldataR_logo.png")
+```
+
+```{r packages, echo = T}
+# Ler as bibliotecas de funções para a sessão
+library(tidymodels) 
+library(MLDataR)
+library(rpart.plot) # para plot arvore de decisao
+library(kknn)
+
+# Ler o dataset HearDisease
+df <- MLDataR::heartdisease
+```
+
+O dataset contém 9 preditores para além da variável resposta
+(`HeartDisease`) e 918 observações.
+
+```{r dataset, , echo = T}
+dim(df)
+head(df)
+```
+
+Cada linha representa um paciente que tem ou não tem doença cardiaca. O
+dataset tem informação sobre:
+
+-   `Age`, idade do paciente em anos;
+-   `Sex`, sexo do paciente;
+-   `RestingBP`, pressão sanguínea para ritmo cardíaco em repouso;
+-   `Cholesterol`, nível de colestrol no sangue;
+-   `FastingBS`, amostra de sangue de glicose após jejum (1=diabetes,
+    0=normal);
+-   `RestingECG`, indicador de infartos do miocárdio prévios;
+-   `MaxHr`, batimento cardíaco máximo;
+-   `Angina`, dor de peito causada por redução do fluxo sanguíneo;
+-   `HeartPeakReading`, leitura no pico da frequência cardiaca;
+-   `HeartDisease`, paciente com doença cardíaca (1= sim, 0= não);
+
+Vamos verificar se os tipos de dados das variáveis são adequados para representar os valores.
+
+```{r dataset-str, echo = T}
+str(df)
+```
+
+Vamos codificar as variáveis (preditores e resposta) com tipos de dados adequados. Por ex. `HearDisease` é uma variável do tipo numérico, vamos convertê-la numa variável categorica (no R designa-se por `factor`).
+
+Vamos aplicar o mesmo racional a outros casos semelhantes. Em algumas variáveis adicionamos um *label* para facilitar a leitura das classes.
+
+```{r dataset-factor, echo = T}
+df$Sex <- factor(df$Sex)
+df$FastingBS  <- factor(df$FastingBS, labels = c("Normal","Diabetes"))
+df$RestingECG  <- factor(df$RestingECG)
+df$Angina <- factor(df$Angina)
+df$HeartDisease <- factor(df$HeartDisease, labels = c("N", "Y"))
+```
+
+Nas próximas sub-secções vamos preparar os dados para o processo de aprendizagem, que passará por:
+
+-   Fase de pre-processamento (`recipes`)
+-   Especificação dos modelos,
+-   Especificar afinação (`tune`) e métodos de reamostragem
+    (`resamples`)
+
+Depois, nas secções seguintes implementaremos o processo de aprendizagem com três familias de classificadores:
+
+-   Regressão logística,
+-   $k$-nearest neighbours ($k$-NN),
+-   Random forests
+
+A regressão logística é da familia dos classificadores linear (a fronteira de decisão é linear, isto é, uma linha recta ou, no caso multivariado, um hiperplano), enquanto os restantes são da família dos classificadores não-lineares (nestes, a fronteira de decisão linear não separa as classes, é necessário um modelo não linear para as separar).
+
+Por fim usaremos as funções aprendidas para prever e obter a estimativa do erro de teste.
+
+### Análise exploratória (Exploratory Data Analysis)
+
+A análise exploratória (EDA) é essencial ao processo de modelação estatística. Vamos ver exemplos de como esta etapa nos fornece informação relevante para termos depois melhor desempenho no processo de modelação.
+
+Vamos começar por focar-nos na variável resposta. Podemos criar um gráfico de barras para ilustrar a sua distribuição.
+
+```{r explora-y-plot, echo = T}
+
+df %>%
+  count(HeartDisease) %>%
+  mutate(freq = round(n / sum(n),2)) %>%
+  mutate(cum = cumsum(freq)) %>%
+  ggplot(aes(x = "", y = freq, fill = HeartDisease, label = freq)) +
+  geom_bar(position = "stack", stat = "identity") +
+  scale_fill_viridis_d(end = .5) +
+  geom_text(aes(label = freq), position = position_stack(vjust = .95), colour = "white") +
+  labs(fill = "Heart disease")
+```
+
+
+
+
+A distribuição de `Y`e `N`é 'equilibrada'. Para modelos lineares como por ex. o modelo de regressão logística, este aspeto é muito relevante, porque se uma das classes fosse muito mais frequente (usual em casos de doenças raras) conduziria a estimativas enviesadas e a um elevado erro de generalização. Neste dataset, no entanto, esse problema não se põe.
+
+Vejamos a distribuição da resposta por sexo:
+
+```{r explora-y-sex-plot, echo = T}
+df %>% 
+  ggplot(aes(x = HeartDisease, fill = Sex)) +
+  geom_bar() +
+  scale_fill_viridis_d(end = .5)
+```
+
+Aqui observamos que o peso do sexo feminino `F` entre pacientes com doença cardíaca é menor que o peso do sexo feminino entre pacientes sem doença cardíaca. Este gráfico sugere que há diferenças na ocorrência da doença cardiaca em função do sexo.
+
+No caso de preditores contínuos podemos criar um histograma. No gráfico seguinte vemos a distribuição do batimento cardíaco máximo. O gráfico ilustra a proporção de pacientes com e sem doença cardiaca ao longo da distribuição. Vemos que até \~ 150 batimentos, a proporção de doentes cardiacos tende a ser superior à dos não cardíacos, e depois disso a tendencia inverte-se.
+
+```{r explora-y-MaxHR-plot, echo = T}
+df %>%
+  ggplot(aes(MaxHR, fill = HeartDisease)) +
+  geom_histogram(binwidth = 2) + 
+  scale_fill_viridis_d(end = .5)
+```
+
+Verificamos que os preditores analisados parecem estar bem
+correlacionados com a resposta, dando boas indicações quanto à sua capacidade preditiva.
+
+Uma análise exploratória é essencial antes de qualquer exercicio de modelação, para detetar padrões que aparentam não ser aleatórios, relações entre a resposta e os preditores considerados.
+
+### Pre-processamento {#sec-preprocessamento}
+
+Antes do treino, os dados passam por um pré-processamento para 'limpar' e transformar os dados. Estas operações são geralmente muito úteis para preparar os dados e fornecer um dataset mais adequado ao processo de aprendizagem[^module_6_ml-9]. 
+
+As necessidades de pré-processamento variam com os modelos usados.
+
+[^module_6_ml-9]: https://www.tmwr.org/pre-proc-table
+
+Neste exemplo vamos proceder à implementação de operações frequentemente necessárias e que serão implementadadas em todos os classificadores que vamo usar:
+
+-   a partição dos dados
+-   transformação de preditores qualitativos em variáveis *dummy*
+-   normalização de preditores quantitativos
+
+Vamos proceder à partição em dados de treino e dados de teste. Os dados de treino serão usados para estimar parâmetros, afinar hiperparâmetros, comparar modelos. Para assegurar que a partição honra as proporções de pacientes com e sem doença cardíaca, a partição por amostragem aleatória é estratificada. Os dados de teste ficarão "guardados numa gaveta" até ao fim do processo de treino e são usados no final para estimar o erro de generalização.
+
+```{r dataset-split, echo = T}
+
+# sempre que usamos uma função geradora de um output aleatorio, 
+# podemos usar o seeding para assegurar sempre o mesmo output (aleatorio) 
+set.seed(12399300)
+
+# initial_split() cria as partições e
+# arg strata estratifica a amostragem aleatória
+# em cada partição
+particao <- initial_split(df, strata = HeartDisease)
+
+# atribuir nome/objeto aos
+# datasets de treino e de teste
+dftr <- training(particao)
+dftt  <- testing(particao)
+```
+
+Conforme vimos em @sec-validacao podemos criarmos partições do dataset de treino para estimar o erro de validação. Vamos usar a função `vfold_cv()` para criar as ditas partições e guardar o resultado num objeto para uso nas fases de treino.
+
+```{r validacao-kfold, echo = T}
+set.seed(4800000)
+
+k_folds <- vfold_cv(dftr, v = 10, strata = HeartDisease)
+```
+
+Vamos também normalizar preditores numéricos e criar variáveis dummy para preditores categoricos. Estas operações são feitas com a função `recipe()` e as funções `step_normalize()` e `step_dummy()`. 
+
+O argumento da função inclui a formula do modelo. O simbolo `~` especifica que é uma formula, onde à sua esquerda está (o nome da) variável resposta e à direita o dos preditores. O simbolo `.` indica que pretendemos todos os preditores do dataset.
+
+```{r recipe-norm-dummy, echo = T}
+receita <- 
+  recipe(HeartDisease ~ ., data = dftr) %>% 
+  step_normalize(all_numeric(), -all_outcomes()) %>% 
+  step_dummy(all_nominal(), -all_outcomes())
+```
+
+Vejamos os resultados do pré-processamentocom as funções `prep()` e `bake()`. 
+
+Estas são usadas respectivamente para 
+
+1) estimar os parâmetros dos dados de treino necessários para serem depois aplicados a outros datasets e 
+
+2) executar os cálculos aos novos dados.
+
+```{r recipe-showdata, echo = T}
+receita %>% 
+  prep(training = dftr) %>% 
+  bake(new_data = NULL)
+```
+
+## Modelo logístico
+
+Com o modelo de regressão logístico o objectivo é prever o valor de uma variável categórica binária (classe 0 ou 1) como uma função linear de preditores. 
+
+Neste exemplo, vamos usar a regressão logística para prever
+se um paciente tem (classe 1) ou não (classe 0) uma doença cardíaca.
+
+A variável resposta será a probabilidade de um paciente ter doença cardíaca.
+
+::: {.callout-note title="Regressão logística e o logito" collapse="true"}
+A fórmula para calcular a probabilidade $\Pr(y=1|x)$ com a regressão logística:
+
+$$
+\Pr(y=1|x) =\frac{1}{1+\exp^z}=\frac{\exp^z}{1+\exp^z}, \quad z=\beta_0 +\sum\mathrm{\beta} \mathbf{x}
+$$
+
+onde $\Pr(y=1|x)$ é a probabilidade de ocorrer a classe de interesse (no nosso exemplo, ter doença cardíaca = 1, não ter doença cardíaca = 0), condicionada pelos preditores $x$. $\beta$ são coeficientes associados a $x$ e $\beta_0$ a ordenada na origem .
+
+O logit é uma função ligação que transforma a regressão logística num modelo linear: 
+
+$$
+\log\bigg[\frac{\Pr(y=1|x)}{1-\Pr(y=1|x)}\bigg] = z
+$$
+
+O termo $\frac{\Pr(y=1|x)}{1-\Pr(y=1|x)}$ designa-se usualmente por chances (*odds*).
+
+
+:::
+
+Como o modelo devolve a probabilidade de um paciente ter doença cardiaca temos de encontrar um critério (regra de decisão) para convertermos a probabilidade numa das classes.
+
+::: {.callout-note title="Regressão logística é um classificador"}
+Embora inclua o termo regressão no nome, a regressão logística é
+aplicada em problemas de classificação. Para classificar uma observação numa das classes, combinamos o modelo de regressão logistico com um critério ou regra de decisão.
+:::
+
+Uma regra de decisão frequentemente aplicada passa por usar o
+classificador de Bayes (que escolhe a classe que maximiza a
+probabilidade). 
+
+
+Num problema de classificação onde há apenas 2 classes,
+é usual prever classe 1 se $\Pr(y=1|x)\ge 0.5$ e na classe 0 em caso contrário. Mas podem escolher-se outras regras de decisão.
+
+### Treino
+
+Agora que temos o pré-processamento terminado vamos preparar a aprendizagem. Vamos usar a estrutura `tidy` para especificar o modelo (*model*) logístico de regressão, com o package `glm` (*engine*) para fazer classificação (*mode*):
+
+```{r log-spec, echo = T}
+log_spec <-
+  logistic_reg() %>% 
+  set_engine("glm") %>%
+  set_mode("classification")
+```
+
+Vamos usar a função `workflow()`para integrar de forma encadeada a receita definida na @sec-preprocessamento e as especificações do modelo.
+
+::: {.callout-note title="workflow"}
+Em Python e outras linguagens designa-se uma série de operações
+encadeadas por *pipeline*. 
+
+No `tidymodels` o termo *pipe* refere-se ao operador `%>%`, por isso, para evitar ambiguidades, no `tidymodels` essa série designa-se por *workflow*.
+:::
+
+A sintaxe seguinte apresenta uma forma de especificar o `workflow`:
+
+```{r log-wflow0, eval = F, echo =T}
+workflow() %>%
+  add_recipe(receita) %>%
+  add_model(log_spec)
+```
+
+Vamos guardar o workflow num objeto:
+
+```{r log-wflow, echo = T}
+log_wflow <- 
+  workflow() %>%
+  add_recipe(receita) %>%
+  add_model(log_spec)
+```
+
+Podemos fazer o ajustamento (*fit*) aos dados de treino:
+
+```{r log-fit, echo = T}
+log_fit <- 
+  log_wflow %>%
+  fit(data = dftr) 
+```
+
+Qual será a classe prevista nos dados de treino? Podemos prever com a função `predict()`, que devolve uma coluna com a classe prevista.
+
+```{r log-predict2, echo =T, results='hide'}
+# predict()
+predict(log_fit, new_data = dftr)
+```
+
+Usando a função `augment()` (da biblioteca `broom`), podemos obter informação adicional sobre os exemplos (e.g. valores
+previstos)[^module_6_ml-10].
+
+[^module_6_ml-10]: as colunas novas começam com o prefixo `.` para evitar escrever em cima de variveis originais com o mesmo nome
+
+```{r log-predict3, echo =T}
+# augment()
+broom::augment(log_fit, new_data = dftt)
+```
+
+Vamos agora ver como medir o desempenho do classificador e ilustrar
+resultados:
+
+-   exatidão ($[\text{TP+TN]}/n$): proporção de exemplos classificados corretamente;
+
+-   precisão ($\text{TP}/(TP+FP)$): proporção de exemplos previstos na  classe 1, que eram da classe 1;
+
+-   sensibilidade ($\text{TP}/[\text{TP}+\text{FN}]$): proporção de exemplos da classe 1, previstos na classe 1;
+
+-   especificidade ($\text{TN}/[\text{TN}+\text{FP}]$): proporção de exemplos da classe 0, previstos na classe 0;
+
+-   curva ROC (Receiver Operating Characteristic).
+
+Com a tabela expandida podemos ter informação adicional sobre o processo de classificação. Vemos que o classificador usa como regra de decisão atribuir a classe mais provável.
+
+Com a função `relocate()` podemos mudar a ordem das colunas. Vamos usar a função para ver lado-a-lado as classes observadas e previstas para os dados de treino:
+
+```{r log-augmentfit, echo = T}
+augment(log_fit, new_data = dftr) %>%
+  relocate(HeartDisease, .pred_class, .pred_Y, .pred_N)
+```
+
+Podemos construir a matriz de confusão para calcular diferentes medidas de desempenho (e.g. precisão, exatidão, sensibilidade).
+
+```{r log-matconf0, eval = F, echo = T}
+augment(log_fit, new_data = dftr) %>%
+  conf_mat(truth = HeartDisease, estimate = .pred_class)
+```
+
+Para melhorar a visualização da matriz podemos usar a função `autoplot()`
+
+```{r log-matconfplot, echo = T, eval = F}
+augment(log_fit, new_data = dftr) %>%
+  conf_mat(truth = HeartDisease, estimate = .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+Podemos calcular a exatidão com a função `accuracy()`
+
+```{r log-accuracy, echo = T, eval = F}
+augment(log_fit, new_data = dftr) %>% 
+  accuracy(truth = HeartDisease, estimate = .pred_class)
+```
+
+a sensibilidade com a função `sensitivity()`
+
+```{r log-sensitivity, echo = T, eval = F}
+augment(log_fit, new_data = dftr) %>%
+  sensitivity(truth = HeartDisease, estimate = .pred_class)
+```
+
+a especificidade com a função `specificity()`
+
+```{r log-specificity, echo = T, eval = F}
+augment(log_fit, new_data = dftr) %>%
+  specificity(truth = HeartDisease, estimate = .pred_class)
+```
+
+Podemos usar a função `yardstick::metric_set()`para devolver estas as medidas de uma só vez:
+
+```{r log-metrics-treino-vset, echo = T}
+heart_metrics <- metric_set(accuracy, specificity, sensitivity)
+augment(log_fit, new_data = dftr) %>%
+  heart_metrics(truth = HeartDisease, estimate = .pred_class)
+```
+
+Podemos visualizar a curva ROC (Receiver Operating Characteristic):
+
+```{r log-roc, out.width="60%"}
+augment(log_fit, new_data = dftr) %>% 
+  roc_curve(truth = HeartDisease, .pred_Y,event_level = "second") %>%
+  autoplot()
+```
+
+No argumento da função `fit_samples()` vamos usar o objecto que criámos na sub-secção @sec-preprocessamento para criar treinar as partições do dataset de treino e estimar o erro de validação.
+
+```{r log-kfold0, echo = T}
+log_res <- fit_resamples(log_wflow, k_folds)
+```
+
+O desempenho do modelo nos dados de treino é o seguinte.
+
+```{r log-metrics-treino-cv, echo = T}
+log_res %>%
+  collect_metrics()
+```
+
+Os resultados apresentados nesta seção resultam do ajustamento aos dados de treino. Mas como vimos antes, o que pretendemos é usar este modelo com dados novos. Será que com novos dados este modelo será adequado?
+
+
+Vamos usar os dados e o modelo especificado, mas agora com procedimentos que nos permitirão ter uma estimativa do erro generalizavel.
+
+### Teste
+
+A estimativa do erro de generalização será o seguinte:
+
+```{r log-finalfit, echo = T}
+
+# ajustamento nos dados de teste
+log_finalfit <- last_fit(log_wflow, particao) 
+
+# guardar resultado final 
+log_results <- collect_metrics(log_finalfit)
+log_results
+
+```
+
+## k-nearest neighbors ($k$-NN)
+
+
+Na sub-secção @sec-classificacao vimos como funciona genericamente o algoritmo $k$-NN. Nesta sub-secção vamos implementar o algoritmo. Vamos introduzir no processo de treino uma afinação para o valor de $k$ (número de vizinhos mais próximos) para minimizar o erro (1-*accuracy*) de classificação.
+
+Sendo um algoritmo de classificação (e regressão) simples, só funciona bem se a distâncias (e.g. euclideanas) refletirem bem a dissemelhança entre os exemplos (quanto mais afastadas estiverem entre si, menor a probabilidade de serem parecidas).
+
+### Treino
+
+Especificar o modelo $k$-NN, usando a estrutura `tidy`:
+
+```{r knn-spec, echo = T}
+knn_spec <-
+  nearest_neighbor(neighbors = tune()) %>% 
+  set_engine("kknn") %>% 
+  set_mode("classification")
+```
+
+Vamos usar o argumento `tune()` para "afinar" o valor do hiperparâmetro $k$ através de validação cruzada. Para tal temos de definir uma grelha (neste caso é apenas um vector).
+
+```{r knn-tunegrid, echo = T}
+k_grid <- tibble(neighbors = seq(1,51, by = 2))
+```
+
+Vamos juntar o modelo à receita especificada na @sec-preprocessamento, integrando tudo num workflow:
+
+```{r knn-workflow, echo = T}
+knn_wflow <- workflow() %>%
+  add_recipe(receita) %>%
+  add_model(knn_spec)
+```
+
+Agora que temos o processo pronto para o treino adicionamos a afinação do parâmetro $k$ para fazer previsões:
+
+```{r knn-tune, echo = T}
+knn_res <- 
+  knn_wflow %>%
+  tune_grid(resamples = k_folds, 
+            grid = k_grid)
+```
+
+Qual é o valor de $k$ que mais melhora o desempenho do algortimo?
+
+```{r knn-best, echo = T}
+# top-5
+show_best(knn_res, metric="accuracy")
+
+# top-1
+select_best(knn_res, metric="accuracy")
+```
+
+Vamos guardar o resultado num objeto.
+
+```{r knn-best-k, echo = T}
+best_knn <- select_best(knn_res, metric="accuracy")
+```
+
+O último passo é usar a função `finalize_workflow()` para adicionar ao nosso workflow o modelo com o hiperparâmetro $k$ melhor afinado:
+
+```{r knn-finalwflow, echo = T}
+final_knn_wflow <- 
+  knn_wflow %>% 
+  finalize_workflow(best_knn)
+```
+
+Este objecto guarda a versão atualizada da função aprendida com os dados de treino/validação.
+
+### Teste
+
+Finalmente ajustamos o modelo aos dados de teste:
+
+```{r knn-finalfit, echo = T}
+knn_finalfit <- final_knn_wflow %>% 
+           last_fit(split = particao)
+```
+
+A função `last_fit()` ajusta o modelo final ao conjunto de dados de treino, e avalia o desempenho nos dados de teste. Em baixo, a função `collect_predictions()` permite visualizar num `tibble` os resultados da classificação com dados de teste
+
+```{r knn-finalmetrics, echo = T}
+
+knn_results <-  
+  knn_finalfit %>% 
+  collect_metrics()
+knn_results
+```
+
+## Árvores de decisão {#sec-arvores}
+
+As árvores de decisão são métodos de aprendizagem que foram
+desenvolvidos na década de 1980, e podem ser aplicados em problemas de classificação ou de regressão. São simples de implementar e úteis para interpretar.
+
+```{r img-dtree, echo=FALSE, fig.cap="Esquema de uma árvore de decisão. Fonte: M.R. Camana et al (2020) 'Extremely Randomized Trees-Based Scheme for Stealthy Cyber-Attack Detection in Smart Grid Networks', IEEE Access, vol. 8, pp. 19921-19933", out.width = "50%"}
+knitr::include_graphics("images/dtree.jpg")
+```
+
+O espaço dos preditores é segmentado/estratificado num conjunto de regiões. As regras usadas para segmentar o espaço de preditores podem ser sintetizadas através de uma árvore. Daí o nome árvores de decisão.
+
+Mais tarde (decada de 1990) apareceram métodos como o *bagging* ou *random forests* , que integram árvores de decisão no processo de aprendizagem. Hoje em dia as árvores de decisão são usadas como partes ou módulos das ferramentas de aprendizagem (e.g. ensembles de árvores de decisão).
+
+Vamos ver a intuição antes de vermos uma árvore. No gráfico seguinte temos os dados da @sec-classificacao. São dados de 120 pacientes que têm um tumor benigno (azul) ou tumor maligno (vermelho). Para cada paciente temos os valores de dois preditores: o tamanho do tumor e a idade do paciente.
+
+Queremos criar um modelo (a árvore) para prever se um tumor é maligno ou benigno a partir destes 2 preditores. O gráfico seguinte ilustra a distribuição dos exemplos classificados no espaço dos preditores.
+
+```{r dtree-exampleplot}
+
+n0 = ceiling(n/2) - 14
+n1 = n - n0
+
+set.seed(34121302)
+x0_ <- round(rnorm(n0, mean =2, sd =1 ),1)
+set.seed(19522208)
+x1_ <- round(rnorm(n1, mean =4, sd =1 ),1)
+x1 <- c(x0_,x1_)
+x1 <- ifelse(x1<=0, 0.01,x1)
+
+set.seed(12123505)
+z0 <- round(rnorm(n0, mean =40, sd =5 ),1)
+set.seed(20231167)
+z1 <- round(rnorm(n1, mean =50, sd =5 ),1)
+x2 <- c(z0, z1)
+
+
+y <- c(rep(0,n0), rep(1,n1))
+labcol <- c(rep("grey", n0),rep("blue", n1))
+df_exe <- data.frame(y,x1, x2)
+
+dfx <- df_exe[,c("x1","x2")]
+dfy <- as.factor(df_exe[,"y"])
+
+ngrid = 5*n # dim grid (linhas + colunas)
+
+xrange <- seq(from = range(x1)[1]-1, to = range(x1)[2]+1, length = ngrid)
+zrange <- seq(from = range(x2)[1]-1, to = range(x2)[2]+1, length = ngrid)
+gridxz <- expand.grid(xrange, zrange)
+names(gridxz) <- c("x1","x2")
+
+dftipo3 <- data.frame(tamanho = df_exe[,2], idade = df_exe[,3], tumor = as.factor(df_exe[,1]))
+dftipo3$tumor <- factor(dftipo3$tumor, labels = c("Benigno", "Maligno"))
+
+# distribuição respostas
+nabs <- table(dftipo3$tumor)
+nrel <- table(dftipo3$tumor)/nrow(dftipo3)
+
+# plot
+ggplot(dftipo3, aes(x = tamanho, y = idade))+
+  geom_point(aes(color=tumor), size = 2) + 
+  scale_color_manual(name = "Tumor", values = c("blue", "red")) +
+  xlab("Tamanho") + 
+  ylab("Idade") +
+  coord_fixed(ratio = .2)
+```
+
+Se quisermos separar os pacientes com tumor maligno dos restantes, o que poderemos fazer? Olhando para o gráfico parece que os pacientes mais novos tendem a ter tumores benignos e os mais velhos tumores malignos.
+
+Vamos tentar separar o espaço dos preditores em 2 regiões, uma com tumores benignos e outra com os tumores malignos.
+
+```{r dtree-exampleplot-split1}
+# plot
+ggplot(dftipo3, aes(x = tamanho, y = idade))+
+  geom_point(aes(color=tumor), size = 2) + 
+  geom_hline (yintercept = 44, color = "violet", size =1, linetype = "dashed") +
+  scale_color_manual(name = "Tumor", values = c("blue", "red")) +
+  xlab("Tamanho") + 
+  ylab("Idade") +
+  coord_fixed(ratio = .2)
+```
+
+Esta divisão parece ter separado relativamente bem os tumores benignos dos malignos. Os pacientes mais novos (até $\approx 44$ anos) tem mais tumores benignos e os mais velhos tem mais tumores malignos (o que faz sentido, pois o risco de ter um tumor maligno aumenta com a idade).
+
+Apesar da separação fazer sentido, ainda há mistura de tumores benignos e malignos, talvez mais evidente na região superior do gráfico. Podemos melhorar esta separação, dividindo a região da seguinte forma:
+
+```{r dtree-exampleplot-split2}
+# plot
+ggplot(dftipo3, aes(x = tamanho, y = idade))+
+  geom_point(aes(color=tumor), size = 2) + 
+  geom_hline (yintercept = 44, color = "violet", size =1, linetype = "dashed") +
+  geom_segment(aes(x = 2.5 , y = 44, xend = 2.5, yend = 60),
+               size =1, linetype = "dashed", color="violet") +
+  scale_color_manual(name = "Tumor", values = c("blue", "red")) +
+  xlab("Tamanho") + 
+  ylab("Idade") +
+  coord_fixed(ratio = .2)
+```
+
+Ficamos agora com o espaço dos preditores dividido em três regiões:
+
+1.  região do lado superior direito, com a grande parte dos tumores malignos, cujos pacientes são mais velhos, e têm tumores de maior dimensão;
+2.  região do lado inferior, com larga maioria de tumores benignos detetados em pacientes mais jovens;
+3.  região do lado superior esquerdo, onde estão a grande maioria de tumores benignos, observados em pacientes mais velhos.
+
+A separação nestas três regiões permitiu segmentar o espaço dos
+preditores em regiões, seguindo o racional das árvores de decisão. A figura seguinte ilustra a árvore de decisão obtida com os mesmos dados:
+
+```{r dtree-example1}
+set.seed(10203041)
+ex_split <- initial_split(dftipo3, strata = tumor)
+
+set.seed(10203040)
+ex_k <- vfold_cv(dftipo3, v = 5, strata = tumor)
+
+ex_receita <- 
+  recipe(tumor ~ idade + tamanho, data =dftipo3)
+  
+ex_spec <-
+  decision_tree(cost_complexity= tune()) %>% 
+  set_engine("rpart") %>%
+  set_mode("classification")
+
+ex_wflow <- workflow() %>%
+  add_recipe(ex_receita) %>%
+  add_model(ex_spec)
+
+ex_grid <- grid_regular(cost_complexity(), levels = 20)
+
+ex_res <- 
+  ex_wflow %>% 
+  tune_grid(resamples = ex_k, grid = ex_grid)
+
+best_ex <- select_best(ex_res, metric="accuracy")
+
+final_ex_wflow <- 
+  ex_wflow %>% 
+  finalize_workflow(best_ex)
+
+ex_finalfit <- final_ex_wflow %>% 
+           last_fit(split = ex_split)
+
+ex_results <-  
+  ex_finalfit %>% 
+  collect_metrics()
+
+ex_finalfit %>%
+  extract_fit_engine() %>%
+  rpart.plot(roundint = FALSE, 
+             yesno = TRUE, 
+             extra = 8)
+```
+
+Vamos compreender e interpretar o gráfico da árvore. A sua construção começa no nó inicial onde estão 100% dos dados. O algoritmo escolhe um preditor e define um valor que melhor separa os exemplos em duas partições - o preditor escolhido é a idade e o valor 44 anos. Do lado esquerdo ficam os exemplos com idade inferior a 44. Do lado direito ficam os restantes. Na partição da direita procede-se a uma nova separação: entre os pacientes com idade $\ge 44$ anos, os que têm um tumor com menos de 2.5 cm ficam do lado esquerdo e os restantes do lado direito.
+
+Em cada um dos nós estão indicadas a classe prevista e a proporção dos exemplos associada.
+
+A terminologia usada nas árvores de decisão é a seguinte:
+
+-   o nó inicial onde estão 100% dos dados designa-se por nó inicial (*root node*);
+
+-   os nós intermédios designam-se por nós-filhos (*child nodes*);
+
+-   os nós finais designam-se por nós-terminais (*leaf nodes*).
+
+A interpretação dos resultados da árvore é a seguinte:
+
+-   a primeira separação foi feita com a idade, portanto esse será o preditor mais importante para prever a malignidade do tumor;
+
+-   sendo um paciente mais jovem, o tamanho do tumor não parece ter um  papel muito relevante na malignidade do tumor;
+
+-   mas entre pacientes mais velhos, o tamanho do tumor parece ter impacto na malignidade: quanto menor o tamanho, maior a probabilidade de ser benigno.
+
+Estas partições especificadas pelo algoritmo correspondem à segmentação que fizemos 'a olho' para separar o espaço dos preditores em três regiões. 
+
+Mas como o o algoritmo escolheu os preditores? 
+
+E como sabe que valores usar para separar os dados (os exemplos)?
+
+Embora tenhamos visto intuitivamente como responder, falta saber como é que o algortimo o faz de forma automática.
+
+A árvore de decisão é um modelo que:
+
+-   Divide o espaço de preditores em regiões distintas (não
+sobreponíveis)
+
+-   Em cada região a classe prevista é a que tem probabilidade máxima.
+
+-   A classe prevista para uma observação que caia numa região é a que tem probabilidade máxima nessa região.
+
+Em teoria o espaço de preditores pode ser dividido de muitas maneiras. Nas árvores o espaço é dividido em rectangulos multidimensionais de forma a minimizar o erro de classificação.
+
+As medidas preferenciais para medir esse erro são o índice de Gini ou a entropia e ganho de informação.
+
+::: {.callout-tip title="Índice de Gini" collapse="true"}
+O indice de Gini é dado por: $$
+\text{G} = \sum_{k=1}^K \hat{p}_{rk}(1-\hat{p}_{rk})
+$$ onde $\hat{p}_{rk}$ é a proporção de exemplos na região $r$ que pertencem à classe $k$. Quanto maior a proporção de exemplos de uma só classe, menor o valor do índice nesse nó.
+:::
+
+O índice de Gini é também conhecido como índice de impureza de Gini. Um valor alto do índice indica que não há uma classe predominante no nó, ou seja, é uma região "impura" com mistura de classes entre os exemplos.
+
+A entropia e ganho são alternativas ao índice de Gini mas com
+interpretação similar (são medidas similares).
+
+::: {.callout-tip title="Entropia e ganho" collapse="true"}
+A entropia $E$ do conjunto de exemplos $s$, é dada por: $$
+E(s) = -\sum_{k=1}^K \hat{p}_{rk}\log_2 (\hat{p}_{rk})
+$$ onde $\hat{p}_{rk}$ é a proporção de exemplos na região $r$ que pertencem à classe $k$.
+
+Quando usamos um nó para fazer uma nova partição, a entropia muda. O ganho de informação é a medida que mede a redução no valor da entropia.
+
+O ganho de informação $g$ com nova partição usando o preditor $v$ é dado por: $$
+\text{g}(s, v) = E(s) - E(s, v) $$ Quanto maior o ganho, mais puro fica o nó.
+:::
+
+Infelizmente, em termos computacionais é pesado percorrer todas as partições do espaço possiveis. Por essa razão, o processo de divisão de um nó é feito de cima para baixo (começa no *root-node*), de forma *gananciosa* (greedy) criando em cada nó a partição que melhor resultado dá (de acordo com o indice de Gini ou a entropia e ganho). 
+
+Este processo de
+construção designa-se por separação recursiva binária (*recursive binary splitting*). Repetimos o procedimento até um critério de paragem ser atingido. Podemos impôr limitações à construção da árvore como por ex. parar quando tivermos no máximo 5 exemplos em cada nó-filho (*pre-prunning*).
+
+O procedimento poderá produzir boas previsões com os dados de treino, mas corre o risco de produzir *overfitting*. Isto porque uma árvore comprida (i.e. com muitos nós terminais), aprende muito bem os padrões nos dados de treino mas acaba por errar em demasia quando prevê em dados teste. Uma árvore menos complexa poderá produzir melhores resultados (é uma medida de compromisso entre a variância e o viés).
+
+::: {.callout-tip title="Flexibilidde numa árvore de decisão" collapse="true"}
+Mede-se pelo número de nós terminais (*leaf nodes*). Quanto maior o número, mais comprida é a árvore e mais complexo/flexivel será o modelo, aumentando o risco de *overfitting*.
+:::
+
+Outra abordagem para procurar atingir um modelo com comprimento 'ótimo', i.e., que atinge um ponto equilibrio entre a variància e o viés (entre o *overfitting* e o *underfitting*) passa por criar uma árvore longa e depois "podar" alguns ramos da árvore (*post-prunning*) obtendo uma árvore menor à custa do aumento do viés. No entanto, faze-lo de forma exaustiva é uma solução computacionalmente exigente porque o número de maneiras diferentes de podar árvores pode ser incomportável.
+
+Em alternativa podemos introduzir um hiperparâmetro que adiciona um custo (uma penalização) a árvores mais complexas. Um custo próximo de zero representa uma baixa penalização, i.e., com poucos nós podados (que poderá levar ao *overfitting*). Um custo elevado irá podar muitos nós da árvore (no limite irá podar todos) e provocar um *bias* elevado (*underfitting*).
+
+Este hiperpârametro, designado por custo de complexidade (*cost
+complexity prunning*) pode ser escolhido por validação cruzada (ou conjunto de validação).
+
+::: {.callout-tip title="Custo de complexidade" collapse="true"}
+Seja $R(T)$ uma medida global de impureza da árvore (e.g. indice de Gini ou Entropia) numa árvore com $T$ nós terminais. Pretende-se minimizar:
+
+$$
+R(T)+\alpha|\tilde{T}|
+$$ onde $\alpha$ é o termo de penalização (estimado por validação
+cruzada) ou custo e $|\tilde{T}|$ o número de nós terminais
+(*leaf-nodes*) da árvore (que mede a complexidade).
+:::
+
+Vamos implementar o algoritmo com o nosso dataset.
+
+### Treino
+
+Vamos especificar a árvore de decisão,com um argumento adicional para afinar o hiperparâmetro $\alpha$ que penaliza modelos mais complexos.
+
+```{r dtree-spec, echo =TRUE}
+dtree_spec <-
+  decision_tree(cost_complexity= tune()) %>% 
+  set_engine("rpart") %>%
+  set_mode("classification")
+```
+
+Vamos criar o *workflow* para juntar as tarefas de @sec-preprocessamento e as especificações para a árvore de decisão.
+
+```{r dtree-workflow, echo = T}
+dtree_wflow <- workflow() %>%
+  add_recipe(receita) %>%
+  add_model(dtree_spec)
+```
+
+Vamos criar uma grelha de valores para afinar o hiperparâmetro.
+
+```{r dtree-tunegrid, echo = T}
+dtree_grid <- grid_regular(cost_complexity(), levels = 100)
+```
+
+Agora que temos as especificações todas preparadas, vamos afinar o hiperparâmetro:
+
+```{r dtree-tune, echo = T}
+dtree_res <- 
+  dtree_wflow %>% 
+  tune_grid(resamples = k_folds, grid = dtree_grid)
+```
+
+A exatidão obtida para os cinco melhores modelos:
+
+```{r dtree-tunebest5, echo = T}
+# top-5
+show_best(dtree_res, metric="accuracy")
+```
+
+Vamos guardar num `tbl_df` (um dataframe com estrutura `tibble`) e atualizar o modelo especificando o valor do hiperparâmtero que devolveu maior exatidão.
+
+```{r dtree-tunebest1, echo = T}
+# top-1
+select_best(dtree_res, metric="accuracy")
+best_dtree <- select_best(dtree_res, metric="accuracy")
+
+final_dtree_wflow <- 
+  dtree_wflow %>% 
+  finalize_workflow(best_dtree)
+```
+
+### Teste
+
+Finalmente ajustamos o modelo aos dados de teste:
+
+```{r dtree-finalfit, echo = T}
+dtree_finalfit <- final_dtree_wflow %>% 
+           last_fit(split = particao)
+
+# guardar resultados de teste
+dtree_results <-  
+  dtree_finalfit %>% 
+  collect_metrics()
+dtree_results
+```
+
+E visualizamos o modelo obtido com a função `rpart.plot()`:
+
+```{r dtree-finalfit_tree, echo = T}
+dtree_finalfit %>%
+  extract_fit_engine() %>%
+  rpart.plot(roundint = FALSE)
+```
+
+As árvores de decisão tem vantagens em relação a métodos mais clássicos como a regressão logística:
+
+-   São fáceis de entender e de explicar,
+-   Reflectem bem o modo como tomamos decisões,
+-   Resultados podem ser visualizados e interpretados (até por um
+    não-especialista).
+
+No entanto tem um ponto fraco não desprezável: é que uma pequena alteração nos dados pode causar uma grande alteração no classificador final.
+
+O desempenho desta familia de classificadores pode no entanto ser
+significativamente melhorado usando métodos de *bagging*, *boosting* ou *random forests*. Na sub-secções seguintes vamos ver *bagging* e *random forests*.
+
+## Bagging
+
+Embora seja uma solução interessante para reduzir a variância do modelo, podar as árvores (via *pre-prunning* ou *post-punning*) faz aumentar o viés do modelo.
+
+Na década de 1990 aparecem novos métodos de aprendizagem automática que tiram partido das árvores de decisão e usam métodos como o *bagging* (ou agregação por *bootstrapping*) e *random forests* para reduzir a variância do modelo sem necessidade de podar árvores (viés reduzido)!
+
+::: {.callout-tip title="Bootstrapping"}
+*Bootstrapping* é um método computacional de reamostragem criado para gerar multiplos subconjuntos de datasets a partir de um dataset original - o dataset de treino. Em cada dataset gerado (*bootstrapped*), as observações - exemplos - são selecionadas aleatoriamente com reposição. Isto significa que um exemplo pode aparecer mais que uma vez num dataset.
+:::
+
+O *bagging* passa por:
+
+1.  Gerar $n$ datasets independentes a partir do dataset de treino (*bootstrapping*);
+2.  Treinar um modelo (árvore) para cada dataset gerado sem a preocupação de o podar;
+3.  Usar cada modelo treinado para prever o valor de uma nova amostra;
+4.  Prever a classe da nova amostra atribuindo a classe mais "votada" pelos modelos treinados
+
+Ao conjunto de árvores aprendidas com o conjunto de datasets gerados por *bootstrap*, designa-se por *ensemble* de árvores.
+
+```{r randomf-schema, echo=FALSE, fig.align = "left", fig.cap="Ilustração do processo de bagging", out.width = '100%'}
+knitr::include_graphics("images/rfbagg.png")
+```
+
+Da teoria estatística[^module_6_ml-11] sabemos que se tivermos um grande número ($N$) datasets de treino independentes com variância $\sigma^2$, a variância da média será $\sigma^2/N$. 
+
+Sendo assim, em vez de podarmos as árvores para reduzir a variância, podemos construir árvores compridas, complexas, que tendem a ter baixo viés e usar métodos como o *bagging* para reduzir a variância do modelo.
+
+[^module_6_ml-11]: Ver e.g. distribuição amostral da média, teorema do limite central
+
+### Treino
+
+Vamos implementar este algoritmo, recorrendo à biblioteca `baguette` que complementa a biblioteca `tidymodels` para implementação de *bagging*.
+
+```{r baguette, echo=FALSE, fig.align = "left", fig.cap="https://baguette.tidymodels.org/", out.width = '50%'}
+knitr::include_graphics("images/baguette_logo.png")
+```
+
+Especificação do modelo de *bagging* com 50 amostras, ajustar os modelos e ver os resultados:
+
+```{r bag-spec-wflow-fit, echo = T}
+# biblioteca para bagging com tidymodels
+library(baguette)
+
+set.seed(992801000)
+bag_spec <- bag_tree() %>%
+  set_engine("rpart", times = 50) %>% # 50 amostras bootstrap
+  set_mode("classification")
+ 
+bag_wflow <- workflow() %>%
+  add_recipe(receita) %>%
+  add_model(bag_spec)
+
+bag_fit <- bag_wflow %>% fit(dftr)
+```
+
+Dado que o processo de bagging envolve o ajustamento de muitas árvores, deixa de ser possível usar as árvores para interpretar resultados.
+
+Podemos no entanto ver outras coisas. Na sub-secção @sec-arvores_intro vimos que podemos estimar a importância de um preditor no modelo com medidas de erro (e.g. o índice de Gini).
+
+No *bagging* o processo é similar: em cada árvore, em cada partição, calcula-se o índice de Gini para cada preditor, agregam-se os valores de todas as árvores por preditor. Os preditores com índice de Gini médio mais baixo são considerados os mais importantes (maior contribuição para aumentar a pureza das *leaf-nodes*).
+
+```{r bag-preditors}
+bag_fit
+```
+
+Vemos que os mais relevantes preditores para a ocorrência de doença cardiaca são `Cholesterol`, `MaxHR` e `HearPeakReading`.
+
+### Teste
+
+Qual será o erro de classificação do algortimo nos dados de teste?
+
+```{r bag-finalfit, echo = T}
+# teste
+bag_rs <- dftt %>%
+  bind_cols(predict(bag_fit, dftt)) 
+
+bag_results <- bag_rs %>%
+  accuracy(HeartDisease, .pred_class)
+bag_results
+```
+
+## Random forests
+
+
+As *random forests* trazem uma pequena alteração ao algoritmo de
+*bagging* que se traduz numa melhoria do algoritmo.
+
+Tal como no *bagging* modelamos árvores de decisão com datasets gerados por *bootstrap* a partir do dataset original. Mas ao modelar as árvores, em vez de considerarmos todos os preditores em cada partição, consideramos apenas alguns candidatos (selecionados por amostragem aleatoria simples). Apenas um destes candidatos será usado na partição.
+
+Em cada partição possível, um novo conjunto de preditores candidatos (de dimensão $m$) é selecionado por amostragem a partir de todos os candidatos (de dimensão $p$). Tipicamente o número de candidatos escolhidos é $\approx m = \sqrt{p}$.
+
+::: {.callout-tip title="Escolha dos preditores candidatos"}
+
+Apesar de usarmos *bootstap* para gerar datasets independentes, as árvores obtidas com *bagging* tendem a estar bem correlacionadas, porque todas usam os mesmos preditores. Imagine um caso em que um único preditor tem uma importância muito elevada em relação a todos os outros.
+
+Com *bagging* a grande maioria (ou todas) das árvores iriam usar esse preditor no *root-node* e consequentemente as árvores seriam parecidas entre si.
+
+Com *random forests*, procura-se "aliviar" esta correlação entre
+modelos. Ao não usar todos os preditores em cada partição, as árvores são levadas a usar diferentes preditores a separar em diferentes alturas. Este procedimento reduz a correlação entre os modelos (árvores), tornando-os mais independentes entre si. Como usamos um número grande de árvores neste processo, e depois calculamos a média, este procedimento tende a melhorar o desempenho do modelo em relação ao ensemble de árvores obtido por *bagging*.
+:::
+
+Vamos usar *random forests* para prever se um paciente tem uma doença cardíaca. Vamos especificar os seguintes hiperparamteros: número de preditores a considerar.
+
+### Treino
+
+Para além de especificarmos o modelo usando a estrutura habitual, vamos adicionar um um hiperparametro para escolher o número de preditores adequado a ser escolhido aleatoriamente em cada partição do ensemble de árvores - `mtry=tune()`.
+
+```{r rf-spec_wf_grid_tune_top, echo = T}
+
+# doParallel::registerDoParallel()
+
+# especificacao do modelo
+rf_spec <- rand_forest( mtry = tune(), trees = 500) %>%
+  set_mode("classification") %>%
+  set_engine("ranger")
+
+# workflow 
+rf_wflow <- workflow() %>%
+  add_recipe(receita) %>%
+  add_model(rf_spec)
+
+# grid de afinação
+rf_grid <- grid_regular(mtry(range = c(1,4)), levels = 5)
+```
+
+```{r rf-tunebest, echo = T}
+set.seed(33889922)
+rf_res <- 
+  rf_wflow %>% 
+  tune_grid(resamples = k_folds, grid = rf_grid)
+
+# top-5
+show_best(rf_res, metric="accuracy")
+
+# top-1
+select_best(rf_res, metric="accuracy")
+best_rf <- select_best(rf_res, metric="accuracy")
+```
+
+```{r rf-tunebest-plot, echo = T}
+
+# grafico tunning
+rf_res %>%
+  collect_metrics() %>%
+  filter(.metric == "accuracy") %>%
+  ggplot(aes(mtry, mean)) +
+  geom_line(alpha = 0.5, size = 1.5) +
+  geom_point() +
+  labs(y = "Accuracy") +
+  labs(x = "# preditores")
+```
+
+```{r rf-tunebestmodel, echo = T}
+final_rf_wflow <- 
+  rf_wflow %>% 
+  finalize_workflow(best_rf)
+```
+
+Ajustamos o modelo aos dados de teste e guardamos os resultados:
+
+```{r rf-finalfit, echo = T}
+
+rf_finalfit <- final_rf_wflow %>% 
+           last_fit(split = particao)
+
+# guardar resultados de teste
+rf_results <-  
+  rf_finalfit %>% 
+  collect_metrics()
+
+# matriz confusao dados teste
+rf_finalfit %>%
+    collect_predictions() %>%
+    conf_mat(HeartDisease, .pred_class)
+```
+
+# Resultados
+
+```{r}
+
+log_results
+knn_results
+dtree_results
+bag_results
+rf_results
+
+
+```
+
+# FIM

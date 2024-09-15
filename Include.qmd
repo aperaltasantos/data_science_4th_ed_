@@ -1,6 +1,6 @@
 ---
-title: "Module 7 | Include  "
-subtitle: "Example of an include"
+title: "Module 7b | Inclusão do Intermediate Data Science Tools "
+subtitle: "Exemplo de uma inclusão quarto"
 author: 
   name: A. Peralta-Santos
   affiliation: 
@@ -23,12 +23,10 @@ execute:
   echo: TRUE
 ---
 
-## Secção INTERNA
+### Secção Incluida Externa
 
-Este texto não vem do qmd "Module 7 | Advanced Data Science Tools"
+Este conteúdo não foi retirado do ficheiro Quarto (qmd) correspondente ao módulo "Module 7b \| Intermediate Data Science Tools".
 
-:::{.callout-warning}
-
-Contém informação sensível
-
+::: callout-warning
+O objetivo desta secção é apenas o de fornecer ao leitor um exemplo de uma inclusão externa a um documento Quarto.
 :::

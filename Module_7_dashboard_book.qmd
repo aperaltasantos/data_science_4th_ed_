@@ -1,0 +1,185 @@
+---
+title: "Module 7a | Dashboard"
+subtitle: "Boas práticas no desenvolvimento de dashboards"
+author: "A. Peralta-Santos"
+affiliation: 
+    - Escola Nacional de Saúde Pública
+date: today
+date-format: long
+lang: pt
+format:
+  html:
+    smooth-scroll: true
+    embed-resources: true
+    code-copy: true
+    code_download: true
+    toc: true
+    toc-location: left
+theme: cosmo
+smooth-scroll: true
+execute:
+  warning: false
+project:
+  output-dir: output/documents
+---
+
+# DASHBOARDS
+
+> A dashboard is a visual display of the most important information needed to achieve one or more objectives; consolidated and arranged on a single screen so the information can be monitored at a glance. [^module_7_dashboard_book-1]
+
+[^module_7_dashboard_book-1]: Retirado de <https://www.linkedin.com/pulse/ultimate-dashboard-guide-dos-donts-zoltan-patai/>
+
+![Cartoon do Marketoonist, usado apenas para fins educacionais.](images/dashabord.jpg){fig-align="center"}
+
+## Quando usar um Dashboard
+
+Os dashboards devem ajudar a compreender se as intervenções/projectos seguem na direção certa, em que áreas é necessário investigar ou quais tópicos que devem ser priorizados. Para apoiar esses objetivos é necessário escolher bem os indicadores de desempenho ou KPIs (Indicadores-Chave de Desempenho) do seu dashboard.
+
+### Diferença entre um dashboard e um relatório
+
+A escolha entre dashboards e relatórios depende das necessidades específicas e dos objetivos de análise de uma organização.
+
+### Quando Usar Dashboards:
+
+-   **Monitorização em Tempo Real:** Para acompanhar a performance e indicadores-chave de desempenho (KPIs) de áreas específicas da empresa/intervenções em tempo real.
+-   **Visão Geral do Desempenho:** Quando é necessário uma visão consolidada da performance de diferentes áreas do "negócio" para facilitar a tomada de decisões rápidas e informadas.
+-   **Objetivos e Metas:** Para visualizar o progresso em relação aos objetivos e metas estabelecidos, permitindo ajustes estratégicos em tempo útil.
+-   **Análise Diagnóstica:** Ideal para identificar tendências, anomalias e oportunidades de melhoria na performance.
+-   **Acesso Rápido a Informações Cruciais:** Para fornecer aos agentes de decisão (diretores e gestores) um acesso rápido e fácil às informações mais importantes, permitindo uma visão holística do desempenho empresarial.
+
+### Quando Usar Relatórios:
+
+-   **Análise Detalhada de Temas Específicos:** Quando se necessita de uma análise profunda e detalhada sobre um aspecto específico ou área temática dentro de um período definido.
+-   **Monitorização de Projetos:** Para o acompanhamento do progresso, resultados e métricas de projetos específicos, especialmente quando esses projetos têm uma duração limitada.
+-   **Documentação e Registro:** Quando é importante criar um registro detalhado das atividades, resultados e análises que possam ser consultados posteriormente ou partilhados com *stakeholders*.
+-   **Avaliação Periódica:** Necessidade de produção em intervalos regulares (mensal, trimestral, anual) para revisão de progresso ou avaliação de resultados.
+-   **Suporte a Decisões Estratégicas Detalhadas:** Fornecer as bases e evidências necessárias para decisões mais complexas que requerem uma compreensão detalhada dos dados e suas implicações.
+
+A escolha entre dashboard e relatório deve alinhar-se com a lógica de "negócio" da organização, considerando os objetivos de análise, a necessidade de monitorização em tempo real versus análise detalhada e a frequência com que as informações precisam ser atualizadas ou consultadas.
+
+## Boas práticas na construção de Dasboards
+
+Para a construção eficaz de dashboards, é fundamental adotar boas práticas que garantir a sua utilidade e eficiência.
+
+### Objetivos Definidos
+
+-   **Clareza de Propósito:** Antes de iniciar o design do dashboard, é crucial ter objetivos claros e bem definidos. O dashboard deve ser projetado para responder a necessidades específicas de informação e decisão.
+-   **Alinhamento com KPIs:** Os indicadores chave de desempenho (KPIs) devem estar alinhados com os objetivos do "negócio" e claramente representados no dashboard para permitir avaliações rápidas do desempenho.
+
+### Qualidade dos Dados
+
+-   **Fontes Confiáveis:** Garantir que os dados utilizados no dashboard provêm de fontes confiáveis e verificadas para assegurar a precisão das informações apresentadas. Sempre que possível garantir metadados de qualidade.
+-   **Limpeza e Tratamento de Dados:** Antes de integrar os dados ao dashboard, realizar uma limpeza e tratamento para eliminar inconsistências, duplicações ou erros que possam comprometer a qualidade da análise.
+
+### Atualização dos Dados
+
+-   **Frequência de Atualização:** Definir a frequência de atualização com base na volatilidade dos dados,no período de reporte e nas necessidades de análise, garantindo que as informações sejam oportunas e relevantes.
+-   **Automatização da Atualização:** Implementar mecanismos de atualização automática dos dados para que o dashboard reflita as informações mais recentes, facilitando a tomada de decisão baseada em dados atuais.
+
+### Simplicidade
+
+-   **Design Limpo e Intuitivo:** O dashboard deve ter um design limpo e intuitivo, evitando a superlotação de gráficos e informações. A simplicidade ajuda a focar nas informações mais importantes.
+-   **Visualização Eficaz:** Utilizar gráficos e visualizações que comunicam de forma eficaz a mensagem desejada. A escolha da visualização adequada (gráficos de barras, linhas, mapas de calor, etc.) é essencial para a interpretação correta dos dados.
+-   **Interatividade e Personalização:** Incorporar elementos interativos que permitam aos utilizadores filtrar, explorar e personalizar os dados visualizados, aumentando a utilidade e a adaptabilidade do dashboard a diferentes necessidades dos utilizadores.
+-   **Legibilidade:** Garantir que o dashboard seja legível, com fontes, cores e tamanhos de texto que facilitem a leitura e compreensão das informações apresentadas.
+
+Adotar estes critérios de boas práticas na construção de dashboards contribui significativamente para a criação de ferramentas eficazes e maximizam a sua adoção, uma vez que, suportam a tomada de decisão baseada em dados, melhorando a gestão e o desempenho.
+
+## Design gráfico de dashboards
+
+Para garantir que um dashboard seja tanto visualmente atraente quanto funcional, é crucial considerar cuidadosamente o seu setup gráfico.
+
+::: callout-caution
+Estes passos devem ser feitos antes do ínicio de se comecar a fazer código.
+:::
+
+### 1. Escolha de Cores
+
+-   **Paleta Limitada:** Use uma paleta de cores limitada para evitar sobrecarga visual. Cores consistentes ajudam na interpretação dos dados.
+-   **Cores para Diferenciação:** Utilize cores para diferenciar elementos de dados, mas mantenha a harmonia visual. Cores contrastantes podem destacar informações chave.
+
+### 2. Tipografia
+
+-   **Legibilidade:** Escolha fontes fáceis de ler em diferentes tamanhos e dispositivos. Evite fontes decorativas que dificultam a leitura rápida.
+-   **Hierarquia Visual:** Use diferentes tamanhos e pesos de fonte para criar uma hierarquia visual, facilitando a distinção entre títulos, subtítulos e conteúdo.
+
+### 3. Layout e Organização
+
+-   **Agrupamento Lógico:** Organize os elementos de forma lógica, agrupando informações relacionadas para facilitar a compreensão.
+-   **Espaçamento Adequado:** Use espaçamento ou *padding* para evitar um design congestionado. Um layout limpo melhora a legibilidade e a usabilidade.
+-   **Zona de Foco:** Posicione as informações mais críticas na parte superior ou no centro do dashboard, onde são mais facilmente visualizadas.
+
+![Layout e Organização de um dashboard](images/Screenshot%202024-02-10%20at%2017.59.30.png){fig-align="left"}
+
+![Layout e Organização alternativo do dashboard](images/Screenshot%202024-02-10%20at%2017.59.40.png)
+
+### 4. Visualizações de Dados
+
+-   **Simplicidade:** Escolha visualizações simples que comuniquem claramente a mensagem. Gráficos complexos podem confundir ou desviar a atenção.
+-   **Consistência nas Visualizações:** Mantenha um estilo consistente nas visualizações para facilitar a comparação e análise de dados.
+-   **Uso de Ícones e Símbolos:** Ícones e símbolos podem ser usados para representar rapidamente ideias ou categorias, mas devem ser claros e universalmente compreensíveis.
+
+### 5. Interatividade
+
+-   **Filtros:** Inclua filtros para permitir que os utilizadores personalizem a visualização dos dados conforme necessário.
+-   **Dicas de Ferramentas:** Use dicas de ferramentas (tooltips) para fornecer mais informações sobre os dados quando o cursor passa sobre elementos gráficos.
+
+### 6. Teste em Diferentes Dispositivos
+
+-   **Responsividade:** Certifique-se de que o dashboard é dinâmico e legível numa variedade de dispositivos, incluindo desktops, tablets e smartphones.
+
+::: callout-note
+Devemos ter sempre em consideração quais os dispoditivos que irão utilizar o nosso dashboards. Uma das filosofias mais rescentes para o desenvolvimento de aplicações web como os dashboards é o *Mobile First*. A aplicabilidade desta filosofia deve ter em conta os utilizadores do dashboards e existem alternativas como a adoção de design responsivos ao tamanho do ecrã.
+:::
+
+### 7. Feedback dos Utilizadores
+
+-   **Iterar com Base no Feedback:** Após a implementação, o uso de questionários, *focus groups* ou logs do dashboards permitem recolher feedback dos utilizadores. Temos de estar dispostos a fazer ajustes no design e na funcionalidade do dashboard para acomodar as necessidades dos utilizadores, particularmente dos agentes de decisão.
+
+Estas dicas são apenas o ínicio, e o objetivo será sempre o de melhorar significativamente a eficácia e a experiência do utilizador, tornando as informações não apenas acessíveis, mas também intuitivas e relevantes para análise e decisão.
+
+## Exemplos de dashboards
+
+### Bons exemplos
+
+A Direção Regional de Estatisticas da Madeira criou um [dashboard](https://app.powerbi.com/view?r=eyJrIjoiNmM0MzUxM2EtNDFmNC00ODcwLThlMzktNDUzNTg3Y2Y2NmI0IiwidCI6IjcxOTQwYTg2LTUyYmQtNGVkMy04OWI3LWUwYTdjZDcwNDA0MyIsImMiOjl9) para monitorizar o número de nascimentos, obitos e casamentos na região. Tem um design limpo, com KPI bem desenhados e intuituvos, faz uso de graficos complementares aos KPI com evolução temporal. Os filtros permitem uma boa interactividade.
+
+![Dasboard da DREM](images/bom_exemplo-01.png)
+
+### Maus exemplos
+
+<https://empregocientificoedocente.dgeec.mec.pt/>
+
+```{=html}
+<iframe width="780" height="500" src="https://empregocientificoedocente.dgeec.mec.pt/" title="Registo Público Nominativo"></iframe>
+```
+O Portal do SNS tem um [dashboard](https://www.sns.gov.pt/monitorizacao-do-sns/medicamentos-e-produtos-de-saude-2/) sobre a utilização de medicamentos biossimilares. Não é muito claro quais são os KPI a monitorizar e a evolução temporal esta em separadores o que torna dificil avaliar a evolução da despesa.
+
+![](images/mau_exemplo-01.png)
+
+```{=html}
+<iframe width="780" height="500" src="https://www.sns.gov.pt/monitorizacao-do-sns/medicamentos-e-produtos-de-saude-2/" title="Medicamentos e Produtos de Saúde"></iframe>
+```
+## Dashboard checklist
+
+### Inputs
+
+-   Qualidade dos dados estável
+
+-   Indicadores e métricas bem defenidos
+
+-   Automatização da atualização de dados
+
+### Outputs
+
+-   Paleta de cores definida (3 a 4 cores dominantes)
+
+-   KPI na primeira linha (ideal 3, no máximo 6)
+
+-   Data da última atualização dos dados
+
+-   Contacto de quem é responsável pelo desenvolvimento e contacto para apoio e dúvidas
+
+-   Exportação de dados e print disponíveis
+
+## FIM

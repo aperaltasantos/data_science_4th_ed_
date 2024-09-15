@@ -1,5 +1,5 @@
 ---
-title: "Módulo 2 | Quarto "
+title: "Módulo 2 | Quarto"
 subtitle: "Introdução ao html em quarto"
 author: 
   name: A. Peralta-Santos
@@ -12,7 +12,8 @@ format:
     embed-resources: true
     smooth-scroll: true
     toc: true
-    toc-location: left
+    toc-location: right
+    highlight-style: pygments
     number-sections: true
     code-copy: true
 theme: cosmo
@@ -24,66 +25,165 @@ execute:
 bibliography: references.bib 
 ---
 
-# Título 1
+## O que é o **Quarto**
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eu tempor velit. Fusce accumsan ultrices fringilla. Praesent sed odio mi. Mauris non ligula turpis. Duis posuere lacus nec diam interdum dictum suscipit magna molestie. Vestibulum nibh dolor, interdum eget rhoncus ut, sodales eget justo. Morbi blandit lorem sit amet nulla egestas aliquam. Nunc pharetra est at nibh ullamcorper in commodo erat dignissim. Cras et suscipit enim.
+Quarto é um formato de script que permite a criação de documentos, apresentações e relatórios dinâmicos, interativos e reprodutíveis a partir de código.
 
-## Título 2
+Foi projetado para trabalhar com diversas linguagens de programação, como R, Python, Julia. O Quarto estende as capacidades do R Markdown, permitindo que os usuários integrem análises e visualizações de dados diretamente em seus documentos, com o suporte adicional para a criação de sites e livros.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eu tempor velit. Fusce accumsan ultrices fringilla. Praesent sed odio mi. Mauris non ligula turpis. Duis posuere lacus nec diam interdum dictum suscipit magna molestie. Vestibulum nibh dolor, interdum eget rhoncus ut, sodales eget justo. Morbi blandit lorem sit amet nulla egestas aliquam. Nunc pharetra est at nibh ullamcorper in commodo erat dignissim. Cras et suscipit enim.
+A ferramenta visa facilitar a comunicação de resultados científicos, análises de dados e conteúdo educativo, de maneira mais eficaz e acessível.
 
-## Título 2
+Podem consultar mais informações no [website do quarto](https://quarto.org/).
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neque ex, vehicula dictum risus fermentum, feugiat faucibus neque. Etiam purus quam, lacinia vel porta in, malesuada ac nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed bibendum placerat tellus, ac finibus lectus euismod eget.
+### O que é o YAML ?
 
-### Título 3
+No contexto do Quarto (e R Markdown), um arquivo YAML é usado no início de um documento para definir várias configurações do documento, como título, autor, data, tipo de saída (HTML, PDF, Word, etc.), parâmetros para análises dinâmicas, entre outros. A sintaxe do YAML é desenhada para ser clara e intuitiva, facilitando a configuração do documento e a especificação de metadados. Um cabeçalho YAML é delimitado por três traços (---) em cada extremo no início do script.
+
+#### Exemplo de YAML
+
+![Exemplo de YAML](images/quarto_exemplo1.png){#fig-yaml}
+
+Neste exemplo na @fig-yaml, o documento é configurado com um título, autor, data e será gerado como um documento HTML com uma tabela de conteúdos flutuante. A estrutura e as opções dentro do YAML podem variar significativamente dependendo das necessidades específicas do documento e das funcionalidades suportadas pela ferramenta de autoria utilizada.
+
+A função "render", como na @fig-render, refere-se ao processo de transformação de um documento fonte (escrito, por exemplo, em Markdown, junto com código em R, Python, ou outra linguagem suportada) num documento de saída formatado, como um HTML, PDF, ou apresentação de slides. Este processo envolve a execução do código contido no documento, a inclusão dos resultados dessa execução (como visualizações de dados, tabelas, ou texto gerado dinamicamente) no documento final, e a aplicação de formatação e estilos especificados.
+
+![Render no YAML](images/quarto_exemplo2.png){#fig-render}
+
+### Execução do código
+
+Existem uma grande variedade de opções disponíveis para personalizar a saída de código nos documentos. Todas essas opções podem ser especificadas no YAML e aplicam-se a todo o documento (@fig-execute) ou em cada chunk de codigo (@fig-chunk).
+
+As opções disponíveis para personalizar a saída incluem:
+
+| Opção     | Descrição                                                                                                                                                                   |
+|--------------------------|----------------------------------------------|
+| `eval`    | Avalia o bloco de código (se `false`, apenas ecoa o código na saída).                                                                                                       |
+| `echo`    | Inclui o código fonte na saída.                                                                                                                                             |
+| `output`  | Inclui os resultados da execução do código na saída (`true`, `false`, ou `asis` para indicar que a saída é markdown bruto e não deve ter nenhum markdown padrão do Quarto). |
+| `warning` | Inclui avisos na saída.                                                                                                                                                     |
+| `error`   | Inclui erros na saída (note que isso implica que erros na execução do código não interromperão o processamento do documento).                                               |
+| `include` | Uma opção geral para prevenir qualquer saída (código ou resultados) de ser incluída (por exemplo, `include: false` suprime toda a saída do resultados ou código).           |
+
+![Exemplo da configuração da excecução no YAML](images/quarto_excecution.png){#fig-execute}
+
+Podemos especificar opções especificas para cada bloco ou chunk de codigo, para isso podemos usar o \|# no início para especificar algo que é só aplicavel para aquele bloco.
+
+![Exemplo da configuração da excecução no chunk](images/quarto_4.png){#fig-chunk}
+
+### Formato do documento
+
+No YAML podemos definir o formato de saída do documento com a opção `format:` como visível na @fig-format
+
+`html:` Gera um documento HTML. É ideal para web e suporta elementos interativos, como gráficos dinâmicos.
+
+`pdf:` Cria um documento PDF, útil para publicações científicas, relatórios formais e qualquer conteúdo que exija um layout fixo.
+
+`docx:` Produz um documento do Microsoft Word, conveniente para colaborações onde os colaboradores preferem usar processadores de texto padrão.
+
+![Formatos de saída dos documentos](images/quarto_5.png){#fig-format}
+
+## Elementos de formatação de Quarto
+
+É possível formatar os nossos documentos Quarto de forma simples. Aqui estão alguns conceitos básicos , focando em títulos, texto em negrito e itálico:
+
+### Títulos
+
+Os títulos no Quarto são criados usando o símbolo `#` antes do texto do título. O número de símbolos `#` indica o nível do título, com `#` sendo o nível mais alto (título principal) e `######` o nível mais baixo (título de sexto nível).
+
+### Negrito
+
+Para tornar um texto em negrito no Quarto, deve envolver o texto com dois asteriscos `**` ou dois underlines `__`. Ambos os métodos produzem o mesmo resultado. Por exemplo:
+
+### Itálico
+
+Para formatar um texto em itálico, você deve envolver o texto com um asterisco `*` ou um underline `_`. Assim como no caso do negrito, ambos os métodos são equivalentes.
+
+### Negrito e Itálico
+
+Se desejar combinar negrito e itálico em um único texto, você pode usar três asteriscos `***` ou três underlines `___` ao redor do texto. Por exemplo:
+
+Exemplos:
 
 Este é o *quarto* [curso]{.underline} de **R**
 
-Nulla mattis diam vitae bibendum consequat. Etiam vitae eros tristique, porta sapien a, aliquet mauris. Praesent ultricies mi nulla, et dignissim nulla mattis at. Fusce rhoncus leo quis odio euismod, hendrerit facilisis risus tincidunt. Aenean at lectus justo. Cras fringilla lacus nisl, ac convallis odio tincidunt vel. Integer vel egestas nisi. Curabitur vitae imperdiet justo.
+***Nulla mattis diam vitae bibendum consequat***. Etiam vitae eros tristique, porta sapien a, aliquet mauris. Praesent ultricies mi nulla, et dignissim nulla mattis at. Fusce rhoncus leo quis odio euismod, hendrerit facilisis risus tincidunt. Aenean at lectus justo. Cras fringilla lacus nisl, ac convallis odio tincidunt vel. Integer vel egestas nisi. Curabitur vitae imperdiet justo.
 
-> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+### Outras formatações
 
-> penso logo existo - Descartes
+#### Citação
 
-<!--- citacao importante --->
+> ”In God we trust. All others must bring data.” W. Edwards Deming.
 
-## Definir a configuração do Quarto
+#### Criar listas
 
-```{r setup, include=FALSE}
-# Configurações gerais para o pacote knitr
-knitr::opts_chunk$set(
-  collapse    = TRUE,  # Agrupa os blocos de código e output
-  warning     = FALSE, # Desativar exibição de avisos
-  message     = FALSE, # Desativar exibição de mensagens
-  echo        = FALSE, # Evitar imprimir o código R que gerou o gráfico
-  eval        = TRUE   # Avaliar e incluir os resultados do código
-  )
+Sem ordem
 
-# Configurações para reprodutibilidade e formatação numérica
-set.seed(1)       # Define a semente para garantir a reprodutibilidade
-options(scipen=5) # Define o número de casas decimais
-```
+-   item 1
+-   item 2
+-   item 3
 
-## Criar um URL inline
+Com ordem
 
-Exemplo [aqui](https://www.statpower.net/Content/310/R%20Stuff/SampleMarkdown.html)
+1.  item 1
+2.  item 2
+3.  item 3
 
-[hiperlink publico](www.publico.pt)
+#### Notas de Rodapé
 
-[jornal expresso](www.expresso.pt)
+Os estudantes de Data Science for healthcare são os melhores. [^module_2_quarto_html-1][^module_2_quarto_html-2]
 
-[hyperlink google](www.google.com)
+[^module_2_quarto_html-1]: Isto é uma nota de rodapé.
 
-Novas ideias [Quarto website](https://quarto.org/docs/output-formats/html-basics.html)
+[^module_2_quarto_html-2]: Readers Digest
 
-Link para a localização do curso [ENSP](www.ensp.unl.pt)
+### Criar um quadro
 
-## Adicionar outra imagem
+As quadros em quarto podem ser definidas de várias formas mas são divididas entre cabeçalho e conteúdo por um linebreak que é definido pelo caracter "-". As colunas são separadas por "\|" pelo menos no centro podendo ser omitidos na primeira e úttima posição. O RStudio por default assume logo a formatação pedida no formato visual.
 
-![figure 1](images/lisboa.jpeg)
+Em que o default é "-" mas com as opções de alinhamento semelhantes aos processadores de texto: (este alinhamento é definido por coluna) - ":----" Alinhamento à esquerda - "----:" Alinhamento à direita - ":----:" Alinhamento ao centro
 
-![Escola Nacional de Saúde Pública](https://www.ensp.unl.pt/wp-content/uploads/2022/10/w3b8330-e1666611629891-768x384.jpg)
+
+
+| Tipo                        | Número | Estadia Média |
+|:----------------------------|:------:|--------------:|
+| Hospitais                   |  5000  |            10 |
+| Cuidados de Saúde Primários | 20000  |             1 |
+| Cuidados de Longa Duração   |  2000  |           100 |
+: Tipos de hospitais e estadia média {#tbl-exemplo1}
+
+Exemplo de tabela com referência @tbl-exemplo1
+
+A definição do espaçamento das colunas pode ser definido no Quarto em 3 posições:
+
+1.  No YMAL - com o parâmetro tbl-colwidths;
+
+2.  Em código que define a tabela; EX:Tabela ": Isto é um quadro {tbl-colwidths="\[75,15,10\]"}";
+
+3.  Pelo número relativo de caracteres de "-".
+
+
+| dia | doentes |
+|-----|---------|
+| 1   | 150     |
+| 2   | 160     |
+: 5.ª Edição {#tbl-exemplo2}
+
+Mais uma vez podemos fazer referência à tabela @tbl-exemplo2
+
+## Hiperlinks
+
+É possível adicionar hiperlinks com [texto](url), como os exemplos abaixo. Link para a localização do curso [ENSP](www.ensp.unl.pt)
+
+## Imagens
+
+É possível adicionar hiperlinks com ![texto](caminho) ![figure 1](images/lisboa.jpeg){#fig-lisboa} , como por exemplo na @fig-lisboa.
+
+Podemos adicionar o url da imagem que queremos mostrar, como na @fig-ensp. 
+
+![Escola Nacional de Saúde Pública](https://www.ensp.unl.pt/wp-content/uploads/2022/10/w3b8330-e1666611629891-768x384.jpg){#fig-ensp} 
+
+Podemos definir a formatação das imagens e realizar referências cruzadas.
+
 
 ::: {#fig-maps layout-ncol="2"}
 ![European Map](images/map_eu.png){#fig-europa width="360"}
@@ -93,14 +193,15 @@ Link para a localização do curso [ENSP](www.ensp.unl.pt)
 Mapas da Europa e Portugal
 :::
 
-## Referências
-
-Veja @fig-maps para exemplos. Em particular, @fig-pt ou @fig-europa
+Veja @fig-maps para exemplos. Em particular, @fig-pt ou @fig-europa.
 
 ## Flowcharts
 
+Mermaid é uma ferramenta popular que permite a criação de diagramas e fluxogramas diretamente no Quarto através de uma sintaxe simples. Pode geralmente incorporar Mermaid em documentos Quarto usando blocos de código HTML ou integrando através de plugins ou extensões específicas, dependendo do seu ambiente de desenvolvimento.
+
 ```{mermaid}
 flowchart TD
+
   A[Population] --> B(Study population)
 
   B --> C{Salt substitute}
@@ -110,42 +211,39 @@ flowchart TD
   C --> E[Not exposed]
 ```
 
-::: panel-tabset
-## ENSP
+## Tabset
 
-Escola
+Os tabsets no Quarto são uma funcionalidade útil para organizar conteúdo em abas dentro de um documento HTML, permitindo aos leitores alternar entre diferentes seções de conteúdo sem a necessidade de rolar pela página. Isso é especialmente útil para apresentar diferentes análises, visualizações de dados ou subseções de informações de maneira compacta e organizada. O uso de tabsets pode tornar os documentos mais interativos e acessíveis, melhorando a experiência do usuário.
 
-## Data Science
-
-R
-
-## Melhor edição
-
-Esta é que é a melhor
-:::
+Para criar tabsets em documentos Quarto, você utiliza a sintaxe especial no cabeçalho das seções que deseja agrupar em abas. Isso é feito adicionando uma opção de metadados no cabeçalho da seção que especifica que as seções devem ser tratadas como abas.
 
 ::: panel-tabset
-## Introdução
+### Introdução
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neque ex, vehicula dictum risus fermentum, feugiat faucibus neque. Etiam purus quam, lacinia vel porta in, malesuada ac nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae
 
-## Imagens
+### Imagens
 
 ![Logotipo do curso](images/HEX_R_DATA_SCIENCE.png "Logo of our course"){width="6cm"}
-
 :::
 
 ## Equações
 
-Usar dois símbolos de dólar para uma equação separada do texto, e assim por diante. $E(log(Y_t))$
+No Quarto pode incluir equações matemáticas em seus documentos utilizando a sintaxe do LaTeX. As equações podem ser inseridas tanto no formato inline (dentro de um parágrafo) quanto em bloco (como uma equação destacada no texto).
 
-$$ E(log(Y_t)) = \beta_0 + \beta_{1-11} \sum_{m=1}^{m=12} MONTH_t + \beta_{12} TIME + \beta_{13} INT_t + \beta_{14} TIME*INT_t + log(POP_t) + \epsilon_t$$
+### Equações Inline
 
-equação simples $Y=ax+2$
+Para escrever uma equação inline, ou seja, uma equação que aparece dentro de um parágrafo ou texto, você usa o símbolo do dólar `$` para envolver a equação. Por exemplo: $Y=ax+2$
 
-usar um símbolo de dólar para equações inline no texto $E(log(Y_t))$
+### Equações em Bloco
 
-## Anotações ao Código 
+Se você quiser que a equação seja exibida em seu próprio parágrafo, destacada do texto ao redor para maior ênfase, você pode usar dois símbolos de dólar `$$` antes e depois da equação @eq-slr.
+
+$$ E(log(Y_t)) = \beta_0 + \beta_{1-11} \sum_{m=1}^{m=12} MONTH_t + \beta_{12} TIME + \beta_{13} INT_t + \beta_{14} TIME*INT_t + log(POP_t) + \epsilon_t $$ {#eq-slr}
+
+## Anotações ao Código
+
+As anotações ao código no Quarto permitem que os autores adicionem explicações ou comentários específicos a partes do código dentro de um documento, melhorando significativamente a legibilidade e a compreensão do código. Essas anotações são particularmente úteis em documentos educativos ou tutoriais, onde explicar o raciocínio por trás de um trecho de código ou destacar certas partes do código pode ajudar os leitores a entender melhor o material.
 
 ```{r include=TRUE}
 #| echo: true
@@ -158,12 +256,19 @@ x <- a+b #<3>
 x #<4> 
 ```
 
-1. Definir a,
-2. Definir b,
-3. Definir x como a soma de a mais b.
-4. Mostrar x ao utilizador
+1.  Definir a,
+2.  Definir b,
+3.  Definir x como a soma de a mais b.
+4.  Mostrar x ao utilizador
 
-## Codigo 'inline'
+## Codigo `inline`
+
+O código `inline` no Quarto permite incorporar o resultado de expressões de código diretamente no texto de um documento. Isso é particularmente útil para inserir valores dinâmicos que resultam de cálculos ou funções dentro do texto, garantindo que o documento reflita os resultados mais recentes cada vez que é renderizado.
+
+Essa funcionalidade é amplamente usada em relatórios de análise de dados, documentos científicos, ou qualquer outro tipo de documento onde a integração de resultados de código diretamente no fluxo do texto é necessária para melhorar a clareza ou a precisão do conteúdo apresentado.
+
+Para incluir código "inline" em um documento Quarto, você utiliza a sintaxe de acentos graves (backticks) com a letra `r` logo no início, seguida pela expressão de código que deseja executar.
+
 ```{r}
 # Z e a media de idades
 media_idade  <- 43
@@ -191,77 +296,13 @@ O número de cirurgias desta semana é `r d`.
 
 A média de idades e `r media_idade`.
 
-```{r}
-x <- 20
-```
+Vantagens do Código "Inline"
 
-Afinal, o resultado de X é `r x` dias.
+Atualização Automática: Quando os dados ou as análises mudam, o texto que inclui código "inline" é automaticamente atualizado para refletir os novos resultados após a re-renderização do documento.
 
-# Formatação de Texto
+Precisão: Elimina a necessidade de atualizar manualmente os números ou resultados no texto, reduzindo o risco de erros ou discrepâncias.
 
-## Notas de Rodapé
-
-Os estudantes de Data Science for healthcare são os melhores. [^1][^2]
-
-[^1]: Isto é uma nota de rodapé.
-
-[^2]: Readers Digest
-
-Adoramos R! [^3]
-
-[^3]: Isto é outra nota de rodapé
-
-Outra nota. [^4]
-
-[^4]: outro teste
-
-### Criar um quadro
-
-As quadros em quarto podem ser definidas de várias formas mas são divididas entre cabeçalho e conteúdo por um linebreak que é definido pelo caracter "-".
-As colunas são separadas por "|" pelo menos no centro podendo ser omitidos na primeira e úttima posição.
-O RStudio por default assume logo a formatação pedida no formato visual.
-
-Em que o default é "-" mas com as opções de alinhamento semelhantes aos processadores de texto:
-(este alinhamento é definido por coluna)
-- ":----" Alinhamento à esquerda
-- "----:" Alinhamento à direita
-- ":----:" Alinhamento ao centro
-
-
-| Tipo                        | Número | Estadia Média |
-|:----------------------------|:------:|--------------:|
-| Hospitais                   | 5000   | 10            |
-| Cuidados de Saúde Primários | 20000  | 1             |
-| Cuidados de Longa Duração   | 2000   | 100           |
-
-A definição do espaçamento das colunas pode ser definido no Quarto em 3 posições:
-
-1. No YMAL - com o parâmetro tbl-colwidths; 
-2. Em código que define a tabela;
-EX:Tabela
-": Isto é um quadro {tbl-colwidths="[75,15,10]"}";
-3. Pelo número relativo de caracteres de "-".
-
-| Alunos  | Nota | Total |
-|---------|------|-------|
-| Liliana |      |       |
-|         |      |       |
-|         |      |       |
-
-: Isto é um quadro {tbl-colwidths="[75,15,10]"}
-
-
-| dia    | doentes |
-|--------|---------|
-| `r  c` | 150     |
-| 2      | 160     |
-
-: 5.ª Edição
-
-
-Escrever em **negrito**
-
-Escrever em *itálico*
+Integração de Dados: Facilita a narrativa baseada em dados, permitindo uma integração fluida de resultados de análise diretamente no texto.
 
 #### Inserir videos/conteúdo web
 
@@ -269,55 +310,33 @@ Como o Quarto funciona com suporte a múltiplas linguagens é possível colocar 
 
 Desde vídeos a iframe de HTMl permitindo embutir dentro do documento sites web.
 
+::: callout-tip
+## Atenção
 
-::: {.callout-tip}
-## Atenção 
 A leitura em iframe é limitada no Firefox por segurança.
 :::
 
 {{< video https://www.youtube.com/watch?v=GmRT0P5axqY&pp=ygUUYW5kcmUgcGVyYWx0YSBzYW50b3M%3D >}}
 
-#### Criar listas
-
-Sem ordem
-
--   item 1
--   item 2
--   item 3
-
-Com ordem
-
-1.  item 1
-2.  item 2
-3.  item 3
-
-Vamos tentar fazer knitting a este markdown
-
--   item 1
--   item 2
-
-1.  primeiro
-2.  segundo
-
 ## Criar Anotações
 
 Existem 4 formas de fazer anotações em R:
 
-1. Notas "{.callout-note}"
+1.  Notas "{.callout-note}"
 
-:::{.callout-note}
+::: callout-note
 Os dados estão atualizados até ao dia `r Sys.Date()`
 :::
 
-2. Avisos "{.callout-warning}"
+2.  Avisos "{.callout-warning}"
 
-:::{.callout-warning}
+::: callout-warning
 Não foi possível confirmar dados de `r Sys.Date()`
 :::
 
-3. Importante "{.callout-caution}"
+3.  Importante "{.callout-caution}"
 
-:::{.callout-caution}
+::: callout-caution
 Os dados estão atualizados até ao dia `r Sys.Date()`
 :::
 
@@ -325,7 +344,7 @@ Os dados estão atualizados até ao dia `r Sys.Date()`
 
 "{.callout-note title="Nota sobre dados"}"
 
-:::{.callout-note title="Nota sobre dados"}
+::: {.callout-note title="Nota sobre dados"}
 Os dados estão atualizados até ao dia `r Sys.Date()`
 :::
 
@@ -333,29 +352,33 @@ Também é possível remover o ícone e tornar a nota menos proeminente.
 
 "{.callout-note icon=false apperance="mininal"}"
 
-:::{.callout-note title="Nota sobre dados" icon=false appearance="mininal"}
+::: {.callout-note title="Nota sobre dados" icon="false" appearance="mininal"}
 Os dados estão atualizados até ao dia `r Sys.Date()`
 :::
 
 ## Criar referências
 
-[@santos2022omicron]
+Criar referências em documentos Quarto permite que você gerencie citações e bibliografias de forma eficiente, utilizando uma abordagem semelhante à encontrada em outras plataformas de composição de documentos científicos, como LaTeX. No Quarto, as referências são geralmente gerenciadas através de arquivos bibliográficos externos (como arquivos .bib em formato BibTeX) ou diretamente dentro do documento usando uma sintaxe específica. Aqui estão os passos básicos para criar referências em documentos Quarto:
 
-[@litaker2005context]
+1.  Criar um Arquivo BibTeX
 
-[@cowin2005cadherins]
+Crie um arquivo .bib contendo todas as suas referências. Cada entrada em um arquivo BibTeX representa uma referência e tem um tipo específico (como `@article`, `@book` , etc.) e uma série de campos (como author, title, year, etc.) que fornecem detalhes sobre a referência.
 
-[@sharma2010various]
+2.  Referenciar o Arquivo BibTeX no Documento Quarto
 
-[@perkins2020increasing]
+No cabeçalho YAML do seu documento Quarto, adicione uma referência ao seu arquivo .bib usando a chave bibliography.
 
-## Problemas
+3.  Citar Referências no Texto
 
-Instalar pandoc https://pandoc.org/installing.html
+Utilize a sintaxe de citação para referenciar uma obra no seu texto. No Quarto, isso geralmente é feito com colchetes e o identificador da referência do BibTeX.
 
-Para macbook M2 https://github.com/rstudio/rstudio/issues/12512
+Exemplo de bibliografia na Data Science @wickham2023r, @knuth84, @guo2023big .
 
-# Referências
+4.  Gerar a Bibliografia
+
+Quando você renderiza seu documento, o Quarto automaticamente processa as citações e gera uma bibliografia no final do documento, formatada de acordo com o estilo de citação especificado no cabeçalho YAML (usando a chave csl para o arquivo de estilo de citação, se necessário).
+
+### Referências
 
 ::: {#refs}
 :::
