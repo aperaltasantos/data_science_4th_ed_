@@ -1,6 +1,8 @@
 ---
 title: "Módulo 3 | Exploração de dados"
-author: "A. Peralta-Santos"
+author: "A. Peralta-Santos e J Dionisio"
+affiliation: 
+    - "Escola Nacional de Saúde Pública"
 date: today
 date-format: long
 format:

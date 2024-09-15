@@ -1,6 +1,6 @@
 ---
 title: "Módulo 3 | Manipulação de dados"
-author: "A. Peralta-Santos"
+author: "A. Peralta-Santos e J Dionisio"
 date: today
 date-format: long
 lang: pt 
@@ -29,7 +29,6 @@ Esta parte garante que tem as configurações padrão para todos os blocos
 de código R.
 
 Pode ser definido num chunk ou no YAML com o parâmetro execute.
-
 
 ```{r}
 rm(list = ls(all.names = TRUE)) 
@@ -64,7 +63,6 @@ carregadas.
 # install.packages("here")
 # install.packages("haven")
 # install.packages("rio")
-
 library(janitor)
 library(tidyverse)
 library(readxl)
@@ -73,8 +71,6 @@ library(data.table)
 library(here)
 library(haven)
 library(rio)
-
-
 ```
 
 ```{r}
@@ -121,9 +117,13 @@ inpatient_hospital <- read_excel("datasets/atividade_internamento_hospitalar.xls
 
 #### Importar dados por cliques
 
-![Importar dados](images/import.png){#fig-import} 
+![Importar
+dados](images/import.png){#fig-import}
 
-Pode importar um dataset no RStudio @fig-import através de cliques no painel "Files" é um processo intuitivo, especialmente para quem prefere uma abordagem mais visual em vez de escrever código manualmente. Os passos são os seguintes:
+Pode importar um dataset no RStudio @fig-import através de cliques no
+painel "Files" é um processo intuitivo, especialmente para quem prefere
+uma abordagem mais visual em vez de escrever código manualmente. Os
+passos são os seguintes:
 
 Passos para Importar um Dataset no RStudio Usando o Painel "Files"
 
@@ -210,6 +210,7 @@ e list.files()
 
 ```{r}
 #| code-annotations: hover
+#| eval: false
 
 ficheiros <- file.info(list.files("datasets", full.names = TRUE))|> #<1>
     rownames_to_column(var = "path") #<2>
@@ -301,9 +302,11 @@ Renomeámos a variável female para a mais comum sex.
 ### Selecionar variaveis (Select)
 
 Este argumento permite selecionar variáveis; temos 7 variáveis em nosso
-conjunto de dados. Vamos verificar se precisamos de todas elas @fig-select.
+conjunto de dados. Vamos verificar se precisamos de todas elas
+@fig-select.
 
-![Esquema de uso do Select](images/select.png){#fig-select}   
+![Esquema de uso do
+Select](images/select.png){#fig-select}
 
 ```{r}
 # 1. Nome do conjunto de dados final
@@ -350,9 +353,11 @@ inpatient_hospital_exclude1 <- inpatient_hospital |>
 
 ### Filtrar conteúdo (Filter)
 
-Este argumento permite filtrar valores ou strings dentro das variáveis, ver @fig-filtro.
+Este argumento permite filtrar valores ou strings dentro das variáveis,
+ver @fig-filtro.
 
-![Esquema de uso do filtro](images/filter.png){#fig-filtro}
+![Esquema de uso do
+filtro](images/filter.png){#fig-filtro}
 
 ```{r}
 # 1. Nome do conjunto de dados final
@@ -388,7 +393,8 @@ head(inpatient_hospital_less_1000)
 O mutate() é uma função usada para transformar ou adicionar novas
 colunas a um conjunto de dados (data frame ou tibble), ver @fig-mutate.
 
-![Esquema de utilização do Mutate](images/mutate.png){#fig-mutate}
+![Esquema de utilização do
+Mutate](images/mutate.png){#fig-mutate}
 
 ```{r}
 # 1. Nome do conjunto de dados final
@@ -436,7 +442,8 @@ group_by(), o que permite calcular resumos agrupados por uma ou mais
 variáveis. Por exemplo, calcular a média de uma variável para diferentes
 grupos, ver @fig-summarize.
 
-![Esquema de utilização do summarise](images/summarize.png){#fig-summarize}
+![Esquema de utilização do
+summarise](images/summarize.png){#fig-summarize}
 
 ```{r}
 # Criar uma variável para armazenar a soma de todos os pacientes que tiveram alta
@@ -601,7 +608,6 @@ sum_patients_year_speciality <- inpatient_hospital_lite |>
   )
 ```
 
-
 ### Cortar dados (Slice)
 
 As operações de cortar elementos são úteis para retirar linhas
@@ -662,7 +668,7 @@ follow-up.
 O comando Pull permite retirar um vector dos dados de uma coluna.
 
 Pode ser útil para loops em que iteramos por vários elementos de um
-vector. Vamos retirar os nomes dos hospitais dos nossos dados. 
+vector. Vamos retirar os nomes dos hospitais dos nossos dados.
 
 ```{r}
 #| code-annotations: hover
@@ -678,7 +684,7 @@ head(hospitais) #<3>
 2.  Retirar um vector com cada
 3.  Apresentar os dados dos hospitais
 
-O Pull tambem pode ser usado para facilitar inline coding 
+O Pull tambem pode ser usado para facilitar inline coding
 
 ```{r}
 hospitais_max_doentes_saidos <- inpatient_hospital_lite |> 
@@ -714,7 +720,6 @@ quartis_estadia <- inpatient_hospital_lite |>
 head(quartis_estadia)
 ```
 
-
 ## DATAS (DATETIME OBJECTS)
 
 Lidar com datas pode ser complicado, mas é uma competência importante de
@@ -729,7 +734,8 @@ POSIXlt classes, ver formatos na @fig-datas.
 Existem alguns pacotes relevantes para lidade com dados em formato de
 data, mas o mais relevante é o "lubridate".
 
-![Formato de datas no R](images/date_formats.jpeg){#fig-datas}
+![Formato de datas no
+R](images/date_formats.jpeg){#fig-datas}
 
 ```{r}
 # Como obter o dia e o dia e hora, relevante na criação de relatórios e de diferenças de dados e o presente

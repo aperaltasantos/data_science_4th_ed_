@@ -1,6 +1,8 @@
 ---
-title: "Module 7b | Intermediate Data Science Tools"
-author: "A. Peralta-Santos"
+title: "Módulo 7 | Ferramentas intermédias de DataScience"
+author: "A. Peralta-Santos e J Dionisio"
+affiliation: 
+    - "Escola Nacional de Saúde Pública"
 date: today
 date-format: long
 format:
@@ -9,20 +11,21 @@ format:
     smooth-scroll: true
     embed-resources: true
     toc: true
-    toc-location: left
+    toc-location: right 
     number-sections: true
     number-depth: 3
     code_download: true
     code-copy: true
 execute:
   warning: false
-params:
-  ano: 2024
-  escola: "ENSP"
-  pessoa: "Aluno"
-  edicao: "4ª"
-  curso: "Data Science with R in Healthcare"
+  collapse: true
+  message: false
+  eval: true
+  echo: true
 title-block-style: default
+editor: 
+  markdown: 
+    wrap: 72
 bibliography: references.bib 
 ---
 
@@ -53,11 +56,11 @@ remove(required_packages)
 remove(pkg)
 ```
 
-# Introdução
+## Introdução
 
 O objetivo deste capítulo não será o de ensinar todas as ferramentas disponíveis em R, mas o de guiar os próximos passos quando quiserem avançar para além dos conceitos dos módulos anteriores e para que possam retirar inspiração dos produtos mais recentes com exemplos disponíveis.
 
-# Ambientes Reprodutíveis
+## Ambientes Reprodutíveis
 
 Como já foi explorado em módulos anteriores, R é uma ferramenta para análise de dados eficientes. A simplicidade de configuração como as ferramentas criadas pela comunidade (Ex: Dplyr, gt, tidymodels) tornam a linguagem como um bom ponto de entrada para muitas áreas como a saúde.
 
@@ -89,16 +92,16 @@ Nestas situações, 3 princípios devem guiar a passagem de um projeto para prod
 3.  Não sou apenas eu a correr
     -   Desafios:
         -   Alterações de arquitetura
-    -   Soluções para este problema podem passar pelo uso de *containers* (unidades de software que isolam uma aplicação e as suas depedências num ambiente portátil) através de plataformas como o *docker (*plataforma que facilita a criação, distribuição e execução destes *containers*).
+    -   Soluções para este problema podem passar pelo uso de *containers* (unidades de software que isolam uma aplicação e as suas depedências num ambiente portátil) através de plataformas como o *docker* (plataforma que facilita a criação, distribuição e execução destes *containers* ).
 
 Com base destes requesitos, vamos focar na estabilidade no ambiente computacional que utilizamos relativamente a dependências que tendem a ser um dos primeiros problemas que encontramos em código com alguns meses.
 
 A ferramenta que iremos abordar para gestão de ambientes será o pacote RENV.
 
 ```{=html}
-<iframe width="780" height="500" src="https://rstudio.github.io/renv/articles/renv.html" title="Introdução ao RENV"></iframe>
+<iframe width="780" height="500" src="https://rstudio.github.io/renv/articles/renv" title="Introdução ao RENV"></iframe>
 ```
-## Renv
+### Renv
 
 Como já foi discutido em módulos anteriores, no R, uma biblioteca (library) é um pasta que contém pacotes instalados. Embora seja comum usar o comando library() para carregar um pacote, o termo biblioteca se refere, na verdade, ao local onde esses pacotes estão armazenados. Por padrão, os pacotes são instalados em uma biblioteca do sistema, que é compartilhada entre todos os projetos.
 
@@ -132,18 +135,18 @@ Desvantagens:
 
 -   Espaço em disco: O isolamento dos pacotes pode ocupar mais espaço, especialmente com muitos projetos isolados.
 
-### Como criar?
+#### Como criar?
 
 -   Ative o renv com o comando renv::init(), que cria uma biblioteca de pacotes exclusiva para o projeto.
 -   Durante a criação de um novo projeto, você pode configurar a reprodutibilidade desde o início, utilizando o renv para gerenciar os pacotes.
 
 ![Possibilidade de criar um projeto com reprodutibilidade como prioridade](images/renv_init.png){width="100%"}
 
-### Como documentar?
+#### Como documentar?
 
 Existe a função snapshot() para capturar o estado atual dos pacotes e gravar no arquivo "renv.lock", que armazena as versões exatas dos pacotes e suas fontes. Esse arquivo é essencial para garantir que o projeto possa ser reproduzido em outras máquinas.
 
-### Como colaborar?
+#### Como colaborar?
 
 O comando renv::status() ajuda a verificar o estado do ambiente do projeto, identificando pacotes que precisam ser instalados ou atualizados.
 
@@ -158,7 +161,7 @@ Worflow:
 3.  snapshot - Registar o ambiente no lockfile
 4.  restore - Reproduzir o ambiente que está no lock file
 
-### SLUSHY
+#### SLUSHY
 
 O pacote slushy foi criada pela empresa GSK.
 
@@ -176,16 +179,12 @@ Workflow:
 
 1.  new_config()
     -   Cria uma nova configuração para o projeto, estabelecendo o ambiente inicial e preparando-o para o gestão de dependências.
-
 2.  slushy_init()
     -   Inicializa o Slushy no projeto atual, configurando os parâmetros necessários para o gestão de pacotes e snapshots.
-
 3.  slushy_add("packagename")
     -   Adiciona um novo pacote ao projeto.
-
 4.  slushy_drop("packagename")
     -   Remove um pacote do projeto.
-
 5.  slushy_update(date = "2023-01-01")
     -   Atualiza os pacotes do projeto com base em um snapshot específico do CRAN na data fornecida. Isto permite controlar quando e como as atualizações são aplicadas, minimizando risco de incompatibilidades.
 
@@ -194,13 +193,11 @@ A vantagem do Slushy está em poder usar snapshot do CRAN para adquirir pacotes 
 ```{=html}
 <iframe width="780" height="500" src="https://gsk-biostatistics.github.io/slushy/" title="Slushy as an alternative to RENV"></iframe>
 ```
+## Quarto Intermédio
 
-# Quarto Intermédio
+### Inclusões (Includes)
 
-## Inclusões (Includes)
-
-Em Quarto, existe uma funcionalidade que permite a reutilização eficiente de conteúdo entre vários documentos. 
-Esta característica é especialmente útil em projetos que exigem que secções de texto, código ou resultados de análises sejam partilhados entre diferentes outputs, garantindo consistência e reduzindo o tempo despendido em atualizações. 
+Em Quarto, existe uma funcionalidade que permite a reutilização eficiente de conteúdo entre vários documentos. Esta característica é especialmente útil em projetos que exigem que secções de texto, código ou resultados de análises sejam partilhados entre diferentes outputs, garantindo consistência e reduzindo o tempo despendido em atualizações.
 
 Reutilizar conteúdo desta forma é possível utilizando a forma "{{< include >}}".
 
@@ -231,7 +228,7 @@ Benefícios:
 
 {{< include Include.qmd >}}
 
-## Parâmetros
+#### Parâmetros
 
 Os parâmetros em Quarto é uma funcionalidade que aumenta a personalização dinâmica do conteúdo de um documento.
 
@@ -283,7 +280,7 @@ quarto::quarto_render(input="Module_7_Advanced_DS_tools.qmd",
                       )
 ```
 
-## HTML e CSS
+### HTML e CSS
 
 HTML (Hypertext Markup Language): É a linguagem básica para estruturação de conteúdo na web. É usada para definir o layout de uma página, criar links, inserir imagens e organizar o conteúdo de forma hierárquica.
 
@@ -311,11 +308,11 @@ Isto permite utilizar classes no texto para uso da formatação preferida.
   
 ```
 
-## Quarto Websites
+### Quarto Websites
 
 Tal como já vimos no módulo 2, o Quarto é uma poderosa plataforma.
 
-Para além da criação de relatórios dinâmicos e reprodutíveis facilita a criação de websites interativos e dinâmicos, permitindo a individuos e a equipas partilhar suas análises de maneira clara e organizada. Ele oferece suporte à navegação por meio de barras laterais ou de navegação global, bem como à pesquisa por texto completo. 
+Para além da criação de relatórios dinâmicos e reprodutíveis facilita a criação de websites interativos e dinâmicos, permitindo a individuos e a equipas partilhar suas análises de maneira clara e organizada. Ele oferece suporte à navegação por meio de barras laterais ou de navegação global, bem como à pesquisa por texto completo.
 
 Websites criados com Quarto podem ser facilmente publicados em plataformas como GitHub Pages, Netlify, ou servidores locais, facilitando a distribuição de conteúdos interativos.
 
@@ -325,10 +322,10 @@ O Livro disponizado foi elaborado utilizando o Github Pages.
 
 Funcionalidades Disponibilizadas:
 
-- Configuração de Navegação
-    -   Quarto permite configurar uma barra de navegação robusta para facilitar a movimentação entre diferentes páginas do seu site. Isso é feito no arquivo _quarto.yml , onde é possível definir links, submenus e ordenação de páginas;
+-   Configuração de Navegação
+    -   Quarto permite configurar uma barra de navegação robusta para facilitar a movimentação entre diferentes páginas do seu site. Isso é feito no arquivo \_quarto.yml , onde é possível definir links, submenus e ordenação de páginas;
     -   Cada página é um documento quarto.
-    
+
 ```{r eval=FALSE}
 
   #Exemplo de código para Quarto website
@@ -378,15 +375,14 @@ format:
 
 ```
 
-- Temas e Personalizações
-    -   Tal como as outras ferramentas Quarto, os Websites suportam temas predefinidos que podem ser aplicados a todo o site, mas também é possível personalizar o estilo visual com CSS. Isso dá flexibilidade para adaptar o site à identidade visual desejada. 
-- Pesquisa e Links intra-documento
-    - Suporte a pesquisa por texto completo e links interno, permitindo que os usuários naveguem facilmente pelo conteúdo.
+-   Temas e Personalizações
+    -   Tal como as outras ferramentas Quarto, os Websites suportam temas predefinidos que podem ser aplicados a todo o site, mas também é possível personalizar o estilo visual com CSS. Isso dá flexibilidade para adaptar o site à identidade visual desejada.
+-   Pesquisa e Links intra-documento
+    -   Suporte a pesquisa por texto completo e links interno, permitindo que os usuários naveguem facilmente pelo conteúdo.
 
-## Quarto Dashboards
+### Quarto Dashboards
 
-Os Quarto Dashboards são uma nova poderosa ferramenta para criar relatórios interativos e dinâmicos utilizando a tecnologia Quarto. 
-Este nova tipologia foi projetada para combinar a simplicidade da criação de documentos dinâmicos com a interatividade de dashboards, o Quarto facilita a publicação de análises de dados visuais e interativos na web ou em documentos offline.
+Os Quarto Dashboards são uma nova poderosa ferramenta para criar relatórios interativos e dinâmicos utilizando a tecnologia Quarto. Este nova tipologia foi projetada para combinar a simplicidade da criação de documentos dinâmicos com a interatividade de dashboards, o Quarto facilita a publicação de análises de dados visuais e interativos na web ou em documentos offline.
 
 Em resumo, mantêm as vantagens do Quarto, mas permite a publicação de um formato mais dinâmico.
 
@@ -395,10 +391,9 @@ Abaixo deixamos um exemplo de um dashboard.
 ```{=html}
 <iframe width="100%" height="500" src="output/documents/Module_7_Dashboard.html" title="Exemplo de Dashboard em Quarto"></iframe>
 ```
-
 Dashboards no Quarto são compostos por vários componentes para navegação e apresentação de dados. Elementos chave incluem:
 
-1. Navegação: Cada dashboard inclui uma barra de navegação no topo com título, opcionalmente um logo e autor. Exemplo de código para adicionar título e autor:
+1.  Navegação: Cada dashboard inclui uma barra de navegação no topo com título, opcionalmente um logo e autor. Exemplo de código para adicionar título e autor:
 
 ```{r}
 #| eval: false
@@ -408,9 +403,9 @@ author: "Seu Nome"
 ---
 ```
 
-2. Páginas: Para dashboards com múltiplas páginas, use cabeçalhos de nível 1 acima dos cabeçalhos de nível 2 que definem linhas e colunas.
+2.  Páginas: Para dashboards com múltiplas páginas, use cabeçalhos de nível 1 acima dos cabeçalhos de nível 2 que definem linhas e colunas.
 
-3. Layout: Os componentes dentro de uma página são organizados em linhas e colunas alternadas, definidas por cabeçalhos em markdown com (#, ##, ###) e especificações computacionais relativas ao seu comportamento em HTML. Por exemplo, um layout simples com duas linhas, sendo a segunda dividida em duas colunas seria algo assim:
+3.  Layout: Os componentes dentro de uma página são organizados em linhas e colunas alternadas, definidas por cabeçalhos em markdown com (#, ##, ###) e especificações computacionais relativas ao seu comportamento em HTML. Por exemplo, um layout simples com duas linhas, sendo a segunda dividida em duas colunas seria algo assim:
 
 ```{r}
 #| eval: false
@@ -429,10 +424,9 @@ A Coluna B contém o resto da largura da página
 
 ```
 
-4. Cards ou Cartões: São a unidade fundamental de exibição nos dashboards, criados automaticamente para células e conteúdo em markdown dentro de linhas e colunas. Cada pedaço de código separado e com output entre linhas ou colunas será colocado no Card.
+4.  Cards ou Cartões: São a unidade fundamental de exibição nos dashboards, criados automaticamente para células e conteúdo em markdown dentro de linhas e colunas. Cada pedaço de código separado e com output entre linhas ou colunas será colocado no Card.
 
-
-5. Orientação: Por predefinição, as páginas são organizadas primeiro por linha e depois por coluna. Isso pode ser alterado especificando a opção orientation: columns no documento.
+5.  Orientação: Por predefinição, as páginas são organizadas primeiro por linha e depois por coluna. Isso pode ser alterado especificando a opção orientation: columns no documento.
 
 [Exemplo de Orientação em colunas](https://quarto.org/docs/dashboards/images/chart-focal-left.png)
 
@@ -448,7 +442,7 @@ A Coluna B contém o resto da largura da página
 
 ```
 
-6. Preenchimento vs. Fluxo (Fill vs. Flow): Cada elemento determina seu tamanho preenchendo o espaço disponível ou seguindo seu tamanho natural. Isso é controlado pelas classes .fill e .flow.
+6.  Preenchimento vs. Fluxo (Fill vs. Flow): Cada elemento determina seu tamanho preenchendo o espaço disponível ou seguindo seu tamanho natural. Isso é controlado pelas classes .fill e .flow.
 
 ```{r}
 #| eval: false
@@ -457,7 +451,7 @@ A Coluna B contém o resto da largura da página
 ## Row {.flow}
 ```
 
-7. Scrolling: Por predefinição, o conteúdo do dashboard preenche todo o espaço disponível na página, mas pode ser configurado para usar a altura natural do conteúdo deixar o utilizador navegar para baixo.
+7.  Scrolling: Por predefinição, o conteúdo do dashboard preenche todo o espaço disponível na página, mas pode ser configurado para usar a altura natural do conteúdo deixar o utilizador navegar para baixo.
 
 ```{r}
 #| eval: false
@@ -471,7 +465,7 @@ fig-width: 10
 ---
 ```
 
-8. Conjuntos de Tabsets: É possível fazer separadores *tabsets* para incluir múltiplas visões de dados ou conteúdo de importância secundária. Eles são criados adicionando a classe .tabset a uma linha ou coluna.
+8.  Conjuntos de Tabsets: É possível fazer separadores *tabsets* para incluir múltiplas visões de dados ou conteúdo de importância secundária. Eles são criados adicionando a classe .tabset a uma linha ou coluna.
 
 ```{r}
 #| eval: false
@@ -507,13 +501,13 @@ code chunks
 
 [Exemplo de resultado de tabsets em Colunas](https://quarto.org/docs/dashboards/images/chart-focal-left.png)
 
-9. Personalização: Tal como tudo em Quarto HTML é tudo personalizável recorrendo a temas que são CSS e SASS. Apesar de úteis para embelezar um produto, a sua utilização é mais avançada que o ãmbito deste curso.
+9.  Personalização: Tal como tudo em Quarto HTML é tudo personalizável recorrendo a temas que são CSS e SASS. Apesar de úteis para embelezar um produto, a sua utilização é mais avançada que o ãmbito deste curso.
 
 Terão ter um exemplo de alterações deste género no ficheiro custom.scss na pasta themes se quiserem explorar.
 
 Para vos apoiar na vossa jornada nos Quarto Dashboard, diponibilizamos no repositório do curso um exemplo entitulado Dashboard.qmd para poderem ver como é construído e explorarem as alterações que podem fazer.
 
-# SHINY
+## SHINY
 
 O pacote Shiny é uma ferramenta interessante para níveis intermédios e avançados da utilização de R. Este pacote fornece uma estrutura para transformar análises de dados em aplicações web interativas, onde os utizadores podem interagir com as visualizações e realizar ajustes em tempo real, sem necessidade de recarregar a página.
 
@@ -522,10 +516,9 @@ O pacote Shiny é uma ferramenta interessante para níveis intermédios e avanç
 Uma aplicação Shiny típicamente é composta por dois componentes principais:
 
 -   Interface do Utilizador (UI): Define a aparência da aplicação e os componentes com os quais o utilizador pode interagir, como botões, sliders, gráficos ou caixas de verificação.
-    - ui.R ou function ui
-
+    -   ui.R ou function ui
 -   Lógica (Server): Contém as funções que processam os dados de entrada e geram as saídas (gráficos, tabelas, etc.). A cada interação do usuário, o servidor recalcula e atualiza os outputs de forma dinâmica.
-    - server.R ou function server
+    -   server.R ou function server
 
 Em baixo, colocamos um exemplo muito simples onde o utilizador pode ajustar o número de observações para gerar diferentes distribuições normais. O gráfico é atualizado automaticamente sempre que o valor do slider é alterado.
 
@@ -557,12 +550,11 @@ server <- function(input, output) {
 shinyApp(ui = ui, server = server)
 ```
 
+## Controlo de versões
 
-# Controlo de versões
+### Uma breve introdução ao GIT e GITHUB
 
-## Uma breve introdução ao GIT e GITHUB
-
-### O quê?
+#### O quê?
 
 O Git é um sistema de controle de versão distribuído, utilizado para controlar mudanças em arquivos de código durante o desenvolvimento de código.
 
@@ -570,7 +562,7 @@ GitHub é uma plataforma baseada na web que utiliza os sistema Git para o armaze
 
 ![Git como sistema de controlo de versões e GitHub como plataforma colaborativas e de partilha de projetos](images/git-github.png){width="100%"}
 
-### Porquê?
+#### Porquê?
 
 Vantagens de usar um sistema git nos nossos projetos:
 
@@ -585,7 +577,7 @@ O plataforma Github permite o armazenamento e gestão de repositórios/projetos 
 3.  Pull requests e revisão de código antes de junção
 4.  Integração com outras ferramentas
 
-### Como implementar?
+#### Como implementar?
 
 1.  Criar [conta no GitHub](https://github.com/join)
 2.  Podemos fazer a gestão de projetos de 2 formas:
@@ -597,25 +589,25 @@ Por ser mais simples iremos utilizar o Github Deskop que pode ser instalar no se
 
 ![Exemplo da interface](https://desktop.github.com/images/screenshot-windows-light.png)
 
-### Worflow
+#### Worflow
 
-#### Criar/Clonar um repositório (Comandos init e add)
+##### Criar/Clonar um repositório (Comandos init e add)
 
 ![Repositórios](https://desktop.github.com/images/screenshot-windows-light.png)
 
-#### Comandos Importantes GIT:
+##### Comandos Importantes GIT:
 
 1.  *Commit* - Grava as alterações no repositório local
 2.  *Pull* - Atualiza o repositório local com as alterações do repositório remoto.
 3.  *Diff* - Mostra o estado atual do repositório, incluindo as alterações do repositório que ainda não foram adicionados ou comprometidos ao repositório.
 4.  *Branch* - Criar ramificações para o repositório
 5.  *Merge* - Fundir ramificações, normalmente para a ramificação principal
-6.  *Log*  - Mostra o histórico de commits. No Github é também utilizada a palavra Activity.
+6.  *Log* - Mostra o histórico de commits. No Github é também utilizada a palavra Activity.
 7.  *Push* - Envia as alterações do repositório local para o repositório remoto.
 
-# Automated Reporting
+## Automated Reporting
 
-## Github Actions
+### Github Actions
 
 GitHub Actions são uma funcionalidade da plataforma GitHub que permite a automação de workflows dentro dos repositório GitHub, sendo uma forma de correr código de forma automática num computador que a plataforma mantêm.
 
@@ -642,7 +634,7 @@ Estas acções são muito interessantes na construção de automatismos que pode
 
 Deixamos 2 exemplos de tarefas que podem ser automatizadas:
 
-## Task Schedualing (Gestão de tarefas automáticas)
+### Task Schedualing (Gestão de tarefas automáticas)
 
 Deixamos o código do workflow que permite correr um script de forma automática com uma temporização regular.
 
@@ -693,7 +685,7 @@ jobs:
 
 ```
 
-## Emails automáticos
+### Emails automáticos
 
 Preparação de um ficheiro com as credenciais de um email.
 
@@ -755,13 +747,13 @@ jobs:
           
 ```
 
-# GENERATIVE AI MODELS IN R Programming
+## GENERATIVE AI MODELS IN R Programming
 
 Desde Novembro de 2022 que se têm falado de modelos de inteligência artificial generativa.
 
 Este modelos, um subconjunto da inteligência artificial, são projetados para gerar novos dados que se assemelham a dados existentes.
 
-### Modelos de Linguagem de Grande Escala (LLMs) na Programação
+#### Modelos de Linguagem de Grande Escala (LLMs) na Programação
 
 LLMs como o ChatGPT ganharam atenção significativa pela sua capacidade de compreender e gerar texto semelhante ao humano.
 
@@ -788,7 +780,6 @@ Existem múltplas LLM mas o mais conhecido é o CHAT-GPT.
 ```{=html}
 <iframe width="780" height="500" src="https://chat.openai.com/" title="LLM as a part for productive programming"></iframe>
 ```
-
 Podemos pedir ao ChatGPT para nos elaborar uma função que calcule o BMI a partir de uma idade e altura.
 
 A fase seguinte poderá ser a de integração de LLM nas nossas ferramentas de programação. Ex: RSTUDIO
@@ -797,9 +788,9 @@ De opções temos o Copilot da Microsoft, disponível no RSTUDIO mas é pago.
 
 ![Localização da Configuração do Copilot](images/copilot.png)
 
-## CHAT GPT no Rstudio
+### CHAT GPT no Rstudio
 
-### Pacote GPTSTUDIO
+#### Pacote GPTSTUDIO
 
 O processo ainda não está muito otimizado mas colocamos os passos para instalar o add-in GPTSTUDIO:
 
@@ -821,7 +812,6 @@ Estas ferramentas ainda estão em desnvolvimento, pelo que pPara já não recome
 A API da OPENAI também tem sofrido alterções o que poderá levar a que algumas da informação aqui apresentado poderá não estar atualizada.
 
 [Documentação Oficial](https://platform.openai.com/docs/api-reference/introduction)
-
 :::
 
 ```{r}
@@ -837,11 +827,11 @@ A API da OPENAI também tem sofrido alterções o que poderá levar a que alguma
 
 ```
 
-### Pacote OpenAi
+#### Pacote OpenAi
 
-O pacote openai para R facilita a interação com a API da OpenAI, permitindo aos usuários utilizar modelos de linguagem avançados como GPT-4 diretamente dentro de scripts R. 
+O pacote openai para R facilita a interação com a API da OpenAI, permitindo aos usuários utilizar modelos de linguagem avançados como GPT-4 diretamente dentro de scripts R.
 
-Este pacote oferece funções para gerar texto, imagens e executar outras tarefas de NLP, simplificando a integração de inteligência artificial em fluxos de trabalho de ciência de dados, diretamente dentro do RStudio ou Positron. 
+Este pacote oferece funções para gerar texto, imagens e executar outras tarefas de NLP, simplificando a integração de inteligência artificial em fluxos de trabalho de ciência de dados, diretamente dentro do RStudio ou Positron.
 
 Ele poderá ser interessante como auxilio em tarefas de análise exploratória de dados (EDA), integrando-se com modelos como GPT (via OpenAI).
 
@@ -874,8 +864,7 @@ Sys.setenv("OPENAI_API_KEY" = "KEY_HERE")
 #   )
 ```
 
-
-Importante de referir novamente que estes modelos têm limitações e  que a sua utilização deve ser feita com precauções.
+Importante de referir novamente que estes modelos têm limitações e que a sua utilização deve ser feita com precauções.
 
 Além disso, o uso da API tem custos, que variam conforme o volume de texto utilizado (contexto) e a resposta realizadas, especialmente ao utilizar modelos maiores como GPT-4.
 
@@ -904,4 +893,4 @@ test_gpt <- create_chat_completion(
 test_gpt[["choices"]][["message.content"]]
 ```
 
-# Fim
+## Fim

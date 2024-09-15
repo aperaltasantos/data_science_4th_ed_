@@ -1,6 +1,8 @@
 ---
 title: "Módulo 5 | Modelos estatísticos"
 author: "A. Peralta-Santos"
+affiliation: 
+    - "Escola Nacional de Saúde Pública"
 date: today
 date-format: long
 lang: pt 
@@ -10,7 +12,7 @@ format:
     smooth-scroll: true
     embed-resources: true
     toc: true
-    toc-location: left
+    toc-location: right
     number-sections: true
     number-depth: 3
     code_download: true
@@ -73,12 +75,12 @@ remove(pkg)
 # TABELAS
 
 ::: callout-important
-O R(Posit) é uma ferramenta poderosa para produzir tabelas de forma muito customizavel. O package com maior potencialidade é o GT. ver mais aqui <https://gt.rstudio.com/articles/gt.html>
+O R(Posit) é uma ferramenta poderosa para produzir tabelas de forma
+muito customizavel. O package com maior potencialidade é o GT. ver mais
+aqui <https://gt.rstudio.com/articles/gt.html>
 
-Outra sugestão de recurso de aprendizagem <https://gt.albert-rapp.de/> 
+Outra sugestão de recurso de aprendizagem <https://gt.albert-rapp.de/>
 :::
-
-
 
 ![](images/table_gt.png)
 
@@ -94,11 +96,9 @@ https://www.nhs.uk/conditions/angina/ HeartPeakReading: reading at the
 peak of the heart rate HeartDisease: the classification label of whether
 patient has heart disease or not
 
-
 Frequentemente os relatórios pedem tabelas descritivas pela variável de
 exposição o "gtsummary" ajuda a criar essas tabelas e pode ser
 complementado pelo package GT
-
 
 ```{r}
 # Carregar o conjunto de dados de doença cardíaca do pacote MLDataR
@@ -145,8 +145,8 @@ table1
 
 ```
 
-
 ## Adaptar a tabela
+
 Melhorar a tabela com o GT
 
 ```{r}
@@ -174,7 +174,7 @@ table1_f
 table1_f |> gtsave("tab_1.docx")
 ```
 
-# TESTES ESTATÍSTICOS 
+# TESTES ESTATÍSTICOS
 
 ## Comparar médias
 
@@ -184,7 +184,11 @@ library(rstatix)
 
 ### Test t (comparar médias)
 
-Realiza um teste t de duas amostras não pareadas (ou teste t independente) no R para comparar as médias de idade (age) entre dois grupos de sexo (sex) no conjunto de dados hd. Este teste é útil para determinar se há uma diferença estatisticamente significativa entre as médias dos dois grupos. 
+Realiza um teste t de duas amostras não pareadas (ou teste t
+independente) no R para comparar as médias de idade (age) entre dois
+grupos de sexo (sex) no conjunto de dados hd. Este teste é útil para
+determinar se há uma diferença estatisticamente significativa entre as
+médias dos dois grupos.
 
 ```{r}
 # Two-samples unpaired test
@@ -196,7 +200,9 @@ hd %>% t_test(age ~ sex)
 
 ### Teste Chi-Quadrado
 
-Realiza um teste qui-quadrado (χ²) para avaliar a associação entre gênero e ocorrência de doença cardíaca no conjunto de dados. Vou comentar o código em português de Portugal para explicar cada parte.
+Realiza um teste qui-quadrado (χ²) para avaliar a associação entre
+gênero e ocorrência de doença cardíaca no conjunto de dados. Vou
+comentar o código em português de Portugal para explicar cada parte.
 
 ```{r}
 # Example contingency table
@@ -512,20 +518,29 @@ check_model(model3)
 
 ```
 
-check_model() é uma função útil para diagnosticar se um modelo de regressão linear cumpre as suposições fundamentais. Fornece gráficos para avaliar aspectos como a normalidade dos resíduos e a homocedasticidade (variância constante dos resíduos).
+check_model() é uma função útil para diagnosticar se um modelo de
+regressão linear cumpre as suposições fundamentais. Fornece gráficos
+para avaliar aspectos como a normalidade dos resíduos e a
+homocedasticidade (variância constante dos resíduos).
 
 ```{r}
 model_performance(model3)
 ```
 
-model_performance() retorna várias métricas de desempenho do modelo, como o R-quadrado, que indica a proporção da variância na variável dependente que é previsível a partir das variáveis independentes, e o RMSE (Root Mean Square Error), que mede a qualidade do ajuste do modelo.
+model_performance() retorna várias métricas de desempenho do modelo,
+como o R-quadrado, que indica a proporção da variância na variável
+dependente que é previsível a partir das variáveis independentes, e o
+RMSE (Root Mean Square Error), que mede a qualidade do ajuste do modelo.
 
 ```{r}
 compare_performance(model2, model3, verbose = FALSE)
 ```
 
-compare_performance() compara métricas de desempenho entre dois modelos. Isso é útil para avaliar qual modelo apresenta melhor ajuste ou previsão. O argumento verbose = FALSE simplifica a saída, mostrando apenas as informações mais críticas.
- 
+compare_performance() compara métricas de desempenho entre dois modelos.
+Isso é útil para avaliar qual modelo apresenta melhor ajuste ou
+previsão. O argumento verbose = FALSE simplifica a saída, mostrando
+apenas as informações mais críticas.
+
 ### Visualização dos efeitos do modelo
 
 ```{r}
@@ -670,13 +685,26 @@ tbl_m4 |> gtsave("output/documents/tbl_m4.docx")
 
 ## SURVIVAL ANALYSIS
 
-A análise de sobrevivência lida com dados de tempo até a ocorrência de um evento. Este tipo de análise é usado para estudar o tempo até a ocorrência de um evento de interesse, frequentemente referido como "falha" ou "morte", embora o evento possa ser qualquer ponto final, como recorrência de doença, alta hospitalar ou falha de uma máquina. As principais características da análise de sobrevivência incluem:
+A análise de sobrevivência lida com dados de tempo até a ocorrência de
+um evento. Este tipo de análise é usado para estudar o tempo até a
+ocorrência de um evento de interesse, frequentemente referido como
+"falha" ou "morte", embora o evento possa ser qualquer ponto final, como
+recorrência de doença, alta hospitalar ou falha de uma máquina. As
+principais características da análise de sobrevivência incluem:
 
-Evento de Interesse: Este é um evento específico que o estudo foi desenhado para observar, como morte, recaída de uma doença, etc. Em contextos não médicos, isso pode ser a falha de um sistema mecânico, mudança de emprego, etc.
+Evento de Interesse: Este é um evento específico que o estudo foi
+desenhado para observar, como morte, recaída de uma doença, etc. Em
+contextos não médicos, isso pode ser a falha de um sistema mecânico,
+mudança de emprego, etc.
 
-Censura: Um aspecto único da análise de sobrevivência é lidar com dados censurados. A censura ocorre quando temos informações incompletas sobre o tempo de sobrevivência de alguns indivíduos. Por exemplo, se um estudo termina e um participante ainda não experimentou o evento de interesse, seus dados são considerados censurados à direita. A censura também pode ocorrer se um participante abandonar o estudo.
+Censura: Um aspecto único da análise de sobrevivência é lidar com dados
+censurados. A censura ocorre quando temos informações incompletas sobre
+o tempo de sobrevivência de alguns indivíduos. Por exemplo, se um estudo
+termina e um participante ainda não experimentou o evento de interesse,
+seus dados são considerados censurados à direita. A censura também pode
+ocorrer se um participante abandonar o estudo.
 
-![](images/event.png) 
+![](images/event.png)
 
 Nota: a função Surv() no pacote {survival} aceita por padrão
 VERDADEIRO/FALSO, onde VERDADEIRO é evento e FALSO é censurado; 1/0 onde
@@ -712,11 +740,19 @@ head(lung)
 
 ### Kaplan-Meier plots
 
-O método Kaplan-Meier é a maneira mais comum de estimar tempos de sobrevivência e probabilidades. Resulta em uma função degrau, onde há uma descida a cada vez que um evento ocorre. 
+O método Kaplan-Meier é a maneira mais comum de estimar tempos de
+sobrevivência e probabilidades. Resulta em uma função degrau, onde há
+uma descida a cada vez que um evento ocorre.
 
-Modelo de Sobrevivência: A função survfit2() com a fórmula Surv(time, status) ~ 1 cria um modelo de sobrevivência usando o tempo (time) e o status do evento (status) do conjunto de dados lung. O termo ~ 1 indica que é um modelo de sobrevivência geral, sem estratificação por variáveis adicionais.
+Modelo de Sobrevivência: A função survfit2() com a fórmula Surv(time,
+status) \~ 1 cria um modelo de sobrevivência usando o tempo (time) e o
+status do evento (status) do conjunto de dados lung. O termo \~ 1 indica
+que é um modelo de sobrevivência geral, sem estratificação por variáveis
+adicionais.
 
-Gráfico de Kaplan-Meier: ggsurvfit() é usado para criar um gráfico de Kaplan-Meier, mostrando a probabilidade de sobrevivência ao longo do tempo.
+Gráfico de Kaplan-Meier: ggsurvfit() é usado para criar um gráfico de
+Kaplan-Meier, mostrando a probabilidade de sobrevivência ao longo do
+tempo.
 
 ```{r}
 # Carregar o pacote ggsurvfit para visualização gráfica de dados de sobrevivência
@@ -738,8 +774,7 @@ survfit2(Surv(time, status) ~ 1, data = lung) %>%
 
 ```
 
-
-Podemos calcular as curvas de sobrevivencia por sexo. 
+Podemos calcular as curvas de sobrevivencia por sexo.
 
 ```{r}
 survfit2(Surv(time, status) ~ sex, data = lung) %>% 
@@ -754,7 +789,9 @@ survfit2(Surv(time, status) ~ sex, data = lung) %>%
 
 ### Survival times
 
-Podemos calcular qual é a probabilidade de sobrevivencia ao ano (365.25 dias). 
+Podemos calcular qual é a probabilidade de sobrevivencia ao ano (365.25
+dias).
+
 ```{r}
 # Criar um modelo de sobrevivência usando a função survfit
 # Surv(time, status) ~ 1 indica um modelo sem variáveis preditoras (análise global)
@@ -766,7 +803,9 @@ summary(model_surv, times = 365.25)
 
 ```
 
-Ou podemos calcular qual é a mediana de sobrevivencia (quanto tempo é que 50% dos doentes tiveram o evento)
+Ou podemos calcular qual é a mediana de sobrevivencia (quanto tempo é
+que 50% dos doentes tiveram o evento)
+
 ```{r}
 # Carregar os pacotes necessários
 # library(survival)
@@ -787,11 +826,18 @@ model_surv %>%
 
 ### Cox regression
 
-Podemos querer quantificar o tamanho do efeito de uma única variável, ou incluir mais de uma variável em um modelo de regressão para levar em conta os efeitos de múltiplas variáveis.
+Podemos querer quantificar o tamanho do efeito de uma única variável, ou
+incluir mais de uma variável em um modelo de regressão para levar em
+conta os efeitos de múltiplas variáveis.
 
-O modelo de regressão de Cox é um modelo semi-paramétrico que pode ser usado para ajustar modelos de regressão univariada e multivariada que têm resultados de sobrevivência.
+O modelo de regressão de Cox é um modelo semi-paramétrico que pode ser
+usado para ajustar modelos de regressão univariada e multivariada que
+têm resultados de sobrevivência.
 
-Podemos ajustar modelos de regressão para dados de sobrevivência usando a função coxph() do pacote {survival}, que leva um objeto Surv() no lado esquerdo e tem uma sintaxe padrão para fórmulas de regressão em R no lado direito.
+Podemos ajustar modelos de regressão para dados de sobrevivência usando
+a função coxph() do pacote {survival}, que leva um objeto Surv() no lado
+esquerdo e tem uma sintaxe padrão para fórmulas de regressão em R no
+lado direito.
 
 ```{r}
 # Carregar os pacotes necessários

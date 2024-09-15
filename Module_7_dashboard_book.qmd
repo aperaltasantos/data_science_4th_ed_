@@ -1,37 +1,45 @@
 ---
-title: "Module 7a | Dashboard"
+title: "Module 7 | Dashboard"
 subtitle: "Boas práticas no desenvolvimento de dashboards"
 author: "A. Peralta-Santos"
 affiliation: 
-    - Escola Nacional de Saúde Pública
+    - "Escola Nacional de Saúde Pública"
 date: today
 date-format: long
-lang: pt
 format:
   html:
+    preview: false
     smooth-scroll: true
     embed-resources: true
-    code-copy: true
-    code_download: true
     toc: true
     toc-location: left
-theme: cosmo
-smooth-scroll: true
+    number-sections: true
+    number-depth: 3
+    code_download: true
+    code-copy: true
 execute:
   warning: false
+  collapse: true
+  message: false
+  eval: true
+  echo: true
+title-block-style: default
+editor: 
+  markdown: 
+    wrap: 72
 project:
   output-dir: output/documents
 ---
 
-# DASHBOARDS
+## DASHBOARDS
 
-> A dashboard is a visual display of the most important information needed to achieve one or more objectives; consolidated and arranged on a single screen so the information can be monitored at a glance. [^module_7_dashboard_book-1]
+> A dashboard is a visual display of the most important information needed to achieve one or more objectives; consolidated and arranged on a single screen so the information can be monitored at a glance. [module_7_dashboard_book-1]
 
-[^module_7_dashboard_book-1]: Retirado de <https://www.linkedin.com/pulse/ultimate-dashboard-guide-dos-donts-zoltan-patai/>
+[module_7_dashboard_book-1]: Retirado de <https://www.linkedin.com/pulse/ultimate-dashboard-guide-dos-donts-zoltan-patai/>
 
 ![Cartoon do Marketoonist, usado apenas para fins educacionais.](images/dashabord.jpg){fig-align="center"}
 
-## Quando usar um Dashboard
+### Quando usar um Dashboard
 
 Os dashboards devem ajudar a compreender se as intervenções/projectos seguem na direção certa, em que áreas é necessário investigar ou quais tópicos que devem ser priorizados. Para apoiar esses objetivos é necessário escolher bem os indicadores de desempenho ou KPIs (Indicadores-Chave de Desempenho) do seu dashboard.
 
@@ -142,7 +150,7 @@ Estas dicas são apenas o ínicio, e o objetivo será sempre o de melhorar signi
 
 ### Bons exemplos
 
-A Direção Regional de Estatisticas da Madeira criou um [dashboard](https://app.powerbi.com/view?r=eyJrIjoiNmM0MzUxM2EtNDFmNC00ODcwLThlMzktNDUzNTg3Y2Y2NmI0IiwidCI6IjcxOTQwYTg2LTUyYmQtNGVkMy04OWI3LWUwYTdjZDcwNDA0MyIsImMiOjl9) para monitorizar o número de nascimentos, obitos e casamentos na região. Tem um design limpo, com KPI bem desenhados e intuituvos, faz uso de graficos complementares aos KPI com evolução temporal. Os filtros permitem uma boa interactividade.
+A Direção Regional de Estatisticas da Madeira criou um [dashboard](https://app.powerbi.com/view?r=eyJrIjoiNmM0MzUxM2EtNDFmNC00ODcwLThlMzktNDUzNTg3Y2Y2NmI0IiwidCI6IjcxOTQwYTg2LTUyYmQtNGVkMy04OWI3LWUwYTdjZDcwNDA0MyIsImMiOjl9) para monitorizar o número de nascimentos, obitos e casamentos na região. Tem um design limpo, com KPI bem desenhados e intuitivos, faz uso de graficos complementares aos KPI com evolução temporal. Os filtros permitem uma boa interactividade.
 
 ![Dasboard da DREM](images/bom_exemplo-01.png)
 
@@ -150,16 +158,14 @@ A Direção Regional de Estatisticas da Madeira criou um [dashboard](https://app
 
 <https://empregocientificoedocente.dgeec.mec.pt/>
 
-```{=html}
-<iframe width="780" height="500" src="https://empregocientificoedocente.dgeec.mec.pt/" title="Registo Público Nominativo"></iframe>
-```
 O Portal do SNS tem um [dashboard](https://www.sns.gov.pt/monitorizacao-do-sns/medicamentos-e-produtos-de-saude-2/) sobre a utilização de medicamentos biossimilares. Não é muito claro quais são os KPI a monitorizar e a evolução temporal esta em separadores o que torna dificil avaliar a evolução da despesa.
 
-![](images/mau_exemplo-01.png)
+![Mau exemplo](images/mau_exemplo-01.png)
 
 ```{=html}
 <iframe width="780" height="500" src="https://www.sns.gov.pt/monitorizacao-do-sns/medicamentos-e-produtos-de-saude-2/" title="Medicamentos e Produtos de Saúde"></iframe>
 ```
+
 ## Dashboard checklist
 
 ### Inputs

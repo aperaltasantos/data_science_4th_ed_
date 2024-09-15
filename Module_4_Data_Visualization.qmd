@@ -6,83 +6,137 @@ lang: pt
 date-format: long
 format:
   html:
+    preview: false
     smooth-scroll: true
     embed-resources: true
-    code-copy: true
-    code_download: true
     toc: true
-    toc-location: left
-theme: cosmo
-smooth-scroll: true
+    toc-location: right
+    number-sections: true
+    number-depth: 3
+    code_download: true
+    code-copy: true
 execute:
   warning: false
-project:
-  output-dir: outputs/documents
+  collapse: true
+  message: false
+  eval: true
+  echo: true
+title-block-style: default
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 # PRINCIPIOS DE VISUALIZAÇÃO
 
 *por Cédric Scherer*
 
-**1. INFORMAÇÃO** (integridade) Apresentar os dados de forma precisa e honesta, sem manipular ou distorcer os fatos para enganar o público.
+**1. INFORMAÇÃO** (integridade) Apresentar os dados de forma precisa e
+honesta, sem manipular ou distorcer os fatos para enganar o público.
 
-**2. HISTÓRIA** (interesse) Narrativa cativante dentro da visualização de dados, tornando a informação não apenas informativa, mas também envolvente e memorável para o espectador.
+**2. HISTÓRIA** (interesse) Narrativa cativante dentro da visualização
+de dados, tornando a informação não apenas informativa, mas também
+envolvente e memorável para o espectador.
 
-**3. OBJETIVO** (utilidade) Garantir que a visualização de dados sirva a um propósito claro, seja para informar, persuadir, educar ou apoiar a tomada de decisões.
+**3. OBJETIVO** (utilidade) Garantir que a visualização de dados sirva a
+um propósito claro, seja para informar, persuadir, educar ou apoiar a
+tomada de decisões.
 
-**4. FORMA VISUAL** (beleza) Valor do design esteticamente agradável na visualização de dados, que realça a experiência do leitor e pode tornar as informações complexas mais acessíveis e compreensíveis.
+**4. FORMA VISUAL** (beleza) Valor do design esteticamente agradável na
+visualização de dados, que realça a experiência do leitor e pode tornar
+as informações complexas mais acessíveis e compreensíveis.
 
 **5. Dicas úteis** *Layout Limpo --- "menos é mais"*
 
--   Use anotações diretas para melhorar a legibilidade e interpretabilidade.
+-   Use anotações diretas para melhorar a legibilidade e
+    interpretabilidade.
 -   Utilize hierarquia para orientar o leitor.
 -   Uso consistente de cores, espaçamento, tipos de letra e peso.
--   Use cores sabiamente e certifique-se de que funcionam para pessoas com daltonismo.
+-   Use cores sabiamente e certifique-se de que funcionam para pessoas
+    com daltonismo.
 -   As informações mais importantes devem receber a principal atenção.
 
 ![Exemplo por Cédric Scherer](images/exemplo_viz.png)\
 
 ## Valor da vizualização
 
-**... make both calculations and graphs. Both sorts of output should be studied; each will contribute to understanding.**\
+**... make both calculations and graphs. Both sorts of output should be
+studied; each will contribute to understanding.**\
 F. J. Anscombe (1973)
 
-"Há uma razão pela qual os cientistas de dados gastam tanto tempo explorando dados usando gráficos. Confiar apenas em medidas de tendencia e dispersão como médias, variâncias e correlações pode ser perigoso, porque conjuntos de dados muito diferentes podem dar resultados semelhantes.
+"Há uma razão pela qual os cientistas de dados gastam tanto tempo
+explorando dados usando gráficos. Confiar apenas em medidas de tendencia
+e dispersão como médias, variâncias e correlações pode ser perigoso,
+porque conjuntos de dados muito diferentes podem dar resultados
+semelhantes.
 
-Este é um princípio que tem sido demonstrado em aulas de estatística por décadas com o Quarteto de Anscombe: quatro gráficos de dispersão que, apesar de serem qualitativamente diferentes, têm a mesma média e variância e a mesma correlação entre eles."
+Este é um princípio que tem sido demonstrado em aulas de estatística por
+décadas com o Quarteto de Anscombe: quatro gráficos de dispersão que,
+apesar de serem qualitativamente diferentes, têm a mesma média e
+variância e a mesma correlação entre eles."
 
-![Todas as distribuições têm a mesma média e variancia](images/datasauros.png)
+![Todas as distribuições têm a mesma média e
+variancia](images/datasauros.png)
 
 ## Boas práticas
 
-**1. Saber quando usar 0 na escala** "Ao usar gráficos de barras, é enganoso não começar as barras a partir de 0. Isso porque, ao usar um gráfico de barras, estamos implicando que o comprimento é proporcional às quantidades exibidas. Ao evitar o 0, diferenças relativamente pequenas podem parecer muito maiores do que realmente são. Essa abordagem é frequentemente usada por políticos ou organizações de mídia tentando exagerar uma diferença."
+**1. Saber quando usar 0 na escala** "Ao usar gráficos de barras, é
+enganoso não começar as barras a partir de 0. Isso porque, ao usar um
+gráfico de barras, estamos implicando que o comprimento é proporcional
+às quantidades exibidas. Ao evitar o 0, diferenças relativamente
+pequenas podem parecer muito maiores do que realmente são. Essa
+abordagem é frequentemente usada por políticos ou organizações de mídia
+tentando exagerar uma diferença."
 
-**2. Ordenar os valores** Quando um dos eixos é usado para mostrar categorias, como é feito em gráficos de barras, o comportamento padrão do ggplot2 é ordenar as categorias alfabeticamente quando são definidas por cadeias de caracteres. Se forem definidas por fatores, são ordenadas pelos níveis dos fatores. Raramente queremos usar a ordem alfabética. Em vez disso, devemos ordenar por uma quantidade significativa.
+**2. Ordenar os valores** Quando um dos eixos é usado para mostrar
+categorias, como é feito em gráficos de barras, o comportamento padrão
+do ggplot2 é ordenar as categorias alfabeticamente quando são definidas
+por cadeias de caracteres. Se forem definidas por fatores, são ordenadas
+pelos níveis dos fatores. Raramente queremos usar a ordem alfabética. Em
+vez disso, devemos ordenar por uma quantidade significativa.
 
-**3. Uso da cor** Ao criar visualizações de dados, é crucial escolher a escala de cores adequada para transmitir informações de forma eficiente e precisa. Aqui estão as boas práticas sobre quando usar escalas de cores sequenciais, qualitativas e divergentes:
+**3. Uso da cor** Ao criar visualizações de dados, é crucial escolher a
+escala de cores adequada para transmitir informações de forma eficiente
+e precisa. Aqui estão as boas práticas sobre quando usar escalas de
+cores sequenciais, qualitativas e divergentes:
 
 1.  **Escala de Cores Sequencial**:
-    -   **Uso**: Ideal para representar dados quantitativos que possuem uma ordem natural ou progressão, como temperaturas, idades ou níveis de renda.
-    -   **Características**: Apresenta uma progressão suave de cores, geralmente variando de claras a escuras ou vice-versa.
+    -   **Uso**: Ideal para representar dados quantitativos que possuem
+        uma ordem natural ou progressão, como temperaturas, idades ou
+        níveis de renda.
+    -   **Características**: Apresenta uma progressão suave de cores,
+        geralmente variando de claras a escuras ou vice-versa.
 2.  **Escala de Cores Divergente**:
-    -   **Uso**: Ideal para dados que possuem um ponto central importante, como variações em relação a uma média ou zero.
-    -   **Características**: Combina duas escalas de cores sequenciais com um ponto de transição, geralmente ao redor de um valor médio, destacando desvios em duas direções opostas.
+    -   **Uso**: Ideal para dados que possuem um ponto central
+        importante, como variações em relação a uma média ou zero.
+    -   **Características**: Combina duas escalas de cores sequenciais
+        com um ponto de transição, geralmente ao redor de um valor
+        médio, destacando desvios em duas direções opostas.
 3.  **Escala de Cores Qualitativa**:
-    -   **Uso**: Adequada para dados categóricos sem ordem ou classificação inerente, como grupos de países, tipos de produtos ou categorias de serviços.
-    -   **Características**: Composta por cores distintas que facilitam a diferenciação entre as categorias.
-    -   **Exemplo Prático**: Em um gráfico de barras mostrando vendas por categoria de produto, cada categoria (como eletrônicos, vestuário, alimentos) pode ser representada por uma cor diferente.
+    -   **Uso**: Adequada para dados categóricos sem ordem ou
+        classificação inerente, como grupos de países, tipos de produtos
+        ou categorias de serviços.
+    -   **Características**: Composta por cores distintas que facilitam
+        a diferenciação entre as categorias.
+    -   **Exemplo Prático**: Em um gráfico de barras mostrando vendas
+        por categoria de produto, cada categoria (como eletrônicos,
+        vestuário, alimentos) pode ser representada por uma cor
+        diferente.
 
 ![Uso da cor por Cedir Scherer](images/uso_cor.png)
 
-**4. Pensar nos daltonicos** Podemos usar uma serie de cores que conseguem ser percepcionadas por daltonicos.
+**4. Pensar nos daltonicos** Podemos usar uma serie de cores que
+conseguem ser percepcionadas por daltonicos.
 
 ## Exemplos de visualização de dados
 
 ### Alterações climáticas
 
-![Yearly fluctuations in area of Arctic covered by ice](images/climate_change_photo.png)
+![Yearly fluctuations in area of Arctic covered by
+ice](images/climate_change_photo.png)
 
-Fonte <https://www.nytimes.com/interactive/2015/03/24/science/earth/arctic-ice-low-winter-maximum.html>
+Fonte
+<https://www.nytimes.com/interactive/2015/03/24/science/earth/arctic-ice-low-winter-maximum.html>
 
 ### COVID-19
 
@@ -94,25 +148,34 @@ Fonte <https://www.ft.com/content/f1a270c3-3870-46ad-99e8-45b5d8f127e0>
 
 Qual o tipo de gráfico que devo escolher?
 
-Exempleos de websites onde podemos pesquisar qual o melhor gráfico para cada situação.
+Exempleos de websites onde podemos pesquisar qual o melhor gráfico para
+cada situação.
 
 [Data to viz website](https://www.data-to-viz.com/)
 
 [Data to viz project](https://datavizproject.com/)
 
-[Principles of good visuals](https://github.com/GraphicsPrinciples/CheatSheet/blob/master/NVSCheatSheet.pdf)
+[Principles of good
+visuals](https://github.com/GraphicsPrinciples/CheatSheet/blob/master/NVSCheatSheet.pdf)
 
 # GGPLOT
 
-o ggplot é uma gramatica de graficos, em que cada elemento é uma instrução para a elaboração do grágico final
+o ggplot é uma gramatica de graficos, em que cada elemento é uma
+instrução para a elaboração do grágico final
 
 Contem os seguintes elementos
 
 **1. data:** O componente de dados.
 
-**2. geom:** É o tipo de gráfico. p.e. gráfico de barras, histograma, densidades suaves, qqplot e boxplot.
+**2. geom:** É o tipo de gráfico. p.e. gráfico de barras, histograma,
+densidades suaves, qqplot e boxplot.
 
-**3. mapping:** Posições dos pontos no eixo x e eixo y. Cada ponto representa uma observação diferente, e mapeamos dados sobre essas observações para pistas visuais como escalas x e y. A cor é outra pista visual que mapeamos para a região. Referimo-nos a isso como o componente de mapeamento estético. Como definimos o mapeamento depende da geometria que estamos usando.
+**3. mapping:** Posições dos pontos no eixo x e eixo y. Cada ponto
+representa uma observação diferente, e mapeamos dados sobre essas
+observações para pistas visuais como escalas x e y. A cor é outra pista
+visual que mapeamos para a região. Referimo-nos a isso como o componente
+de mapeamento estético. Como definimos o mapeamento depende da geometria
+que estamos usando.
 
 **4. Facets:** semelhante ao agrupar por
 
@@ -212,9 +275,12 @@ p
 ### Box plot
 
 ::: callout-important
-No ggplot2, é possível criar uma estrutura de gráfico básica sem vinculá-la diretamente a um conjunto de dados específico.
+No ggplot2, é possível criar uma estrutura de gráfico básica sem
+vinculá-la diretamente a um conjunto de dados específico.
 
-Esta abordagem permite adicionar múltiplas camadas ao gráfico, cada uma podendo vir de um conjunto de dados diferente, mas que devem compartilhar as mesmas variáveis nos eixos x e y.
+Esta abordagem permite adicionar múltiplas camadas ao gráfico, cada uma
+podendo vir de um conjunto de dados diferente, mas que devem
+compartilhar as mesmas variáveis nos eixos x e y.
 :::
 
 ```{r}
@@ -231,7 +297,12 @@ p1
 
 ## Facets
 
-A facetação é uma técnica poderosa que permite dividir um gráfico em múltiplos subgráficos menores, chamados facetas, com cada faceta representando um subconjunto dos dados baseado em uma ou mais variáveis categóricas. Isso é particularmente útil para comparar padrões dentro de diferentes níveis ou categorias de uma variável (ou variáveis) em um conjunto de dados.
+A facetação é uma técnica poderosa que permite dividir um gráfico em
+múltiplos subgráficos menores, chamados facetas, com cada faceta
+representando um subconjunto dos dados baseado em uma ou mais variáveis
+categóricas. Isso é particularmente útil para comparar padrões dentro de
+diferentes níveis ou categorias de uma variável (ou variáveis) em um
+conjunto de dados.
 
 ```{r}
 # Criar um gráfico de boxplot usando o conjunto de dados 'inpatient_hospital_lite'
@@ -267,7 +338,8 @@ p1
 
 ## Theme
 
-Define a estetica do gráfico, tamanhos de letra, alinhamentos, cores do fundo
+Define a estetica do gráfico, tamanhos de letra, alinhamentos, cores do
+fundo
 
 ```{r}
 # Theme classic
@@ -329,7 +401,8 @@ p1
 
 ### Criar o proprio tema
 
-Podemos criar o nosso proprio tema como um objecto e depois invocar esse tema para os nossos objectos ggplot
+Podemos criar o nosso proprio tema como um objecto e depois invocar esse
+tema para os nossos objectos ggplot
 
 ```{r}
 # Criar o tema 
@@ -352,7 +425,8 @@ theme_r_datascience <-
 ```
 
 ::: callout-important
-Este recurso é bastante útil porque permite alterar completamente o tema <https://www.rdocumentation.org/packages/ggplot2/versions/3.4.4/topics/theme>
+Este recurso é bastante útil porque permite alterar completamente o tema
+<https://www.rdocumentation.org/packages/ggplot2/versions/3.4.4/topics/theme>
 :::
 
 ```{r}
@@ -498,13 +572,18 @@ p_final_1<- ggplot(data= inpatient_hospital_lite,
 
 ## Tamanho e aspecto
 
-**Podemos não depender exclusivamente do painel de visualização do RStudio!**
+**Podemos não depender exclusivamente do painel de visualização do
+RStudio!**
 
-Quando o protótipo de gráfico estiver quase pronto, decida um tamanho fixo para o gráfico.
+Quando o protótipo de gráfico estiver quase pronto, decida um tamanho
+fixo para o gráfico.
 
-**Abordagem 1:** salvar o grafico e inspecioná-lo e repetir. Isso pode ser chato e demorado...
+**Abordagem 1:** salvar o grafico e inspecioná-lo e repetir. Isso pode
+ser chato e demorado...
 
-**Abordagem 2:** usar um qmd ou rmd com saída inline e configurações de chunk. Definir fig-width / fig.width e fig-height / fig.height por chunk ou globalmente.
+**Abordagem 2:** usar um qmd ou rmd com saída inline e configurações de
+chunk. Definir fig-width / fig.width e fig-height / fig.height por chunk
+ou globalmente.
 
 ```{r}
 #| label: fig-boxplot
@@ -584,15 +663,36 @@ ggsave( filename = here::here("output_figures",
 
 ## VISUALIZAR DISTRIBUIÇÕES
 
-Existem vários tipos de gráficos no R que podem ser usados para visualizar distribuições, cada um adequado para diferentes tipos de dados e análises. Aqui estão alguns dos tipos mais comuns de gráficos para visualizar distribuições, juntamente com uma breve explicação de seu uso:
+Existem vários tipos de gráficos no R que podem ser usados para
+visualizar distribuições, cada um adequado para diferentes tipos de
+dados e análises. Aqui estão alguns dos tipos mais comuns de gráficos
+para visualizar distribuições, juntamente com uma breve explicação de
+seu uso:
 
-**Gráfico de Densidade (Density plot)** Descrição: Similar ao histograma, mas mostra uma linha contínua que representa a distribuição de probabilidade estimada dos dados. Uso: Bom para visualizar a forma da distribuição, especialmente útil para comparar distribuições entre diferentes grupos.
+**Gráfico de Densidade (Density plot)** Descrição: Similar ao
+histograma, mas mostra uma linha contínua que representa a distribuição
+de probabilidade estimada dos dados. Uso: Bom para visualizar a forma da
+distribuição, especialmente útil para comparar distribuições entre
+diferentes grupos.
 
-**Histograma (Histogram)** Descrição: Mostra a frequência de diferentes intervalos (ou "bins") de uma variável numérica. Uso: Útil para entender a forma e a dispersão de uma distribuição univariada.
+**Histograma (Histogram)** Descrição: Mostra a frequência de diferentes
+intervalos (ou "bins") de uma variável numérica. Uso: Útil para entender
+a forma e a dispersão de uma distribuição univariada.
 
-**Gráfico de Caixa (Boxplot)** Descrição: Representa a mediana, os quartis e os outliers dos dados. Uso: Excelente para comparar a distribuição de uma variável numérica entre diferentes grupos categóricos e para identificar outliers.
+**Gráfico de Caixa (Boxplot)** Descrição: Representa a mediana, os
+quartis e os outliers dos dados. Uso: Excelente para comparar a
+distribuição de uma variável numérica entre diferentes grupos
+categóricos e para identificar outliers.
 
-**Jitter Plot** Descrição: No gráfico de dispersão com jitter, uma pequena quantidade de ruído aleatório (jitter) é adicionada à posição dos pontos. Isso ajuda a separar visualmente os pontos que, de outra forma, cairiam exatamente na mesma posição. Uso: É particularmente útil quando você tem muitos pontos de dados que estão alinhados verticalmente ou horizontalmente devido à sua natureza discreta ou categórica. O jitter ajuda a visualizar a densidade desses pontos e a evitar que eles se sobreponham, o que pode obscurecer a quantidade real de dados em qualquer posição específica.
+**Jitter Plot** Descrição: No gráfico de dispersão com jitter, uma
+pequena quantidade de ruído aleatório (jitter) é adicionada à posição
+dos pontos. Isso ajuda a separar visualmente os pontos que, de outra
+forma, cairiam exatamente na mesma posição. Uso: É particularmente útil
+quando você tem muitos pontos de dados que estão alinhados verticalmente
+ou horizontalmente devido à sua natureza discreta ou categórica. O
+jitter ajuda a visualizar a densidade desses pontos e a evitar que eles
+se sobreponham, o que pode obscurecer a quantidade real de dados em
+qualquer posição específica.
 
 ### Gráfico de Densidade (Density plot)
 
@@ -681,9 +781,17 @@ p1
 
 **Gráfico de Barras (geom_bar() ou geom_col())**
 
-Descrição: Um gráfico de barras mostra a relação entre uma variável numérica e uma variável categórica. Cada entidade da variável categórica é representada como uma barra. O tamanho da barra representa seu valor numérico.
+Descrição: Um gráfico de barras mostra a relação entre uma variável
+numérica e uma variável categórica. Cada entidade da variável categórica
+é representada como uma barra. O tamanho da barra representa seu valor
+numérico.
 
-Uso: O gráfico de barras é às vezes descrito como uma forma monótona de visualizar informações. No entanto, é provavelmente a maneira mais eficiente de mostrar esse tipo de dados. Ordenar as barras e fornecer boas anotações são frequentemente necessários. geom_bar() é usado para dados de contagem, enquanto geom_col() é para dados de soma ou média já calculados.
+Uso: O gráfico de barras é às vezes descrito como uma forma monótona de
+visualizar informações. No entanto, é provavelmente a maneira mais
+eficiente de mostrar esse tipo de dados. Ordenar as barras e fornecer
+boas anotações são frequentemente necessários. geom_bar() é usado para
+dados de contagem, enquanto geom_col() é para dados de soma ou média já
+calculados.
 
 ### Gráfico de Barras (Bar plot)
 
@@ -843,9 +951,13 @@ p1
 
 ### Gráfico tarte (Doughnut plot)
 
-Descrição:O gráfico de tarte tem com 'fatias' representando as percentagens de diferentes categorias. A diferença é o espaço em branco no meio, que o faz parecer uma rosca.
+Descrição:O gráfico de tarte tem com 'fatias' representando as
+percentagens de diferentes categorias. A diferença é o espaço em branco
+no meio, que o faz parecer uma rosca.
 
-Uso: Cada 'fatia' do gráfico representa uma categoria dos dados, e o tamanho da fatia é proporcional à quantidade ou percentagem da categoria em relação ao total.
+Uso: Cada 'fatia' do gráfico representa uma categoria dos dados, e o
+tamanho da fatia é proporcional à quantidade ou percentagem da categoria
+em relação ao total.
 
 ```{r}
 
@@ -884,7 +996,12 @@ ggplot(data, aes(ymax = ymax, ymin = ymin, xmax = 4, xmin = 3, fill = category))
 
 ### Dispersão (Scatterplot)
 
-Um gráfico de dispersão (scatterplot) é uma ferramenta fundamental na análise de dados, utilizada para examinar a relação entre duas variáveis numéricas. Este tipo de gráfico exibe pontos representando a combinação de valores de duas variáveis, uma no eixo horizontal (eixo X) e outra no eixo vertical (eixo Y). A posição de cada ponto no gráfico indica os valores dessas variáveis para cada observação no conjunto de dados.
+Um gráfico de dispersão (scatterplot) é uma ferramenta fundamental na
+análise de dados, utilizada para examinar a relação entre duas variáveis
+numéricas. Este tipo de gráfico exibe pontos representando a combinação
+de valores de duas variáveis, uma no eixo horizontal (eixo X) e outra no
+eixo vertical (eixo Y). A posição de cada ponto no gráfico indica os
+valores dessas variáveis para cada observação no conjunto de dados.
 
 ```{r}
 inpatient_hospital_lite <- inpatient_hospital_lite |>
@@ -902,6 +1019,8 @@ ggplot(data = inpatient_hospital_lite,
   theme_clean()              # Aplicar um tema limpo e minimalista
 
 ```
+
+
 
 Adicionar mais elementos
 
@@ -957,7 +1076,8 @@ p1
 ```
 
 ::: callout-warning
-**ATENÇÃO** Se queremos definir uma cor temos de definir fora o aes. Podemos definir também o formato da figura.
+**ATENÇÃO** Se queremos definir uma cor temos de definir fora o aes.
+Podemos definir também o formato da figura.
 :::
 
 ```{r}
@@ -1044,9 +1164,16 @@ p1
 
 ## Gráfico de linhas (Line plot)
 
-Descrição: Um gráfico de linhas ou gráfico linear exibe a evolução de uma ou várias variáveis numéricas. Os pontos de dados são conectados por segmentos de linha reta. É semelhante a um gráfico de dispersão, exceto que os pontos de medição são ordenados (tipicamente pelo seu valor no eixo x) e unidos com segmentos de linha reta.
+Descrição: Um gráfico de linhas ou gráfico linear exibe a evolução de
+uma ou várias variáveis numéricas. Os pontos de dados são conectados por
+segmentos de linha reta. É semelhante a um gráfico de dispersão, exceto
+que os pontos de medição são ordenados (tipicamente pelo seu valor no
+eixo x) e unidos com segmentos de linha reta.
 
-Uso: Um gráfico de linhas é frequentemente usado para visualizar uma tendência nos dados ao longo de intervalos de tempo -- uma série temporal -- portanto, a linha é frequentemente desenhada de forma cronológica.
+Uso: Um gráfico de linhas é frequentemente usado para visualizar uma
+tendência nos dados ao longo de intervalos de tempo -- uma série
+temporal -- portanto, a linha é frequentemente desenhada de forma
+cronológica.
 
 ```{r}
 inpatient_hospital_sum <- inpatient_hospital_lite |>
@@ -1198,14 +1325,20 @@ p2
 ```
 
 ::: callout-note
-Embora não seja necessário, existe um espaço entre o gráfico e os eixos. Para eliminar esse espaço podemos adicionarpo seguinte código:
+Embora não seja necessário, existe um espaço entre o gráfico e os eixos.
+Para eliminar esse espaço podemos adicionarpo seguinte código:
 
 coord_cartesian( expand = FALSE )
 :::
 
 ## Gráfico Área (Area chart)
 
-O Gráfico de Área (Area chart) é uma forma de visualização de dados frequentemente utilizada para representar quantidades numéricas ao longo do tempo, sendo semelhante ao gráfico de linhas, mas com as áreas abaixo das linhas preenchidas. Este tipo de gráfico é útil para destacar a magnitude das mudanças ao longo do tempo, oferecendo uma visão clara do volume ou da quantidade dentro de um determinado período.
+O Gráfico de Área (Area chart) é uma forma de visualização de dados
+frequentemente utilizada para representar quantidades numéricas ao longo
+do tempo, sendo semelhante ao gráfico de linhas, mas com as áreas abaixo
+das linhas preenchidas. Este tipo de gráfico é útil para destacar a
+magnitude das mudanças ao longo do tempo, oferecendo uma visão clara do
+volume ou da quantidade dentro de um determinado período.
 
 ```{r}
 p1<-  ggplot( data = inpatient_hospital_year,
@@ -1244,7 +1377,9 @@ p1
 
 ### Barras de erro (Error Bars)
 
-As barras de erro (Error Bars) são uma ferramenta crucial em gráficos para representar a incerteza nos dados. Elas permitem aos espectadores compreender a variabilidade ou a precisão das medidas,
+As barras de erro (Error Bars) são uma ferramenta crucial em gráficos
+para representar a incerteza nos dados. Elas permitem aos espectadores
+compreender a variabilidade ou a precisão das medidas,
 
 ```{r}
 
@@ -1311,14 +1446,20 @@ p1
 ```
 
 ::: callout-note
-A função geom_ribbon no ggplot2 do R é uma ferramenta poderosa para visualizar intervalos de confiança ou outras áreas de incerteza em torno de uma linha num gráfico.
+A função geom_ribbon no ggplot2 do R é uma ferramenta poderosa para
+visualizar intervalos de confiança ou outras áreas de incerteza em torno
+de uma linha num gráfico.
 
-geom_ribbon é usada no ggplot2 para adicionar uma "faixa" ou "área" sombreada ao gráfico. Esta faixa é definida por duas linhas, uma representando o limite superior e outra o limite inferior do intervalo que se deseja destacar.
+geom_ribbon é usada no ggplot2 para adicionar uma "faixa" ou "área"
+sombreada ao gráfico. Esta faixa é definida por duas linhas, uma
+representando o limite superior e outra o limite inferior do intervalo
+que se deseja destacar.
 :::
 
 ## ESTATÍSTICAS EM GRÁFICOS (STATISTICS)
 
-Podemos adicionar medidas estatísticas directamente nos gráficos sem necessidade de as calcular previamente.
+Podemos adicionar medidas estatísticas directamente nos gráficos sem
+necessidade de as calcular previamente.
 
 ```{r}
 
@@ -1384,9 +1525,15 @@ p1
 
 ## COMBINAR PLOTS
 
-O pacote patchwork no R oferece uma solução elegante para combinar e organizar múltiplos gráficos criados com ggplot2. Esta biblioteca destaca-se pela simplicidade e flexibilidade, permitindo aos utilizadores dispor gráficos de forma intuitiva numa única janela gráfica, facilitando a comparação e a análise conjunta de diferentes visualizações.
+O pacote patchwork no R oferece uma solução elegante para combinar e
+organizar múltiplos gráficos criados com ggplot2. Esta biblioteca
+destaca-se pela simplicidade e flexibilidade, permitindo aos
+utilizadores dispor gráficos de forma intuitiva numa única janela
+gráfica, facilitando a comparação e a análise conjunta de diferentes
+visualizações.
 
-Ver mais aqui <https://patchwork.data-imaginist.com/articles/patchwork.html>
+Ver mais aqui
+<https://patchwork.data-imaginist.com/articles/patchwork.html>
 
 ```{r}
 library(patchwork)
@@ -1403,17 +1550,27 @@ p2 / p3  # Empilha 'p2' sobre 'p3'
 
 ## Tipos de dados espaciais
 
-**Dados de áreas**: Este tipo de dados representa o espaço geográfico através de pontos, linhas e polígonos. Polígonos são utilizados para áreas maiores como lagos, parques ou fronteiras de países.
+**Dados de áreas**: Este tipo de dados representa o espaço geográfico
+através de pontos, linhas e polígonos. Polígonos são utilizados para
+áreas maiores como lagos, parques ou fronteiras de países.
 
-**Dados Raster (grelha)**: São dados que representam o espaço geográfico como uma matriz de células ou pixels, com cada célula tendo um valor específico. Imagens de satélite e mapas de elevação são exemplos típicos de dados raster.
+**Dados Raster (grelha)**: São dados que representam o espaço geográfico
+como uma matriz de células ou pixels, com cada célula tendo um valor
+específico. Imagens de satélite e mapas de elevação são exemplos típicos
+de dados raster.
 
-**Dados localização (Point data)**: São dados que correspondem a uma localização especifica no espaço. p.e. localização de uma estação meteorologica.
+**Dados localização (Point data)**: São dados que correspondem a uma
+localização especifica no espaço. p.e. localização de uma estação
+meteorologica.
 
 ## Shapefiles
 
-Os dados espaciais são frequentemente representados através de um formato de armazenamento de dados denominado shapefile.
+Os dados espaciais são frequentemente representados através de um
+formato de armazenamento de dados denominado shapefile.
 
-Podemos encontrar shapefiles de diversas fontes, p.e. Ministério da Administração Interna, ao Eurostat, https://ec.europa.eu/eurostat/web/gisco/overview
+Podemos encontrar shapefiles de diversas fontes, p.e. Ministério da
+Administração Interna, ao Eurostat,
+https://ec.europa.eu/eurostat/web/gisco/overview
 
 ```{r}
 # Carregar o pacote giscoR para obter dados geográficos
@@ -1475,7 +1632,8 @@ ggplot(PT_nuts) +
 
 #### Mapas
 
-Por vezes podemos carregar a shapefile e os dados e juntar os dados, desde que tenhamos um identificador comum
+Por vezes podemos carregar a shapefile e os dados e juntar os dados,
+desde que tenhamos um identificador comum
 
 ```{r}
 # Carregar o pacote sf para trabalhar com dados espaciais
@@ -1516,13 +1674,21 @@ sanity <- anti_join(comm_pt,
 
 ```
 
-**Color** Função: A estética color é usada para definir a cor das linhas ou bordas de um objeto no gráfico. No contexto de mapas, color define a cor das fronteiras ou linhas que delimitam as unidades geográficas (como países, regiões, estados, etc.).
+**Color** Função: A estética color é usada para definir a cor das linhas
+ou bordas de um objeto no gráfico. No contexto de mapas, color define a
+cor das fronteiras ou linhas que delimitam as unidades geográficas (como
+países, regiões, estados, etc.).
 
-Exemplo: geom_sf(color = "black") desenha as fronteiras de unidades geográficas em preto.
+Exemplo: geom_sf(color = "black") desenha as fronteiras de unidades
+geográficas em preto.
 
-**Fill** Função: A estética fill é usada para definir a cor de preenchimento do interior de um objeto. Em mapas, fill define a cor dentro das fronteiras das unidades geográficas.
+**Fill** Função: A estética fill é usada para definir a cor de
+preenchimento do interior de um objeto. Em mapas, fill define a cor
+dentro das fronteiras das unidades geográficas.
 
-Exemplo: geom_sf(aes(fill = variavel)) preenche as áreas internas das unidades geográficas com cores que podem variar de acordo com uma variável, como a densidade populacional, categorias de dados, etc.
+Exemplo: geom_sf(aes(fill = variavel)) preenche as áreas internas das
+unidades geográficas com cores que podem variar de acordo com uma
+variável, como a densidade populacional, categorias de dados, etc.
 
 ```{r}
 
@@ -1619,7 +1785,8 @@ p
 Podemos alterar as cores agora
 
 ::: callout-note
-Este website é um optimo recurso para escolher cores <https://colorbrewer2.org/>
+Este website é um optimo recurso para escolher cores
+<https://colorbrewer2.org/>
 :::
 
 ```{r}
@@ -1659,12 +1826,16 @@ p
 
 #### Operações com shapefiles
 
-**Criação de Geometrias:** st_sfc() e st_sf() são usados para criar objetos de geometria simples ou um dataframe espacial, respectivamente.
+**Criação de Geometrias:** st_sfc() e st_sf() são usados para criar
+objetos de geometria simples ou um dataframe espacial, respectivamente.
 
-**Operações Geométricas:** Funções como st_union(), st_intersection(), st_difference() são utilizadas para realizar operações geométricas entre objetos espaciais.
+**Operações Geométricas:** Funções como st_union(), st_intersection(),
+st_difference() são utilizadas para realizar operações geométricas entre
+objetos espaciais.
 
 ::: callout-note
-Este website é um optimo recurso <file:///Users/andreperaltasantos/Downloads/sf.pdf>
+Este website é um optimo recurso
+<file:///Users/andreperaltasantos/Downloads/sf.pdf>
 :::
 
 ```{r}
@@ -1707,7 +1878,8 @@ p
 
 #### Mapa Europeu
 
-Podemos descarregar os mapas das NUTS directamente do pacote giscoR. Neste caso vamos fazer o download de NUTS0 (paises)
+Podemos descarregar os mapas das NUTS directamente do pacote giscoR.
+Neste caso vamos fazer o download de NUTS0 (paises)
 
 ```{r}
 # Carregar o pacote giscoR
@@ -1726,7 +1898,8 @@ nuts0 <- gisco_get_nuts(
 
 Podemos obter dados do Eurostat directamente do pacote eurostat.
 
-Podemos explorar mais aqui <https://ropengov.github.io/eurostat/articles/eurostat_tutorial.html>
+Podemos explorar mais aqui
+<https://ropengov.github.io/eurostat/articles/eurostat_tutorial.html>
 
 ```{r}
 # Carregar o pacote eurostat
@@ -1742,7 +1915,8 @@ healthy_life_expectancy <- get_eurostat("hlth_silc_17") |>
 
 ```
 
-Os passos para gerar o mapa são 1. Juntar os dados, 2. Definir as categorias, 3. criar o mapa
+Os passos para gerar o mapa são 1. Juntar os dados, 2. Definir as
+categorias, 3. criar o mapa
 
 ```{r}
 # Combinar os dados NUTS com os dados de expectativa de vida saudável
@@ -1848,7 +2022,14 @@ ggsave(
 
 ### Dados Raster
 
-Os dados raster são uma forma fundamental de representação de dados espaciais, especialmente utilizados em análises geográficas e de remote sensing. Em comparação comos dados vetoriais, que representam características geográficas como pontos, linhas e polígonos, os dados raster são formados por células (ou pixels) organizados em uma grade regular (latice). Cada célula de um raster tem um valor associado, que pode representar diversas informações, como temperatura, altitude, umidade, etc.
+Os dados raster são uma forma fundamental de representação de dados
+espaciais, especialmente utilizados em análises geográficas e de remote
+sensing. Em comparação comos dados vetoriais, que representam
+características geográficas como pontos, linhas e polígonos, os dados
+raster são formados por células (ou pixels) organizados em uma grade
+regular (latice). Cada célula de um raster tem um valor associado, que
+pode representar diversas informações, como temperatura, altitude,
+umidade, etc.
 
 ```{r}
 # Carregar o pacote geodata para trabalhar com dados geoespaciais
@@ -1887,7 +2068,8 @@ g_tmax_map
 
 ### Dados de Localização
 
-Os dados de localização são pontos de coordenadas (lat, long) que podemos adicionar à nossa shapefile.
+Os dados de localização são pontos de coordenadas (lat, long) que
+podemos adicionar à nossa shapefile.
 
 ```{r}
 # Filtrar só para a ARS de Lisboa e Vale do Tejo
@@ -1936,9 +2118,15 @@ p
 
 ### Open Streep maps
 
-O OpenStreetMap (OSM) é um projeto colaborativo que cria mapas livres e editáveis do mundo, semelhante à Wikipedia, mas para mapas. Fornece dados geográficos acessíveis e atualizados que são úteis para uma variedade de aplicações, desde navegação e planejamento urbano até análises geoespaciais e projetos de pesquisa.
+O OpenStreetMap (OSM) é um projeto colaborativo que cria mapas livres e
+editáveis do mundo, semelhante à Wikipedia, mas para mapas. Fornece
+dados geográficos acessíveis e atualizados que são úteis para uma
+variedade de aplicações, desde navegação e planejamento urbano até
+análises geoespaciais e projetos de pesquisa.
 
-O osmdata é um pacote no R que permite manipular os dados do OpenStreetMap diretamente do R. É uma ferramenta para cientistas de dados e pesquisadores que trabalham com dados geoespaciais.
+O osmdata é um pacote no R que permite manipular os dados do
+OpenStreetMap diretamente do R. É uma ferramenta para cientistas de
+dados e pesquisadores que trabalham com dados geoespaciais.
 
 ::: callout-warning
 Por vezes pode ser necessario reiniciar o R depois de instalar o osmdata
@@ -1997,9 +2185,13 @@ ggplot() +
 
 ### Mapas Interactivos (leaflet)
 
-O Leaflet para R é usado para criar mapas interativos que podem ser integrados em relatórios R Markdown, aplicativos Shiny ou páginas da web. Esses mapas podem incluir funcionalidades como zoom, pan e layers interativos.
+O Leaflet para R é usado para criar mapas interativos que podem ser
+integrados em relatórios R Markdown, aplicativos Shiny ou páginas da
+web. Esses mapas podem incluir funcionalidades como zoom, pan e layers
+interativos.
 
-Personalização: Oferece ampla personalização de mapas, ver mais aqui <https://rstudio.github.io/leaflet/>
+Personalização: Oferece ampla personalização de mapas, ver mais aqui
+<https://rstudio.github.io/leaflet/>
 
 ```{r}
 
@@ -2047,24 +2239,46 @@ p
 
 # EXTENÇÕES
 
-As extensões ggplot2 são pacotes no R que ampliam a funcionalidade do ggplot2. Estas extensões adicionam novas camadas, temas, escalas e outras funcionalidades, permitindo aos usuários criar gráficos mais complexos e personalizados.
+As extensões ggplot2 são pacotes no R que ampliam a funcionalidade do
+ggplot2. Estas extensões adicionam novas camadas, temas, escalas e
+outras funcionalidades, permitindo aos usuários criar gráficos mais
+complexos e personalizados.
 
-Aqui estão algumas das extensões ggplot2 mais populares e suas funcionalidades:
+Aqui estão algumas das extensões ggplot2 mais populares e suas
+funcionalidades:
 
-**gganimate:** Permite criar animações com ggplot2. Com gganimate, você pode transformar gráficos estáticos em animações para mostrar mudanças nos dados ao longo do tempo ou destacar movimentos ou transições.
+**gganimate:** Permite criar animações com ggplot2. Com gganimate, você
+pode transformar gráficos estáticos em animações para mostrar mudanças
+nos dados ao longo do tempo ou destacar movimentos ou transições.
 
-**ggridges:** Usado para criar gráficos de "ridgeplot", que são úteis para visualizar a distribuição de uma variável contínua ao longo de várias categorias. Esses gráficos são uma alternativa esteticamente agradável aos gráficos de densidade ou violino.
+**ggridges:** Usado para criar gráficos de "ridgeplot", que são úteis
+para visualizar a distribuição de uma variável contínua ao longo de
+várias categorias. Esses gráficos são uma alternativa esteticamente
+agradável aos gráficos de densidade ou violino.
 
-**ggforce:** Fornece uma variedade de funcionalidades que não estão disponíveis no ggplot2 padrão, como links geométricos entre pontos, gráficos de densidade facetados e muito mais.
+**ggforce:** Fornece uma variedade de funcionalidades que não estão
+disponíveis no ggplot2 padrão, como links geométricos entre pontos,
+gráficos de densidade facetados e muito mais.
 
-**patchwork:** Uma biblioteca para combinar vários gráficos ggplot2 em um único layout. É muito útil para criar painéis de gráficos complexos.
+**patchwork:** Uma biblioteca para combinar vários gráficos ggplot2 em
+um único layout. É muito útil para criar painéis de gráficos complexos.
 
-**ggrepel:** Oferece melhorias na forma como os rótulos de texto são adicionados aos gráficos. Ajuda a evitar a sobreposição de texto, tornando os gráficos mais legíveis.
+**ggrepel:** Oferece melhorias na forma como os rótulos de texto são
+adicionados aos gráficos. Ajuda a evitar a sobreposição de texto,
+tornando os gráficos mais legíveis.
 
 [extensions of ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
 
-**esquisse:** é um add-in para R que permite criar e personalizar visualizações de dados interativas com ggplot2 e filtrar dados com dplyr. Ele fornece uma interface gráfica intuitiva que facilita a criação de gráficos, mesmo para usuários que não estão familiarizados com a sintaxe do ggplot2. Aqui estão algumas de suas principais características:
+**esquisse:** é um add-in para R que permite criar e personalizar
+visualizações de dados interativas com ggplot2 e filtrar dados com
+dplyr. Ele fornece uma interface gráfica intuitiva que facilita a
+criação de gráficos, mesmo para usuários que não estão familiarizados
+com a sintaxe do ggplot2. Aqui estão algumas de suas principais
+características:
 
-Interface de Arrastar e Soltar: esquisse oferece uma interface de arrastar e soltar para mapear suas variáveis em diferentes estéticas, tornando a criação de gráficos rápida e acessível. <https://dreamrs.github.io/esquisse/index.html>
+Interface de Arrastar e Soltar: esquisse oferece uma interface de
+arrastar e soltar para mapear suas variáveis em diferentes estéticas,
+tornando a criação de gráficos rápida e acessível.
+<https://dreamrs.github.io/esquisse/index.html>
 
 # FIM

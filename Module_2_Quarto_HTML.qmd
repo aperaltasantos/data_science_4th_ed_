@@ -56,7 +56,7 @@ Existem uma grande variedade de opções disponíveis para personalizar a saída
 As opções disponíveis para personalizar a saída incluem:
 
 | Opção     | Descrição                                                                                                                                                                   |
-|--------------------------|----------------------------------------------|
+|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `eval`    | Avalia o bloco de código (se `false`, apenas ecoa o código na saída).                                                                                                       |
 | `echo`    | Inclui o código fonte na saída.                                                                                                                                             |
 | `output`  | Inclui os resultados da execução do código na saída (`true`, `false`, ou `asis` para indicar que a saída é markdown bruto e não deve ter nenhum markdown padrão do Quarto). |
@@ -142,13 +142,12 @@ As quadros em quarto podem ser definidas de várias formas mas são divididas en
 
 Em que o default é "-" mas com as opções de alinhamento semelhantes aos processadores de texto: (este alinhamento é definido por coluna) - ":----" Alinhamento à esquerda - "----:" Alinhamento à direita - ":----:" Alinhamento ao centro
 
-
-
 | Tipo                        | Número | Estadia Média |
 |:----------------------------|:------:|--------------:|
 | Hospitais                   |  5000  |            10 |
 | Cuidados de Saúde Primários | 20000  |             1 |
 | Cuidados de Longa Duração   |  2000  |           100 |
+
 : Tipos de hospitais e estadia média {#tbl-exemplo1}
 
 Exemplo de tabela com referência @tbl-exemplo1
@@ -161,11 +160,11 @@ A definição do espaçamento das colunas pode ser definido no Quarto em 3 posi�
 
 3.  Pelo número relativo de caracteres de "-".
 
-
 | dia | doentes |
 |-----|---------|
 | 1   | 150     |
 | 2   | 160     |
+
 : 5.ª Edição {#tbl-exemplo2}
 
 Mais uma vez podemos fazer referência à tabela @tbl-exemplo2
@@ -178,12 +177,11 @@ Mais uma vez podemos fazer referência à tabela @tbl-exemplo2
 
 É possível adicionar hiperlinks com ![texto](caminho) ![figure 1](images/lisboa.jpeg){#fig-lisboa} , como por exemplo na @fig-lisboa.
 
-Podemos adicionar o url da imagem que queremos mostrar, como na @fig-ensp. 
+Podemos adicionar o url da imagem que queremos mostrar, como na @fig-ensp.
 
-![Escola Nacional de Saúde Pública](https://www.ensp.unl.pt/wp-content/uploads/2022/10/w3b8330-e1666611629891-768x384.jpg){#fig-ensp} 
+![Escola Nacional de Saúde Pública](https://www.ensp.unl.pt/wp-content/uploads/2022/10/w3b8330-e1666611629891-768x384.jpg){#fig-ensp}
 
 Podemos definir a formatação das imagens e realizar referências cruzadas.
-
 
 ::: {#fig-maps layout-ncol="2"}
 ![European Map](images/map_eu.png){#fig-europa width="360"}
