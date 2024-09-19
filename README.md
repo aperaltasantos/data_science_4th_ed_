@@ -1,7 +1,7 @@
 # **Fundamentos de Data Science na saúde: aplicações com R**
 
 ```{=html}
-<img src="images/HEX_R_DATA_SCIENCE.png" align="right"
+<img src="https://github.com/aperaltasantos/data_science_4th_ed_/blob/main/images/HEX_R_DATA_SCIENCE.png" align="right"
      alt="Logo curso" width="120" height="148">
 ```
 O Curso **Fundamentos de Data Science na saúde: aplicações com R** de André Peralta Santos (coordenador), descobrirá como o RStudio (POSIT®) pode revolucionar a sua forma de interação com dados, promovendo uma análise data-driven com níveis elevados de eficiência e tirando partidos de novas técnicas, incluindo machine learning. Este livro ensina as práticas mais avançadas em ciência de dados, com foco particular na área da saúde, através de exemplos concretos e aplicáveis. Será exposto ao trabalho colaborativo, à automação de relatórios para partilha em formatos HTML ou Word, à criação de dashboards interativos, e ao uso do GitHub e do ChatGPT para gestão de versões e integração com inteligência artificial.
