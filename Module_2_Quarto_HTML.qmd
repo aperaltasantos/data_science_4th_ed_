@@ -370,11 +370,11 @@ No cabeçalho YAML do seu documento Quarto, adicione uma referência ao seu arqu
 
 Utilize a sintaxe de citação para referenciar uma obra no seu texto. No Quarto, isso geralmente é feito com colchetes e o identificador da referência do BibTeX.
 
-Exemplo de bibliografia na Data Science @wickham2023r, @knuth84, @guo2023big .
+Exemplo de bibliografia na Data Science @santos2022omicron, @litaker2005context, @cowin2005cadherins .
 
 4.  Gerar a Bibliografia
 
-Quando você renderiza seu documento, o Quarto automaticamente processa as citações e gera uma bibliografia no final do documento, formatada de acordo com o estilo de citação especificado no cabeçalho YAML (usando a chave csl para o arquivo de estilo de citação, se necessário).
+Quando renderiza o documento, o Quarto automaticamente processa as citações e gera uma bibliografia no final do documento, formatada de acordo com o estilo de citação especificado no cabeçalho YAML (usando a chave csl para o arquivo de estilo de citação, se necessário).
 
 ### Referências
 
