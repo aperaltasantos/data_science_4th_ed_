@@ -22,7 +22,7 @@ lang: pt
 execute:
   warning: false
   echo: TRUE
-bibliography: references.bib 
+bibliography: templates/references.bib 
 ---
 
 ## O que é o **Quarto**
@@ -56,7 +56,7 @@ Existem uma grande variedade de opções disponíveis para personalizar a saída
 As opções disponíveis para personalizar a saída incluem:
 
 | Opção     | Descrição                                                                                                                                                                   |
-|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|------------|------------------------------------------------------------|
 | `eval`    | Avalia o bloco de código (se `false`, apenas ecoa o código na saída).                                                                                                       |
 | `echo`    | Inclui o código fonte na saída.                                                                                                                                             |
 | `output`  | Inclui os resultados da execução do código na saída (`true`, `false`, ou `asis` para indicar que a saída é markdown bruto e não deve ter nenhum markdown padrão do Quarto). |
@@ -130,11 +130,11 @@ Com ordem
 
 #### Notas de Rodapé
 
-Os estudantes de Data Science for healthcare são os melhores. [^module_2_quarto_html-1][^module_2_quarto_html-2]
+Os estudantes de Data Science for healthcare são os melhores. [^1][^2]
 
-[^module_2_quarto_html-1]: Isto é uma nota de rodapé.
+[^1]: Isto é uma nota de rodapé.
 
-[^module_2_quarto_html-2]: Readers Digest
+[^2]: Readers Digest
 
 ### Criar um quadro
 
@@ -175,7 +175,9 @@ Mais uma vez podemos fazer referência à tabela @tbl-exemplo2
 
 ## Imagens
 
-É possível adicionar hiperlinks com ![texto](caminho) ![figure 1](images/lisboa.jpeg){#fig-lisboa} , como por exemplo na @fig-lisboa.
+É possível adicionar hiperlinks com ![texto](caminho)
+
+![figure 1](images/lisboa.jpeg){#fig-lisboa} , como por exemplo na @fig-lisboa.
 
 Podemos adicionar o url da imagem que queremos mostrar, como na @fig-ensp.
 

@@ -1,29 +1,31 @@
-# Data Science with R for Healthcare professionals 
+# **Fundamentos de Data Science na saúde: aplicações com R**
 
-<img src="https://github.com/aperaltasantos/data_science_2nd_ed/blob/main/images/logo.png" align="right"
-     alt="Size Limit logo by Anton Lovchikov" width="120" height="148">
+```{=html}
+<img src="images/HEX_R_DATA_SCIENCE.png" align="right"
+     alt="Logo curso" width="120" height="148">
+```
+O Curso **Fundamentos de Data Science na saúde: aplicações com R** de André Peralta Santos (coordenador), descobrirá como o RStudio (POSIT®) pode revolucionar a sua forma de interação com dados, promovendo uma análise data-driven com níveis elevados de eficiência e tirando partidos de novas técnicas, incluindo machine learning. Este livro ensina as práticas mais avançadas em ciência de dados, com foco particular na área da saúde, através de exemplos concretos e aplicáveis. Será exposto ao trabalho colaborativo, à automação de relatórios para partilha em formatos HTML ou Word, à criação de dashboards interativos, e ao uso do GitHub e do ChatGPT para gestão de versões e integração com inteligência artificial.
 
-O Curso Data Science with R in Healthcare é uma formação promovida pela NOVA Saúde Pública, em parceria com a ENSP-NOVA.
+Ser-lhe-á proporcionado um conjunto de exemplos práticos com código e exercícios destinados a analisar dados reais, colaborar em projetos de complexidade variável, automatizar a geração de relatórios recorrentes e enriquecer as suas análises com painéis interativos. O curso está estruturado em oito módulos essenciais:
 
-Nesta formação poderá aprender a utilizar as potencialidades de software R Studio, desde a importação de dados, criação de modelos, gráficos e tabelas prontas para publicação. Adicionalmente, aprenderá como trabalhar em ambiente colaborativo e compartilhar seu código, automatizar relatórios e partilhá-los em HTML ou Word, criar de dashboards e utilizar o GitHub para controlo de versões.
+1.  Fundamentos de R
+2.  Introdução ao Quarto
+3.  Manipulação e Exploração de Dados
+4.  Visualização de Dados
+5.  Modelos Estatísticos
+6.  Dashboards
+7.  Introdução ao Machine Learning
+8.  Tópicos Avançados em Ciência de Dados
+9.  Projecto capstone
 
-Estas ferramentas de Data Science podem aumentar a sua produtividade e eficiência para profissionais que, de forma rotineira, têm de analisar dados e servir de base para aprofundar conhecimentos em machine learning e inteligência articifial. 
+## Agradecimentos
 
-## Conteúdo
+Expresso os meus sinceros agradecimentos ao João Dionísio pela sua revisão crítica e enriquecimento do código. Um agradecimento especial também a Manuel Ribeiro pela contribuição valiosa nos materiais do módulo 7.
 
-[Site do curso](https://www.ensp.unl.pt/cursos/cursos-de-curta-duracao/data-science-with-r-in-healthcare/)
-| 18.5h |
-- Introdução ao R
-- Manipulação de dados
-- Visualização de dados
-- Construção de modelos
-- Relatórios e dashboards dinâmicos
-- Introdução ao GitHib
+## Licença
 
-## Direitos 
+O conteúdo deste livro é disponibilizado sob a licença [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/), não sendo permitido o seu uso para fins comerciais.
 
-Todos os alunos têm direito a fazer usufruto do codigo por tempo indeterminado. 
-O codigo do curso não deve ser partilhado com terceiros, na sua versão integral ou parcial.
-Quaisquer questões pode ser direcionadas ao secretariado do curso.  
+## Direitos
 
-
+Todos os alunos têm direito a fazer usufruto do codigo por tempo indeterminado. O codigo do curso não deve ser partilhado com terceiros, na sua versão integral ou parcial.
