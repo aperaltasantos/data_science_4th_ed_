@@ -2,7 +2,7 @@ project:
   output-dir: output/documents
 
 toc: true
-bibliography: references.bib  
+bibliography: templates/references.bib  
 
 format:
   html:

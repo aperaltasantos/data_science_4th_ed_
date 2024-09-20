@@ -12,7 +12,7 @@ format:
     reference-doc: templates/template1.docx
     toc: true
 editor: visual
-bibliography: references.bib
+bibliography: templates/references.bib
 csl: templates/vancouver.csl 
 ---
 

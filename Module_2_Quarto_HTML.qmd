@@ -233,7 +233,7 @@ No Quarto pode incluir equações matemáticas em seus documentos utilizando a s
 
 ### Equações Inline
 
-Para escrever uma equação inline, ou seja, uma equação que aparece dentro de um parágrafo ou texto, você usa o símbolo do dólar `$` para envolver a equação. Por exemplo: $Y=ax+2$
+Para escrever uma equação inline, ou seja, uma equação que aparece dentro de um parágrafo ou texto, você usa o símbolo do dólar `$` para envolver a equação. Por exemplo: $Y=ax+2$ 
 
 ### Equações em Bloco
 

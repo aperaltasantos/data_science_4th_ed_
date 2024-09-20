@@ -12,7 +12,7 @@ lang: pt
 execute:
   warning: false
   echo: TRUE
-bibliography: references.bib 
+bibliography: templates/references.bib 
 output-dir: documents
 ---
 
