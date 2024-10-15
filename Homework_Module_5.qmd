@@ -143,7 +143,7 @@ Crie um modelo de regressão logística para avaliar o efeito da temperatura no 
 
 Crie um modelo de regressão logística para avaliar o efeito da temperatura no risco de ISCs (AnyInfection) ajustado para Age, FEMALE, BMI, CharlsonScore e CHF.
 
-1. Criar modelo no objeto model_logit_uni
+1. Criar modelo no objeto model_logit_multi
 2. Criar tabela com dados da regressão no objeto model_logit_multi_tidy
 
 
@@ -167,7 +167,7 @@ Resposta:
 
 ### Exercicio M5.4 Tabelas de Regressão
 
-Crie uma tabela com os OR, p-value e Confidence Intervals do modelo construído em 6. Exporte a tabela criada em 8 para Word.
+Crie uma tabela com os OR, p-value e Confidence Intervals do modelo construído em 5.3.2. Exporte a tabela criada para Word.
 
 1. O objeto tabela deve-se chamar tbl_multi
 
