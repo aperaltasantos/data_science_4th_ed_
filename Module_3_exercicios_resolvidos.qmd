@@ -217,7 +217,7 @@ survival_time <- survival_hypoxia_full |>
   clean_names() |> 
   drop_na(female, diabetes) |> 
   summarise(
-    media = mean(bmi,na.rm = T),
+    media = mean(time_survival,na.rm = T),
     .by = c(female, diabetes)
   )
 
@@ -417,7 +417,11 @@ validate(survival_time, name = "Verifying data Survival Time") |>
     "diabetes",
     "media"), colnames(), description = "Survival Time tem apenas as colunas pedidas") |>
   validate_if(nrow(survival_time)==4, description = "Survival Time tem apenas as linhas pedidas") |>
+<<<<<<< Updated upstream
   validate_if(sum(media, na.rm = TRUE) == 186.6944,description = "Survival Time tem os resultados das médias esperados") |> 
+=======
+  validate_if(sum(media, na.rm = TRUE) == 1583.514 ,description = "Survival Time tem os resultados das médias esperados") |> 
+>>>>>>> Stashed changes
   add_results(report) 
  
 
