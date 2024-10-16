@@ -94,17 +94,59 @@ Use o dataset Core_Temperature.xlsx, e consulte a documentação em Core_Tempera
 2. Limpar o nome das variáveis
 
 ```{r}
-
+temperature_data <- import("datasets/Core_Temperature.xlsx") |> 
+  clean_names() |> 
+  mutate(
+   any_infection = factor(
+     any_infection,
+     levels = c(0,1),
+     labels = c("Não", "Sim")
+   )
+  )
 ```
 
 ### Exercicio M5.1 Estatística Descritiva
 
 Deve criar uma Tabela 1 comparando a distribuição das variáveis de confundimento (Age, FEMALE, BMI, CharlsonScore, SurgeryType, CHF) pelos pacientes que tiveram ISC (AnyInfection).
 
-1. O nome do objeto deve ser tabela1
+1. O nome do objeto deve ser tabela 1
 
 ```{r}
+tabela1 <- tbl_summary(
+  temperature_data,
+  include = c(age, female, bmi, charlson_score, surgery_type), # Selecionar variáveis específicas para o resumo
+  by = any_infection, # Dividir a tabela pelo estado da doença cardíaca
+  missing = "no",# Excluir dados ausentes do resumo
+  statistic = list(
+  all_continuous() ~ "{mean} ({sd})",
+  all_categorical() ~ "{n} / {N} ({p}%)"),
+  label =list(
+    age= "Idade", 
+    female="Sexo", 
+    bmi="Índice de Massa Corporal", 
+    charlson_score="Score de Charlson", 
+    surgery_type="Tipo de Cirugia"
+  )   
+) |> 
+  modify_spanning_header(c("stat_1", "stat_2") ~ "**Infecção do Sítio Cirúrgico**") %>%
+  add_n() |>  # Adicionar uma coluna para contar observações não ausentes
+  add_p() |>  # Realizar testes estatísticos para comparar grupos
+  modify_header(label = "**Característica**") |>  # Personalizar o cabeçalho da tabela
+  bold_labels()|> # Tornar as etiquetas em negrito para ênfase
+  as_gt() |>  
+  tab_header(
+    title = md("**Modelo de Risco para Infecção do Sítio cirúrgico**") ,
+    subtitle = "Por Idade, Sexo, BMI, Score Charlson, Tipo de cirurgia"
+  ) |>
+  tab_source_note(
+    source_note = md("Source: Core Temperature Dataset")
+  ) |>
+  fmt_number( decimals = 3) |>   
+  opt_stylize(style = 1, color = "gray") |> 
+  opt_align_table_header(align = "left") 
 
+# Visualizar a tabela criada
+tabela1
 ```
 
 
@@ -120,6 +162,17 @@ Deve criar uma visualização comparando a distribuição da temperatura (TWATem
 #| fig-width: 7.5
 #| 
 
+p1<- ggplot(data= temperature_data, 
+            aes(x = any_infection, y = twa_temp)) +
+  geom_boxplot(outlier.shape = NA) + 
+  labs(title = "Distribuição da média ponderada do tempo da temperatura central\nPor ocorrência de Infecção do Sítio Cirúrgico",
+         y = "Média ponderada do tempo da temperatura central",
+         x = "Infecção do Sítio Cirúrgico", 
+         caption = "Fonte: Core Temperature Dataset") +
+  theme_minimal() 
+  
+
+p1
 
 ```
 
@@ -135,7 +188,17 @@ Crie um modelo de regressão logística para avaliar o efeito da temperatura no 
 
 
 ```{r}
+model_logit_uni <- glm(
+  any_infection ~ twa_temp,  # Definir a fórmula do modelo
+  family = "binomial",                   # Especificar a função de ligação binomial para resposta binária
+  data = temperature_data                            # Usar o conjunto de dados 'hd'
+)
 
+# Utilizar a função tidy para criar um resumo do modelo
+# 'exponentiate = TRUE' transforma os coeficientes em razões de probabilidades
+# 'conf.int = TRUE' inclui os intervalos de confiança
+model_logit_uni_tidy <- tidy(model_logit_uni, exponentiate = TRUE, conf.int = TRUE)
+model_logit_uni_tidy
 ```
 
 
@@ -149,6 +212,33 @@ Crie um modelo de regressão logística para avaliar o efeito da temperatura no 
 
 ```{r}
 # Criar um modelo de regressão logística para prever a ocorrência de risco de ISCs (AnyInfection).
+model_logit_multi <- glm(
+  any_infection ~ twa_temp+ 
+                       age+ 
+                    female+ 
+                       bmi+ 
+            charlson_score+ 
+                       chf,  # Definir a fórmula do modelo
+  family = "binomial",                   # Especificar a função de ligação binomial para resposta binária
+  data = temperature_data                            # Usar o conjunto de dados 'hd'
+)
+
+# Utilizar a função tidy para criar um resumo do modelo
+# 'exponentiate = TRUE' transforma os coeficientes em razões de probabilidades
+# 'conf.int = TRUE' inclui os intervalos de confiança
+model_logit_multi_tidy <- tidy(model_logit_multi, exponentiate = TRUE, conf.int = TRUE) 
+  # Modificar os nomes dos termos para torná-los mais legíveis
+  # mutate(
+  #   term = case_when(
+  #     term == "(Intercept)" ~ "Intercept", 
+  #     term == "twa_temp" ~ "Temperatura Média", # Renomear '(Intercept)' para 'Intercept'
+  #     term == "age" ~ "Idade",                 # Renomear 'age' para 'Age'
+  #     term == "female" ~ "Sexo",
+  #     term == "bmi" ~ "IMC",
+  #     term == "charlson_score" ~ "Score de Charlson",
+  #     term == "chf" ~ "Insuficiência Cardíaca",
+  #   )
+  # ) 
 
 ```
 
@@ -159,11 +249,23 @@ Compare os dois modelos em termos de performance.
 
 ```{r}
 #Usando o pacote performance
+# Verificar as suposições do modelo de regressão linear 'model3'
+# Esta função verifica várias suposições importantes, como normalidade dos resíduos, homocedasticidade, entre outras.
+# check_model(model_logit_multi)
 
+#Usando o pacote performance
+
+model_performance(model_logit_uni)
+
+model_performance(model_logit_multi)
 
 ```
 
-Resposta:
+Resposta: O AIC é mais baixo para model_logit_multi, sugerindo que tem um melhor ajuste aos dados com menos penalizações pelo número de parâmetros no modelo.
+O BIC mais baixo para model_logit_uni sugere que pode ser o modelo mais apropriado ao considerar a complexidade do modelo pois esta métrcia penaliza complexidade.
+O Tjur's R2, uma medida de ajuste do modelo, é maior para model_logit_multi, indicando um poder discriminatório ligeiramente melhor, mas ambos não se afastam muito do zero indicando uma baixa capacidade preditiva de ambos os modelos.
+Ambos os modelos têm um PCP quase idêntico, indicando um desempenho preditivo geral similar.
+Apesar de melhor em termos preditivos, o modelo multivariado é mais complexo.
 
 ### Exercicio M5.4 Tabelas de Regressão
 
@@ -172,8 +274,43 @@ Crie uma tabela com os OR, p-value e Confidence Intervals do modelo construído 
 1. O objeto tabela deve-se chamar tbl_multi
 
 ```{r}
-# Criar uma tabela com o pacote gt a partir do resumo do modelo 'model_logit_multi'
+# Criar uma tabela com o pacote gt a partir do resumo do modelo 'model4_tidy'
+tbl_multi <- 
+  gt(model_logit_multi_tidy) |>
+  # Adicionar um cabeçalho com título e subtítulo
+  tab_header(
+    title = md("**Modelo de Risco para Infecção do Sítio Cirúrgico**"),
+    subtitle = "Por Média ponderada do tempo da temperatura central Idade, Sexo, BMI, Score Charlson, Tipo de cirurgia"
+  ) |>
+  # Adicionar uma nota de rodapé com a fonte dos dados
+  tab_source_note(
+    source_note = md("Fonte: Core Temperature Dataset")
+  ) |> 
+  # Renomear os rótulos das colunas
+  cols_label(
+    term = "Preditor",
+    estimate = "Razão de Probabilidades (OR)",
+    p.value = "Valor p",
+    conf.low = "IC Inferior",
+    conf.high = "IC Superior"
+  ) |> 
+  # Formatar todos os números com três casas decimais
+  fmt_number(decimals = 3) |>
+  # Aplicar um estilo visual às células dos rótulos das colunas
+  tab_style(
+    style = cell_fill(color = "grey95"),
+    locations = list(cells_column_labels())
+  ) |>
+  # Alinhar o cabeçalho da tabela à esquerda
+  opt_align_table_header(align = "left") 
 
+# Mostrar a tabela gt
+tbl_multi
+
+gtsave(
+  tbl_multi,
+  "tabela.docx"
+)
 ```
 
 ## FIM
@@ -340,4 +477,5 @@ rm(list = ls())
 ```{=html}
 <iframe width="100%" height=1000 src="validation_report5_resolvido.html"></iframe>
 ```
+
 
