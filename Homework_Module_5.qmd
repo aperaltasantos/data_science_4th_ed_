@@ -217,7 +217,8 @@ if(exists("model_logit_uni")) {
   model_logit_uni <- data.frame(
     term = "A",
     std.error = -20,
-    statistic = 10
+    statistic = 10,
+    estimate = 15
   )
 }
 
