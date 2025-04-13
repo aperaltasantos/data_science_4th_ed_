@@ -8,6 +8,7 @@ format:
       - icon: twitter
         href: https://twitter.com/andre_peralta
     scrolling: true 
+    embed-resources: true
 logo: images/ensp_logo1.png
 #theme: [lumen, theme/custom.scss]
 fig-width: 10
@@ -128,36 +129,35 @@ time_period2 <- max(csp$Período)
 
 Este dashboard mostra estatísticas de:
 
-|              |                     |
-|--------------|---------------------|
-| **Tipo de Cuidados** | Cuidados de Saúde Hospitalares |
-| **Desagregação**     | ARS  |
-| **Última Atualização**    | `{r} time_period`   |
-| **Tipo de Cuidados** | Atividade do Síndrome Gripal nos Cuidados de Saúde Hospitalares |
+|                        |                                                                 |
+|-----------------------------|-------------------------------------------|
+| **Tipo de Cuidados**   | Cuidados de Saúde Hospitalares                                  |
+| **Desagregação**       | ARS                                                             |
+| **Última Atualização** | `{r} time_period`                                               |
+| **Tipo de Cuidados**   | Atividade do Síndrome Gripal nos Cuidados de Saúde Hospitalares |
 
 ------------------------------------------------------------------------
 
-|              |                     |
-|--------------|---------------------|
-| **Tipo de Cuidados** | Cuidados de Saúde Primários |
-| **Desagregação**     | ARS  |
-| **Última Atualização**    | `{r} time_period2`   |
-| **Tipo de Cuidados** | Atividade do Síndrome Gripal nos Cuidados de Saúde Primários |
+|                        |                                                              |
+|-----------------------------|-------------------------------------------|
+| **Tipo de Cuidados**   | Cuidados de Saúde Primários                                  |
+| **Desagregação**       | ARS                                                          |
+| **Última Atualização** | `{r} time_period2`                                           |
+| **Tipo de Cuidados**   | Atividade do Síndrome Gripal nos Cuidados de Saúde Primários |
 
 ------------------------------------------------------------------------
 
 ::: {.callout-note collapse="true"}
 ## Nota
 
-Estes dados são reais e públicos. 
+Estes dados são reais e públicos.
 
 Foram extraídos do Portal da Tranparência a 06/01/2024.
 
 Links dos dados utilizados:
 
-1. [Dados dos CSP](https://transparencia.sns.gov.pt/explore/dataset/atendimentos-nos-csp-gripe/table/?disjunctive.ars&sort=dia);
-2. [Dados dos Hospitais](https://transparencia.sns.gov.pt/explore/dataset/atividade-sindrome-gripal-csh/table/?disjunctive.ars&disjunctive.indicador&sort=periodo).
-
+1.  [Dados dos CSP](https://transparencia.sns.gov.pt/explore/dataset/atendimentos-nos-csp-gripe/table/?disjunctive.ars&sort=dia);
+2.  [Dados dos Hospitais](https://transparencia.sns.gov.pt/explore/dataset/atividade-sindrome-gripal-csh/table/?disjunctive.ars&disjunctive.indicador&sort=periodo).
 :::
 
 # Cuidados de Saúde Primários
@@ -184,7 +184,7 @@ n_gripe <-  csp |> filter(Período>=max(csp$Período)-30) |> summarise(valor=sum
 #| message: false
 #| warning: false
 list(
-  icon = "person-circle",
+  icon = "lungs-fill",
   color = "primary",
   value = n_consultas 
 )
@@ -218,13 +218,13 @@ list(
 
 ### Column {width="60%"}
 
-#### Row {height="40%" .tabset}
+#### Row {.tabset height="40%"}
+
 
 ```{r}
 #| title: Consultas Gripe - Norte
 #| message: false
 #| warning: false
-
 
 data <- csp  |> 
   filter(
@@ -244,6 +244,7 @@ data |>   e_charts(Período) |>
   e_tooltip(trigger = "axis") |>
   e_legend(show = FALSE) |> # Assuming no legend is necessary as there's only one line
   e_theme("light")
+
 ```
 
 ```{r}
@@ -438,7 +439,6 @@ leaflet(csp1) |>
   addLegend(pal = mypalette, values = ~bin, opacity = 0.9, title = "Incidência da Gripe por 100 000 habitantes", position = "bottomleft")
 ```
 
-
 # Cuidados de Saúde Hospitalares {orientation="columns"}
 
 ## Column {width="60%"}
@@ -514,7 +514,7 @@ ggplotly(csh |>
   )
 ```
 
-### Row {height="40%" .tabset}
+### Row {.tabset height="40%"}
 
 ```{r}
 #| title: Episódios com diagnóstico de infeção respiratória - Norte (%)
@@ -777,7 +777,7 @@ csh|>
     class = 'cell-border stripe',
     filter = 'top',
     options = list(dom = 'ftp'
-                   , paging = TRUE)
+                   ,paging = TRUE)
     )
 ```
 

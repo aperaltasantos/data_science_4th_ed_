@@ -1,0 +1,417 @@
+---
+title: "Modulo 5 | Exercícios"
+author: "A. Peralta-Santos"
+date: today
+date-format: long
+lang: pt 
+format:
+  html:
+    preview: false
+    smooth-scroll: true
+    embed-resources: true
+    toc: true
+    toc-location: left
+    number-sections: true
+    number-depth: 3
+    code_download: true
+    code-copy: true
+execute:
+  warning: false
+  collapse: true
+  message: false
+  eval: true
+  echo: true
+title-block-style: default
+theme: templata_ensp
+editor: 
+  markdown: 
+    wrap: 72
+project:
+  output-dir: outputs/documents
+---
+# Setup
+
+```{r}
+#| warning: false
+#| message: false
+#| error: false
+
+
+rm(list = ls(all.names = TRUE)) 
+# Packages
+required_packages <- c(
+                       "assertr",
+                       "data.validator",
+                       "janitor",
+                       "tidyverse",
+                       "rio",
+                       "data.table",
+                       "broom",
+                       "gt",
+                       "gtsummary",
+                       "glm2",
+                       "performance",
+                       "see"
+                       # colocar aqui se foram utilizados mais pacotes
+                       )      
+
+for (pkg in required_packages) {
+  # install packages if not already present
+  if (!pkg %in% rownames(installed.packages())) {
+    install.packages(pkg)
+  }
+  
+  # load packages to this current session 
+  library(pkg, character.only = TRUE)
+}
+remove(required_packages)
+remove(pkg)
+
+```
+# Exercício - Hipotermia Cirúrgica
+
+## Contexto
+
+A hipotermia cirúrgica (definida como temperatura central < 36°C) é conhecida por causar coagulopatia, alteração no metabolismo de drogas, recuperação prolongada e desconforto térmico. Menos compreendido é se as infecções do sítio cirúrgico (ISCs) também estão associadas à hipotermia intraoperatória.
+
+Isso é importante, pois as infecções do sítio cirúrgico são uma grande fonte de morbidade, mortalidade, prolongamento da hospitalização e custos de saúde. O risco geral de ISC é de 1 a 3%, geralmente, mas é substancialmente maior, 10 a 15%, para pacientes submetidos à cirurgia colorretal.
+
+Literatura publicada até a data sugere que a hipotermia moderada causa ISCs e várias outras complicações. No entanto, alguns desses estudos estão desatualizados (os procedimentos cirúrgicos descritos já não são realizados) e muitos não possuem dados suficientes de temperatura intraoperatória. Portanto, é desconhecido se a hipotermia leve ou temperaturas normotérmicas influenciam o risco de infecção. [^1]
+
+[^1]: *Fonte: The Core Temperature dataset was contributed by Ms. Jordyn Homoki, Research and Teaching Assistant, and Dr. Amy Nowacki, Associate Professor, Cleveland Clinic. Please refer to this resource as: Homoki, J. and Nowacki AS, "Core Temperature Dataset", TSHS Resources Portal (2023). Available at https://www.causeweb.org/tshs/core-temperature/.*
+
+## Objetivo
+
+Avaliar a relação entre a média ponderada do tempo (TWATemp) da temperatura central e as infecções graves de feridas e sistêmicas que se desenvolvem dentro de 30 dias após a cirurgia colorretal, no geral e após levar em conta as informações de covariáveis.
+
+## Instruções
+
+### Dataset
+
+Use o dataset Core_Temperature.xlsx, e consulte a documentação em Core_Temperature_Data_Dictionary2.pdf na pasta de datasets. O objetivo geral do exercício é avaliar o efeito da temperatura (TWATemp) no risco de ISCs (AnyInfection).
+
+1. Importar para um objeto "temperature_data" com o dataset
+2. Limpar o nome das variáveis
+
+```{r}
+temperature_data <- import("datasets/Core_Temperature.xlsx")
+
+clean_names(temperature_data)
+```
+
+### Exercicio M5.1 Estatística Descritiva
+
+Deve criar uma Tabela 1 comparando a distribuição das variáveis de confundimento (Age, FEMALE, BMI, CharlsonScore, SurgeryType, CHF) pelos pacientes que tiveram ISC (AnyInfection).
+
+1. O nome do objeto deve ser tabela1
+
+```{r}
+temperature_data <- temperature_data %>%
+  rename(Sex = FEMALE) 
+
+temperature_data <- temperature_data %>%
+  mutate(
+    Sex = case_when(
+      Sex == 0 ~ "Male",
+      Sex == 1 ~ "Female",
+      TRUE ~ as.character(Sex)
+    ),
+    AnyInfection = case_when(
+      AnyInfection == 0 ~ "No",
+      AnyInfection == 1 ~ "Yes",
+      TRUE ~ as.character(AnyInfection)
+    )
+  )
+
+tabela_1 <- tbl_summary(
+  temperature_data,
+  include = c(Age, Sex, BMI, CharlsonScore, SurgeryType, CHF),
+  by = AnyInfection,
+  missing = "no"
+) |> 
+  modify_spanning_header(c("stat_1", "stat_2") ~ "**Infection**") %>%
+  add_n() |>  
+  add_p() |>  
+  modify_header(label = "**Variable**") |>  
+  bold_labels()
+
+tabela_1
+
+
+```
+
+
+### Exercicio M5.2 Visualização
+
+Deve criar uma visualização comparando a distribuição da temperatura (TWATemp) pelo risco de ISCs (AnyInfection).
+
+1. Visualização deve ser criada no objeto p1
+
+
+```{r}
+#| fig-height: 5
+#| fig-width: 7.5
+#| 
+
+p1 <- ggplot(
+  data = temperature_data, 
+  aes(x = AnyInfection, y = TWATemp)) +
+  geom_violin()
+ 
+p1
+
+```
+
+
+### Exercicio M5.3 Modelos
+
+#### Exercicio M5.3.1 Univariado
+
+Crie um modelo de regressão logística para avaliar o efeito da temperatura no risco de ISCs (AnyInfection).
+
+1. Criar modelo no objeto model_logit_uni
+2. Criar tabela com dados da regressão no objeto model_logit_uni_tidy
+
+
+```{r}
+model_logit_uni <- lm(TWATemp ~ as.factor(AnyInfection), data = temperature_data)
+
+summary(model_logit_uni)
+
+model_logit_uni_tidy <- tidy(model_logit_uni, conf.int = TRUE)
+
+model_logit_uni_tidy
+
+
+```
+
+
+#### Exercicio M5.3.2 Múltiplo
+
+Crie um modelo de regressão logística para avaliar o efeito da temperatura no risco de ISCs (AnyInfection) ajustado para Age, FEMALE, BMI, CharlsonScore e CHF.
+
+1. Criar modelo no objeto model_logit_multi
+2. Criar tabela com dados da regressão no objeto model_logit_multi_tidy
+
+
+```{r}
+# Criar um modelo de regressão logística para prever a ocorrência de risco de ISCs (AnyInfection).
+
+model_logit_multi <- glm(
+  as.factor(AnyInfection) ~ Age + as.factor(Sex) + BMI + CharlsonScore + CHF, 
+  family = "binomial",
+  data = temperature_data)
+
+model_logit_multi
+
+model_logit_multi_tidy <- tidy(model_logit_multi, exponentiate = TRUE, conf.int = TRUE)
+
+model_logit_multi_tidy
+
+```
+
+
+#### Exercicio M5.3.3 Performance
+
+Compare os dois modelos em termos de performance.
+
+```{r}
+#Usando o pacote performance
+
+compare_performance(model_logit_uni, model_logit_multi, verbose = FALSE)
+
+```
+
+Resposta:
+
+### Exercicio M5.4 Tabelas de Regressão
+
+Crie uma tabela com os OR, p-value e Confidence Intervals do modelo construído em 5.3.2. Exporte a tabela criada para Word.
+
+1. O objeto tabela deve-se chamar tbl_multi
+
+```{r}
+# Criar uma tabela com o pacote gt a partir do resumo do modelo 'model_logit_multi'
+
+tbl_multi <- model_logit_multi_tidy %>% 
+  select(term, estimate, p.value, conf.low, conf.high) %>% 
+  mutate(
+    term = case_when(
+      term == "(Intercept)" ~ "Intercept",
+      term == "as.factor(Sex)Male" ~ "Sex (Male)",
+      TRUE ~ term
+    )
+  ) %>% 
+  rename (
+    Variable = term,
+    OR = estimate
+  )
+
+tbl_multi
+```
+
+## FIM
+
+# Validation - NÃO ALTERAR
+
+```{r validation for objects}
+#| code-fold: true
+#| echo: false
+if(exists("tabela1")) {
+  print(":) Objeto 'tabela1' criado com sucesso")
+} else {
+  print(":( Objeto 'tabela1' não existe")
+  tabela1 <- list(
+    '_data' = data.frame(variable = "A")
+  )
+}
+
+if(exists("p1")) {
+  print(":) Objeto 'p1' criado com sucesso")
+  if("any_infection" %in% as.character(p1$mapping[["x"]])){
+    print(":) Objeto 'p1' com variável correta no X")
+  }else {
+  print(":( X não está associado à variável correta")}
+  if("twa_temp" %in% as.character(p1$mapping[["y"]])){
+    print(":) Objeto 'p1' com variável correta no Y")
+  }else {
+  print(":( Y não está associado à variável correta")}
+    
+} else {
+  print(":( Objeto 'p1' não existe")
+  p1 <- data.frame(
+    ID = "A"
+  )
+}
+
+if(exists("model_logit_uni")) {
+  print(":) Objeto 'model_logit_uni' criado com sucesso")
+} else {
+  print(":( Objeto 'model_logit_uni' não existe")
+  model_logit_uni <- data.frame(
+    term = "A",
+    std.error = -20,
+    statistic = 10
+  )
+}
+
+if(exists("model_logit_uni_tidy")) {
+  print(":) Objeto 'model_logit_uni_tidy' criado com sucesso")
+} else {
+  print(":( Objeto 'model_logit_uni_tidy' não existe")
+  model_logit_uni_tidy <- data.frame(
+        term = "A",
+    std.error = -20,
+    statistic = 10,
+    estimate = 15
+  )
+}
+
+
+if(exists("model_logit_multi")) {
+  print(":) Objeto 'model_logit_multi' criado com sucesso")
+} else {
+  print(":( Objeto 'model_logit_multi' não existe")
+  model_logit_multi <- data.frame(
+        term = "A",
+    std.error = -20,
+    statistic = 10,
+    estimate = 15
+  )
+}
+
+if(exists("model_logit_multi_tidy")) {
+  print(":) Objeto 'model_logit_multi_tidy' criado com sucesso")
+} else {
+  print(":( Objeto 'model_logit_multi_tidy' não existe")
+  model_logit_multi_tidy <- data.frame(
+        term = "A",
+    std.error = -20,
+    statistic = 10,
+    estimate = 25
+  )
+}
+
+if(exists("tbl_multi")) {
+  print(":) Objeto 'tbl_multi' criado com sucesso")
+} else {
+  print(":( Objeto 'tbl_multi' não existe")
+  tbl_multi <- list(
+    '_data' = data_frame(term = "A")
+  )
+}
+```
+
+
+```{r validation for outputs}
+#| code-fold: true
+#| include: false
+
+require(data.validator)
+require(assertr)
+
+report <- data_validation_report()
+
+between <- function(a, b) {
+  function(x) { a <= x & x <= b }
+}
+
+# model_logit_uni_tidy
+# model_logit_multi_tidy
+
+
+validate(tabela1[["_data"]], name = "Verifying tabela1") |>
+  validate_if(has_all_names("p.value"),colnames(), description = "Tabela1 pede p-value") |>
+  validate_if(unique(variable) %in% c("age",
+    "female",
+    "bmi",
+    "charlson_score",
+    "surgery_type"),variable,description = "Tem as variáveis pedidas para a tabela 1") |> 
+  validate_if(nrow(tabela1[["_data"]])==5, description = "Tem apenas as variáveis pedidas para a tabela 1") |> 
+  add_results(report)
+
+
+validate(model_logit_uni_tidy, name = "Verifying model_logit_uni_tidy") |>
+  validate_if(has_all_names("p.value", "conf.low","conf.high"),colnames(), description = "Modelo univariado pede p-value e intervalos de confiança") |>
+  validate_if(unique(term) %in% c("(Intercept)","twa_temp")
+              ,term,description = "Tem as variáveis pedidas para a tabela 1") |> 
+  validate_if(nrow(model_logit_uni_tidy)==2, description = "Tem apenas as variáveis pedidas para a regressão univariada") |>
+  validate_cols(between(0,1.4),"estimate",description = "Valor dos coeficientes dentro do esperado") |> 
+  validate_cols(between(0.05,2.3),"std.error",description = "Valor do Desvio-padrão dentro do esperado") |> 
+  validate_cols(between(-5.4,5),"statistic",description = "Valor do Desvio-padrão dentro do esperado") |> 
+  add_results(report)
+
+validate(model_logit_multi_tidy, name = "Verifying model_logit_multi_tidy") |>
+  validate_if(has_all_names("p.value", "conf.low","conf.high"),colnames(), description = "Modelo multivariado pede p-value e intervalos de confiança") |>
+  validate_if(unique(term) %in% c("(Intercept)","twa_temp","age","female","bmi","charlson_score", "chf")
+              ,term,description = "Tem as variáveis pedidas para a tabela 1") |> 
+  validate_if(nrow(model_logit_multi_tidy)==7, description = "Tem apenas as variáveis pedidas para a regressão multivariada") |>
+  validate_cols(between(0,1.41),"estimate",description = "Valor dos coeficientes dentro do esperado") |> 
+  validate_cols(between(0.001,2.29),"std.error",description = "Valor do Desvio-padrão dentro do esperado") |> 
+  validate_cols(between(-4.8,4.3),"statistic",description = "Valor do Desvio-padrão dentro do esperado") |> 
+  add_results(report)
+
+validate(tbl_multi[["_data"]] , name = "Verifying tbl_multi") |>
+  validate_if(has_all_names("term", "estimate" , "p.value"   ,"conf.low" , "conf.high"),colnames(), description = "Tabela tem as colunas pedidas") |>
+  validate_if(unique(term) %in% c("(Intercept)",
+                                  "twa_temp",
+                                  "age",
+                                  "female",
+                                  "bmi",
+                                  "charlson_score",
+                                  "chf"),term,description = "Tem as variáveis pedidas para a tabela final") |> 
+  validate_if(nrow(tbl_multi[["_data"]])==7, description = "Tem apenas as variáveis pedidas para a tabela final") |> 
+  add_results(report)
+
+get_results(report)
+
+save_report(report, output_file ="validation_report5_resolvido.html")
+
+rm(list = ls())
+
+```
+
+```{=html}
+<iframe width="100%" height=1000 src="validation_report5_resolvido.html"></iframe>
+```
+

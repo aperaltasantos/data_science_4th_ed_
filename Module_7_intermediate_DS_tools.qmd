@@ -23,6 +23,12 @@ execute:
   eval: true
   echo: true
 title-block-style: default
+params:
+  ano: 2024
+  escola: "ENSP"
+  pessoa: "Aluno"
+  edicao: "4ª"
+  curso: "Data Science with R in Healthcare"
 editor: 
   markdown: 
     wrap: 72
