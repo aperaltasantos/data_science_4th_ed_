@@ -1,0 +1,523 @@
+---
+title: "Módulo 2  | Data Science Collaboration tools: Github"
+author: "João Dionísio e A. Peralta-Santos"
+date: today
+date-format: long
+lang: pt 
+format:
+  html:
+    preview: false
+    smooth-scroll: true
+    embed-resources: true
+    toc: true
+    toc-location: right
+    number-sections: true
+    number-depth: 3
+    code_download: true
+    code-copy: true
+execute:
+  warning: false
+  collapse: true
+  message: false
+  eval: true
+  echo: true
+title-block-style: default
+theme: templata_ensp
+editor: 
+  markdown: 
+    wrap: 72
+project:
+  output-dir: outputs/documents
+---
+
+# Controlo de Versões: Uma Salvaguarda para o seu Trabalho
+
+## O que é o Controlo de Versões?
+
+O controlo de versões é um sistema que regista as alterações feitas a um ficheiro ou a um conjunto de ficheiros ao longo do tempo, para que possa recuperar versões específicas mais tarde. É uma ferramenta fundamental para qualquer trabalho que envolva a criação e modificação de documentos, especialmente código.
+
+Pense nisto: se é um designer gráfico, quer guardar todas as versões de uma imagem. Se é um cientista de dados, quer guardar todas as versões do seu script de análise. Um Sistema de Controlo de Versões (VCS, na sigla em inglês) permite fazer exatamente isso de forma robusta e organizada. Com um VCS, pode:
+
+-   Reverter ficheiros específicos ou o projeto inteiro para um estado anterior.
+-   Comparar as alterações ao longo do tempo.
+-   Ver quem modificou o quê, e quando, o que é crucial para encontrar a origem de um problema.
+-   Recuperar facilmente o seu trabalho se cometer um erro grave ou perder ficheiros.
+
+### Tipos de Sistemas de Controlo de Versões
+
+Existem várias abordagens para o controlo de versões:
+
+1.  **Sistemas Locais**: A abordagem mais básica é copiar ficheiros para outra pasta (ex: `projeto_v2`, `projeto_final_mesmo`). É simples, mas muito propenso a erros. É fácil esquecer-se em que pasta está e sobrescrever o ficheiro errado.
+
+2.  **Sistemas Centralizados (CVCS)**: Sistemas como o Subversion e o Perforce usam um único servidor central que contém todos os ficheiros versionados. Os utilizadores (clientes) fazem "check-out" dos ficheiros desse servidor.
+    -   **Vantagem**: Todos na equipa sabem o que os outros estão a fazer, e os administradores têm controlo total.
+    -   **Desvantagem**: O servidor é um ponto único de falha. Se o disco do servidor avariar e não houver backups, perde-se *tudo*.
+
+3.  **Sistemas Distribuídos (DVCS)**: É aqui que o **Git** entra. Num DVCS, os clientes não fazem apenas o check-out da última versão dos ficheiros; eles **espelham completamente o repositório**, incluindo todo o seu histórico.
+    -   **Vantagem**: Cada clone é um backup completo de todos os dados. Se o servidor principal falhar, qualquer um dos clones dos clientes pode ser copiado de volta para o servidor para o restaurar. Isto torna o sistema incrivelmente robusto e flexível, permitindo diferentes tipos de fluxos de trabalho colaborativos.
+
+![Diagrama de um sistema de controlo de versões distribuído como o Git.](https://git-scm.com/book/en/v2/images/distributed.png)
+
+## O que é o Git? Uma Mente Focada em Snapshots
+
+A grande diferença do Git é a forma como ele "pensa" nos dados. Enquanto muitos sistemas de controlo de versões armazenam a informação como uma lista de alterações feitas a cada ficheiro, o Git pensa nos seus dados mais como uma **série de snapshots (fotografias) de um mini sistema de ficheiros**.
+
+Sempre que faz um *commit* (guarda o estado do seu projeto), o Git tira uma "fotografia" do aspeto de todos os seus ficheiros nesse momento e armazena uma referência a esse snapshot. Para ser eficiente, se os ficheiros não mudaram, o Git não armazena o ficheiro novamente, apenas um link para a versão anterior idêntica que já guardou.
+
+![O Git armazena os dados como snapshots do projeto ao longo do tempo.](https://git-scm.com/book/en/v2/images/snapshots.png)
+
+Esta abordagem torna o Git mais parecido com um sistema de ficheiros com ferramentas poderosas por cima, e tem várias vantagens:
+
+-   **Operações Locais e Rápidas**: Como tem o histórico completo do projeto no seu disco local, a maioria das operações (como ver o histórico ou comparar versões) é quase instantânea. Não precisa de contactar um servidor.
+-   **Integridade de Dados**: Tudo no Git é verificado por checksums antes de ser armazenado e é referenciado por esse checksum. Isto significa que é impossível alterar o conteúdo de qualquer ficheiro ou diretório sem que o Git saiba.
+-   **Confiança nas Adições**: Quase todas as ações no Git apenas *adicionam* dados à base de dados. É muito difícil perder trabalho que já foi "commitado".
+
+## Os Três Estados do Git
+
+Para entender como o Git funciona, é crucial conhecer os três estados principais em que os seus ficheiros podem residir: **modificado**, **preparado (staged)** e **commitado (committed)**.
+
+-   **Modificado (Modified)**: Significa que alterou o ficheiro, mas ainda não o guardou na base de dados do Git. Estas são as alterações na sua pasta de trabalho.
+-   **Preparado (Staged)**: Significa que marcou um ficheiro modificado na sua versão atual para fazer parte do seu próximo *commit* (o próximo snapshot).
+-   **Commitado (Committed)**: Significa que os dados estão guardados de forma segura na sua base de dados local do Git.
+
+Isto leva-nos a três áreas de trabalho distintas:
+
+1.  **A Pasta de Trabalho (Working Directory)**: É uma cópia de uma versão do projeto. É a pasta no seu computador onde pode ver e editar os ficheiros.
+2.  **A Área de Preparação (Staging Area)**: É um ficheiro, geralmente contido no seu diretório Git, que armazena informações sobre o que vai entrar no seu próximo *commit*. É uma área intermédia.
+3.  **O Diretório Git (Repositório)**: É onde o Git armazena os metadados e a base de dados de objetos para o seu projeto. É a parte mais importante do Git, e é o que é copiado quando clona um repositório.
+
+![As três áreas: Pasta de Trabalho, Área de Preparação e Diretório Git.](https://git-scm.com/book/en/v2/images/areas.png)
+
+O fluxo de trabalho básico do Git é o seguinte:
+
+1.  **Modifica** ficheiros na sua pasta de trabalho.
+2.  **Prepara** os ficheiros (faz *stage*), adicionando snapshots deles à sua área de preparação. No GitHub Desktop, isto é feito ao selecionar os ficheiros que quer incluir no commit.
+3.  **Faz um commit**, que pega nos ficheiros tal como estão na área de preparação e armazena esse snapshot permanentemente no seu diretório Git.
+
+::: {.callout-note collapse="true"}
+## Comandos de Terminal Correspondentes
+
+Para os curiosos, aqui estão os comandos no terminal que correspondem a este fluxo:
+
+1.  Depois de modificar os ficheiros, usa-se `git status` para ver o que foi alterado. Mostra os ficheiros na *working directory* que foram modificados.
+2.  Para adicionar ficheiros à *staging area*, usa-se `git add nome_do_ficheiro.R`. Se executar `git status` novamente, verá que o ficheiro passou para a secção "Changes to be committed".
+3.  Para fazer o commit, usa-se `git commit -m "Mensagem descritiva do commit"`.
+:::
+
+## A Nossa Ferramenta: GitHub Desktop
+
+Embora possa usar o Git através de linhas de comando, existe uma forma muito mais visual e intuitiva de o fazer: o **GitHub Desktop**.
+
+O GitHub Desktop é uma aplicação gratuita que simplifica o uso do Git, abstraindo estes três estados numa interface gráfica simples, onde as suas alterações são visíveis e os passos de *stage* e *commit* são combinados numa única ação.
+
+![A interface do GitHub Desktop para Windows.](https://desktop.github.com/images/screenshot-windows-light.png)
+
+Neste módulo, iremos focar-nos exclusivamente no **GitHub Desktop**, mas é útil entender a teoria por detrás da ferramenta.
+
+## Porque é que isto é essencial para a Ciência de Dados?
+
+Usar Git e GitHub pode parecer complexo no início, mas os benefícios para um cientista de dados são enormes:
+
+1.  **Reprodutibilidade**: Garante que qualquer pessoa (incluindo o seu "eu" do futuro) consegue reproduzir a sua análise. Um histórico claro de alterações mostra exatamente que código e que dados geraram os seus resultados.
+2.  **Colaboração Simplificada**: Permite que trabalhe em equipa no mesmo projeto sem o caos de enviar ficheiros por email. Cada pessoa pode trabalhar na sua cópia, e o Git ajuda a juntar (*merge*) as alterações de forma inteligente.
+3.  **Segurança e Backup**: Ao guardar o seu trabalho no GitHub, tem um backup automático na nuvem. Se o seu computador avariar, o seu projeto está seguro.
+4.  **Portfólio Profissional**: O seu perfil no GitHub serve como um portfólio dinâmico. Empregadores podem ver os seus projetos, a qualidade do seu código e a sua capacidade de colaboração.
+
+---
+
+## Guia Prático: O Seu Primeiro Projeto com GitHub Desktop
+
+Vamos agora pôr as mãos na massa. Este guia irá acompanhá-lo desde a criação da sua conta até à publicação do seu primeiro projeto no GitHub, usando apenas o GitHub Desktop.
+
+### Configuração Inicial (Apenas uma vez)
+
+Antes de começar, precisa de uma conta no GitHub e de instalar o GitHub Desktop.
+
+1.  **Crie uma conta no GitHub**: Visite [github.com](https://github.com) e crie uma conta gratuita. Escolha um nome de utilizador profissional; ele fará parte do seu portfólio!
+
+2.  **Instale o GitHub Desktop**: Descarregue e instale a aplicação a partir de [desktop.github.com](https://desktop.github.com/).
+
+3.  **Faça Login e Configure o Git**:
+    -   Abra o GitHub Desktop. A primeira vez, ele pedirá para fazer login com a sua conta GitHub.
+    -   De seguida, ele pedirá para configurar o seu nome (`user.name`) e email (`user.email`) para o Git. **É crucial que use o mesmo email da sua conta GitHub**. Esta configuração identifica quem fez cada alteração. O GitHub Desktop trata disto por si.
+
+### Passo 1: Criar o seu primeiro repositório
+
+Um **repositório** (ou "repo") é simplesmente uma pasta que contém todos os ficheiros do seu projeto, juntamente com o seu histórico de alterações.
+
+Vamos criar um novo repositório no seu computador.
+
+1.  Abra o GitHub Desktop e clique em **Create a New Repository on your Hard Drive...**.
+
+    ![Criar um novo repositório no GitHub Desktop.](images/create-new-repo.png){width="80%"}
+
+2.  Preencha os campos:
+    -   **Name**: Dê um nome curto e descritivo ao seu projeto (ex: `primeiro-projeto-ds`).
+    -   **Description**: Uma frase que descreva o projeto.
+    -   **Local Path**: A pasta no seu computador onde o repositório será guardado. Escolha um local de fácil acesso (ex: `Documentos/GitHub`).
+    -   **Initialize this repository with a README**: **Marque esta opção**. Um ficheiro `README.md` é o "cartão de visita" do seu projeto.
+    -   **Git Ignore**: Selecione `R` na lista. Isto cria um ficheiro `.gitignore` que diz ao Git para ignorar ficheiros temporários e desnecessários comuns em projetos de R.
+    -   **License**: Escolha uma licença (ex: `MIT License`). Uma licença define como outras pessoas podem usar o seu código.
+
+3.  Clique em **Create Repository**.
+
+Parabéns, acabou de criar o seu primeiro repositório Git no seu computador!
+
+::: {.callout-note collapse="true"}
+## Comandos de Terminal Correspondentes
+
+A criação de um repositório no terminal envolve alguns passos:
+
+1.  Navegar até à pasta do seu projeto.
+    ```bash
+    cd "C:/Users/SeuUtilizador/Documents/GitHub/primeiro-projeto-ds"
+    ```
+2.  Inicializar o repositório. Este comando cria a subpasta `.git` oculta que contém toda a magia.
+    ```bash
+    git init
+    ```
+3.  Adicionar todos os ficheiros iniciais (`README.md`, `.gitignore`, etc.) à área de preparação (*staging area*).
+    ```bash
+    git add .
+    ```
+    O `.` é um atalho para "todos os ficheiros nesta pasta".
+:::
+
+### Passo 2: O Ciclo de Trabalho: Fazer Alterações e Commits
+
+Agora que o repositório está criado, vamos seguir o ciclo de trabalho que vimos anteriormente.
+
+1.  **Faça uma alteração**:
+    -   Abra a pasta do projeto no seu computador (o GitHub Desktop tem um atalho "Show in Explorer" / "Show in Finder").
+    -   Abra o ficheiro `README.md` com um editor de texto (como o RStudio, VS Code, ou Bloco de Notas) e adicione uma linha de texto, por exemplo: "Este é o meu primeiro projeto de Data Science com Git!".
+    -   Grave o ficheiro.
+
+2.  **Reveja e prepare as alterações (Stage)**:
+    -   Volte ao GitHub Desktop. A interface irá mostrar-lhe as alterações que fez. Os ficheiros alterados aparecem na barra lateral esquerda. O painel principal mostra a vermelho o que foi removido e a verde o que foi adicionado.
+    -   O GitHub Desktop **seleciona automaticamente (stages) todas as alterações** por defeito. Se quiser incluir apenas algumas, pode desmarcar os ficheiros que não quer incluir no seu *commit*.
+
+    ![A vista de alterações no GitHub Desktop, mostrando as linhas adicionadas (a verde).](images/commit-view.png){width="100%"}
+
+3.  **Faça o Commit**:
+    -   Na parte inferior esquerda, encontrará a área de *commit*.
+    -   No campo **Summary (required)**, escreva uma mensagem curta e clara que descreva a alteração. Ex: `Adiciona descrição inicial ao README`.
+    -   (Opcional) No campo **Description**, pode adicionar mais detalhes.
+    -   Clique no botão azul **Commit to `main`**.
+
+O seu *commit* está agora guardado no histórico do seu repositório **local**. `main` é o nome do ramo (branch) principal do seu projeto.
+
+::: {.callout-note collapse="true"}
+## Comandos de Terminal Correspondentes
+
+1.  Para ver as alterações que fez (o que está `modified` mas não `staged`), use `git status`.
+2.  Para ver exatamente *o que* mudou no conteúdo dos ficheiros, use `git diff`.
+3.  Para adicionar as suas alterações à área de preparação, use `git add README.md`.
+4.  Para fazer o commit, use `git commit -m "Adiciona descrição inicial ao README"`.
+:::
+
+#### A Arte de Escrever Boas Mensagens de Commit
+
+A mensagem de commit é um dos aspetos mais importantes de um bom fluxo de trabalho. Ela explica o **porquê** de uma alteração. Uma mensagem bem escrita é uma ajuda imensa para os seus colegas e para o seu "eu" do futuro.
+
+**Regras para uma boa mensagem (Summary):**
+
+1.  **Seja breve e descritiva**: O sumário deve ter cerca de 50 caracteres.
+2.  **Use o modo imperativo**: Escreva como se estivesse a dar uma ordem. Isto é uma convenção.
+    -   **Bom**: `Adiciona script de limpeza de dados`
+    -   **Mau**: `Adicionei o script de limpeza` ou `Script de limpeza adicionado`
+3.  **Seja específico**:
+    -   **Bom**: `Corrige erro de cálculo na média de idade`
+    -   **Mau**: `Correções` ou `Bug fix`
+
+**Exemplos de Mensagens de Commit em Data Science:**
+
+| Bom `(Sumário)`                                      | Mau                  |
+| ---------------------------------------------------- | -------------------- |
+| `Adiciona gráfico de dispersão de peso vs. altura`   | `Gráfico novo`       |
+| `Remove colunas duplicadas do dataset de clientes`   | `Limpeza de dados`   |
+| `Altera o modelo de regressão para RandomForest`     | `Update do modelo`   |
+| `Aumenta o tamanho da fonte nos eixos do gráfico`    | `Ajustes`            |
+| `Corrige erro na importação de ficheiros CSV com ;`  | `Erro corrigido`     |
+| `Adiciona documentação da função 'calculate_mean'`   | `Docs`               |
+
+No campo **Description** (opcional no GitHub Desktop), pode adicionar mais detalhes se a alteração for complexa.
+
+::: {.callout-note collapse="true"}
+## Comando de Terminal para Commit
+
+No terminal, um commit com sumário e descrição seria assim:
+
+```bash
+git commit -m "Adiciona script de limpeza de dados" -m "O script remove valores NAs das colunas 'idade' e 'salário' e converte a coluna 'data_registo' para o formato datetime."
+```
+:::
+
+### Passo 3: Publicar o seu repositório no GitHub
+
+Até agora, o seu projeto só existe no seu computador. Vamos publicá-lo para que fique guardado online no seu perfil do GitHub.
+
+1.  No GitHub Desktop, verá uma mensagem a dizer "Publish repository to GitHub". Clique no botão azul **Publish repository**.
+
+    ![O botão para publicar o repositório no GitHub.](images/publish-repo.png){width="80%"}
+
+2.  Na janela que aparece:
+    -   Confirme o **Name** e a **Description**.
+    -   **Keep this code private**: Desmarque esta opção se quiser que o seu projeto seja público e faça parte do seu portfólio. Para projetos privados, precisa de uma conta paga (ou do plano gratuito com limites).
+    -   Clique em **Publish Repository**.
+
+O GitHub Desktop irá enviar todos os seus ficheiros e o histórico de *commits* para o GitHub. Se visitar o seu perfil em `github.com/seu-username`, verá lá o seu novo repositório!
+
+::: {.callout-note collapse="true"}
+## Comandos de Terminal Correspondentes
+
+Publicar um repositório local para o GitHub pela primeira vez envolve dois passos:
+
+1.  **Adicionar o repositório remoto**: Tem de dizer ao seu Git local qual é o URL do repositório no GitHub. `origin` é o nome padrão para o seu repositório remoto principal.
+    ```bash
+    git remote add origin https://github.com/seu-username/primeiro-projeto-ds.git
+    ```
+2.  **Fazer o "Push" inicial**: Enviar o seu ramo `main` para o remoto `origin`. O `-u` estabelece uma ligação para que futuros `push` e `pull` sejam mais simples.
+    ```bash
+    git push -u origin main
+    ```
+:::
+
+### Passo 4: O Ciclo Continua (Commit & Push)
+
+O seu projeto está agora online. E se fizer mais alterações? O ciclo é quase o mesmo.
+
+1.  **Modifique** um ficheiro localmente (por exemplo, adicione mais texto ao `README.md`).
+2.  **Faça o Commit** dessa alteração no GitHub Desktop (com uma nova mensagem, ex: `Detalha objetivos do projeto`).
+
+Agora, o seu repositório local está um *commit* à frente do repositório no GitHub. O GitHub Desktop mostra-lhe isso.
+
+3.  **Faça o Push**: Clique no botão **Push origin** para enviar o seu novo *commit* para o GitHub.
+
+    ![O botão "Push" para enviar commits para o GitHub.](images/push-origin.png){width="80%"}
+
+Este é o ciclo essencial para trabalhar sozinho: **Modificar -> Commitar -> Fazer Push**.
+
+::: {.callout-note collapse="true"}
+## Comandos de Terminal Correspondentes
+
+Depois de fazer um novo commit, para o enviar para o GitHub, o comando é mais simples:
+```bash
+git push
+```
+Para ver o histórico de commits, pode usar:
+```bash
+git log --oneline --graph
+```
+Isto mostra-lhe a sequência de commits de forma compacta e gráfica.
+:::
+
+---
+
+## Guia de Colaboração: Trabalhar em Equipa
+
+A verdadeira magia do GitHub acontece quando colaboramos. Vamos ver como pode juntar-se a um projeto existente e trabalhar em equipa usando o GitHub Desktop.
+
+### Passo 1: Clonar um Repositório
+
+Quando quer contribuir para um projeto que já existe no GitHub, o primeiro passo é **clonar** o repositório. Clonar significa criar uma cópia local do projeto no seu computador, já ligada ao repositório online.
+
+1.  Vá à página do projeto no GitHub.
+2.  Clique no botão verde **"<> Code"**.
+3.  Selecione o separador **"HTTPS"** e clique no botão **"Open with GitHub Desktop"**.
+
+    ![Clonar um repositório para o seu computador usando o GitHub Desktop.](images/clone-repo.png){width="80%"}
+
+4.  O seu browser irá pedir permissão para abrir o GitHub Desktop. Permita.
+5.  O GitHub Desktop irá abrir e perguntar-lhe onde quer guardar o projeto no seu computador (**Local Path**). Confirme a localização e clique em **Clone**.
+
+Agora tem uma cópia completa do projeto no seu computador, incluindo todo o seu histórico.
+
+::: {.callout-note collapse="true"}
+## Comando de Terminal Correspondente
+
+Clonar um repositório no terminal é muito direto. Basta usar o comando `git clone` seguido do URL que encontra no site do GitHub.
+
+```bash
+git clone https://github.com/nome-do-dono/nome-do-repo.git
+```
+Isto cria uma pasta com o nome do repositório e descarrega tudo para lá.
+:::
+
+### Passo 2: O Ciclo de Colaboração (Fetch, Pull, Push)
+
+Quando trabalha em equipa, várias pessoas estão a fazer *push* de alterações para o mesmo repositório. Precisa de uma forma de se manter atualizado com o trabalho dos outros e de partilhar o seu.
+
+1.  **Fetch (Verificar se há novidades)**: Antes de começar a trabalhar, é boa prática ver se há alterações novas no GitHub. No GitHub Desktop, clique no botão **Fetch origin**. A aplicação irá contactar o GitHub e verificar se existem novos *commits* feitos pelos seus colegas. Não irá alterar os seus ficheiros ainda, apenas informa-o do estado do projeto.
+
+    ![O botão "Fetch origin" verifica se existem alterações no repositório remoto.](images/fetch-origin.png){width="80%"}
+
+2.  **Pull (Puxar as novidades)**: Se o `Fetch` encontrar alterações, o botão transforma-se em **Pull origin**. Ao clicar nele, o GitHub Desktop irá descarregar essas alterações e aplicá-las (fazer *merge*) aos seus ficheiros locais. Isto garante que está a trabalhar na versão mais recente do projeto.
+
+3.  **Modificar, Commitar e Fazer Push**: Agora, o seu fluxo de trabalho é o mesmo que já aprendeu:
+    -   Faça as suas alterações locais.
+    -   Faça *commit* das suas alterações com uma mensagem clara.
+    -   Faça *Push* para o GitHub para partilhar o seu trabalho com a equipa.
+
+O ciclo de colaboração é: **Pull -> Modificar -> Commitar -> Push**. Execute sempre o `Pull` antes de começar a trabalhar para evitar conflitos!
+
+::: {.callout-note collapse="true"}
+## Comandos de Terminal Correspondentes
+
+O ciclo de colaboração no terminal é o seguinte:
+
+1.  **Verificar novidades (Fetch)**: Descarrega a informação sobre novos commits, mas não os aplica aos seus ficheiros.
+    ```bash
+    git fetch origin
+    ```
+2.  **Integrar novidades (Pull)**: O `pull` é, na verdade, um `fetch` seguido de um `merge`. Ele baixa as alterações e tenta fundi-las com o seu trabalho local.
+    ```bash
+    git pull origin main
+    ```
+3.  **Enviar o seu trabalho (Push)**:
+    ```bash
+    git push origin main
+    ```
+:::
+
+### Passo 3: O Poder dos Branches (Ramos)
+
+E se quiser experimentar uma nova análise sem afetar o projeto principal? Ou se duas pessoas estiverem a trabalhar em partes diferentes do projeto ao mesmo tempo? A solução é usar **branches** (ramos).
+
+Um *branch* é uma linha de desenvolvimento paralela. Permite-lhe trabalhar isoladamente sem perturbar o ramo principal (que se chama, por defeito, `main`). Um branch é, na sua essência, apenas um ponteiro leve e móvel para um dos seus commits. O nome de branch por defeito no Git é `master`.
+
+### Porque é que os Branches são Essenciais?
+
+Imagine o ramo `main` como a versão "oficial" e funcional do seu projeto. Nunca se deve trabalhar diretamente nela. Em vez disso, para cada nova tarefa, cria-se um novo branch.
+
+-   **Experimentação Segura**: Quer testar um novo algoritmo de machine learning? Crie um branch `experimento-novo-modelo`. Se não funcionar, pode simplesmente apagar o branch. O `main` nunca foi afetado.
+-   **Desenvolvimento Paralelo**: Você pode estar a trabalhar na `feature-novo-grafico` enquanto um colega trabalha no `bugfix-leitura-csv`. Os vossos trabalhos não interferem um com o outro.
+-   **Código Mais Limpo**: O ramo `main` só recebe trabalho que está completo e revisto. Isto mantém a estabilidade do projeto.
+
+### O Fluxo de Trabalho com Branches
+
+1.  **Criar um Novo Branch**: Crie um novo ramo a partir do `main`.
+2.  **Trabalhar no Branch**: Faça commits no seu novo ramo.
+3.  **Abrir um Pull Request**: Quando o seu trabalho estiver pronto, abra um "Pull Request" no GitHub. Isto é um pedido para "puxar" as suas alterações do seu ramo para o `main`. É aqui que a revisão de código acontece.
+4.  **Merge**: Depois de aprovado, o seu branch é fundido (*merged*) no `main`.
+
+**Exemplo no GitHub Desktop:**
+
+1.  **Criar um Novo Branch**: No GitHub Desktop, clique no menu "Current Branch" e depois no botão **New Branch**. Dê um nome descritivo ao seu ramo (ex: `analise-exploratoria-temp`).
+    ![Criar um novo branch no GitHub Desktop.](images/new-branch.png){width="100%"}
+
+2.  **Trabalhar no Branch**: Todas as alterações e *commits* que fizer agora serão guardados *apenas* neste novo ramo.
+
+3.  **Publicar o Branch**: Para que os outros vejam o seu branch (ou para abrir um Pull Request), precisa de o publicar. O GitHub Desktop irá mostrar um botão **"Publish branch"**.
+
+::: {.callout-note collapse="true"}
+## Comandos de Terminal para Branches
+
+-   **Criar um novo branch**:
+    ```bash
+    git branch analise-exploratoria-temp
+    ```
+-   **Mudar para o novo branch**:
+    ```bash
+    git checkout analise-exploratoria-temp
+    ```
+-   **Criar e mudar para o branch num só passo (muito comum)**:
+    ```bash
+    git checkout -b analise-exploratoria-temp
+    ```
+-   **Ver todos os branches locais**:
+    ```bash
+    git branch
+    ```
+-   **Enviar um novo branch para o GitHub**:
+    ```bash
+    git push -u origin analise-exploratoria-temp
+    ```
+-   **Apagar um branch localmente (depois de ser merged)**:
+    ```bash
+    git branch -d analise-exploratoria-temp
+    ```
+:::
+
+### Desfazendo Coisas (Reset & Restore)
+
+O que fazer quando comete um erro?
+
+-   **Descartar alterações num ficheiro que ainda não foram "commitadas"**: Se modificou um ficheiro e quer voltar à versão do último commit, no GitHub Desktop pode clicar com o botão direito no ficheiro e escolher "Discard Changes".
+-   **Reverter um commit inteiro**: Se fez um commit e se arrependeu, a forma mais segura é usar a opção "Revert this Commit" no histórico do GitHub Desktop. Isto cria um *novo* commit que desfaz as alterações do commit anterior, mantendo o histórico intacto.
+
+::: {.callout-note collapse="true"}
+## Comandos de Terminal para Desfazer Coisas
+
+Estes comandos são poderosos e devem ser usados com cuidado.
+
+-   **Descartar alterações na *working directory***: Para um ficheiro chamado `analise.R`, este comando restaura-o para a versão que está na *staging area* (ou no último commit, se não estiver na staging area).
+    ```bash
+    git restore analise.R
+    ```
+-   **Remover um ficheiro da *staging area***: Se adicionou um ficheiro por engano com `git add`, pode retirá-lo da staging area com:
+    ```bash
+    git reset analise.R
+    # ou, com a sintaxe mais moderna:
+    git restore --staged analise.R
+    ```
+-   **Apagar um ficheiro do Git e do disco**:
+    ```bash
+    git rm meu_ficheiro.txt
+    ```
+-   **Mover/Renomear um ficheiro**:
+    ```bash
+    git mv nome_antigo.R nome_novo.R
+    ```
+:::
+
+O conceito mais importante a reter é: **crie sempre um novo branch para uma nova tarefa ou funcionalidade**. Isto mantém o ramo `main` limpo e funcional, e é a base de um fluxo de trabalho colaborativo bem-sucedido.
+
+---
+
+## Integração com RStudio: Uma Alternativa Poderosa
+
+Para cientistas de dados que passam a maior parte do tempo no RStudio, a boa notícia é que o RStudio tem uma excelente integração com o Git. Isto permite-lhe realizar a maioria das operações de controlo de versões sem nunca sair do seu ambiente de desenvolvimento.
+
+### Configuração Inicial
+
+1.  **Instalar o Git**: O RStudio utiliza a sua instalação de Git do sistema. Se ainda não o fez, instale o Git a partir de [git-scm.com](https://git-scm.com/downloads).
+2.  **Configurar o RStudio**: Vá a `Tools > Global Options > Git/SVN`. Certifique-se de que o RStudio detetou a sua instalação de Git. Se o campo "Git executable" estiver vazio, procure o ficheiro `git.exe` (no Windows) ou `git` (no macOS/Linux).
+
+    ![Configurar o Git no RStudio.](https://happygitwithr.com/images/rstudio-git-config-mac.png){width="80%"}
+
+### O Painel Git no RStudio
+
+Quando abre um projeto que é um repositório Git no RStudio (seja um que criou ou um que clonou), verá um novo painel chamado **"Git"** (normalmente no mesmo sítio que "Environment" e "History"). Este painel é o seu centro de controlo.
+
+![O painel Git no RStudio.](https://happygitwithr.com/images/rstudio-git-pane-commit.png){width="100%"}
+
+### O Fluxo de Trabalho no RStudio
+
+Vamos ver como o ciclo de trabalho `Pull -> Modificar -> Commitar -> Push` funciona no RStudio.
+
+1.  **Pull (Receber Alterações)**: Antes de começar, clique no botão **Pull** (seta azul para baixo) no painel Git. Isto irá descarregar e fundir quaisquer alterações do repositório remoto, garantindo que tem a versão mais recente.
+
+2.  **Modificar Ficheiros**: Edite os seus scripts `.R` ou ficheiros `.qmd` como faria normalmente no RStudio.
+
+3.  **Stage (Preparar Alterações)**: No painel Git, verá uma lista de todos os ficheiros que modificou. Os ícones mostram o estado (`M` para modificado, `A` para adicionado, `D` para apagado).
+    -   Para adicionar um ficheiro à área de preparação (*staging area*), **marque a caixa "Staged"** ao lado do nome do ficheiro.
+    -   Pode selecionar vários ficheiros para agrupar as alterações num único commit.
+
+4.  **Commit (Gravar Alterações)**: Depois de preparar os ficheiros, clique no botão **Commit**.
+    -   Abrirá uma nova janela. No canto superior direito, escreva a sua **mensagem de commit** (curta e imperativa).
+    -   Clique no botão **Commit**.
+
+    ![A janela de commit no RStudio.](https://r-bio.github.io/images/rstudio-commit.png)
+
+5.  **Push (Enviar Alterações)**: Após fazer um ou mais commits, o painel Git irá informá-lo de que o seu repositório local está "à frente" do remoto. Clique no botão **Push** (seta verde para cima) para enviar os seus commits para o GitHub.
+
+### Gestão de Branches no RStudio
+
+O RStudio também torna fácil trabalhar com branches:
+
+-   Para **ver em que branch está**, olhe para o canto superior do painel Git.
+-   Para **criar um novo branch** ou **mudar de branch**, clique no pequeno ícone de branch roxo ( wygląda jak `(-<` ). Abrirá uma janela onde pode criar um novo branch ou selecionar um existente para fazer checkout.
+
+![Gestão de branches no RStudio.](https://i.ytimg.com/vi/hP4z3u-oE8w/maxresdefault.jpg){width="70%"}
+
+Trabalhar com Git no RStudio é incrivelmente eficiente, pois mantém todo o seu fluxo de trabalho, desde a codificação e análise até ao controlo de versões, num único local.

@@ -1,5 +1,5 @@
 ---
-title: "Modulo 5 | Exercícios"
+title: "Modulo 4 | Exercícios"
 author: "A. Peralta-Santos"
 date: today
 date-format: long
@@ -44,14 +44,7 @@ required_packages <- c(
                        "data.validator",
                        "janitor",
                        "tidyverse",
-                       "rio",
-                       "data.table",
-                       "broom",
-                       "gt",
-                       "gtsummary",
-                       "glm2",
-                       "performance",
-                       "see"
+                       "rio"
                        # colocar aqui se foram utilizados mais pacotes
                        )      
 
@@ -68,108 +61,44 @@ remove(required_packages)
 remove(pkg)
 
 ```
-# Exercício - Hipotermia Cirúrgica
 
-## Contexto
+# Exercicio visualização - Hypoxia 
 
-A hipotermia cirúrgica (definida como temperatura central < 36°C) é conhecida por causar coagulopatia, alteração no metabolismo de drogas, recuperação prolongada e desconforto térmico. Menos compreendido é se as infecções do sítio cirúrgico (ISCs) também estão associadas à hipotermia intraoperatória.
+Este é um estudo sobre a pressão arterial média intraoperatória em pacientes com apneia obstrutiva do sono submetidos a procedimentos cirúrgicos de perda de peso (bariátrica). Os participantes são 281 pacientes adultos diagnosticados com apneia obstrutiva do sono nos dois anos anteriores à sua cirurgia bariátrica. Além da pressão arterial média, o conjunto de dados inclui informações sobre demografia, status de oxigênio noturno, comorbidades, tipo e duração da cirurgia, vasopressores e frequência cardíaca. Os dados foram limpos e contêm alguns dados ausentes. Não há outliers ou problemas de dados.[^1]
 
-Isso é importante, pois as infecções do sítio cirúrgico são uma grande fonte de morbidade, mortalidade, prolongamento da hospitalização e custos de saúde. O risco geral de ISC é de 1 a 3%, geralmente, mas é substancialmente maior, 10 a 15%, para pacientes submetidos à cirurgia colorretal.
+[^1]:*The Hypoxia MAP dataset was contributed by Dr. Amy Nowacki, Associate Professor, Cleveland Clinic. Please refer to this resource as: Amy S. Nowacki, “Hypoxia MAP Treatment Dataset”, TSHS Resources Portal (2022). Available at https://www.causeweb.org/tshs/hypoxia/.*
 
-Literatura publicada até a data sugere que a hipotermia moderada causa ISCs e várias outras complicações. No entanto, alguns desses estudos estão desatualizados (os procedimentos cirúrgicos descritos já não são realizados) e muitos não possuem dados suficientes de temperatura intraoperatória. Portanto, é desconhecido se a hipotermia leve ou temperaturas normotérmicas influenciam o risco de infecção. [^1]
-
-[^1]: *Fonte: The Core Temperature dataset was contributed by Ms. Jordyn Homoki, Research and Teaching Assistant, and Dr. Amy Nowacki, Associate Professor, Cleveland Clinic. Please refer to this resource as: Homoki, J. and Nowacki AS, "Core Temperature Dataset", TSHS Resources Portal (2023). Available at https://www.causeweb.org/tshs/core-temperature/.*
-
-## Objetivo
-
-Avaliar a relação entre a média ponderada do tempo (TWATemp) da temperatura central e as infecções graves de feridas e sistêmicas que se desenvolvem dentro de 30 dias após a cirurgia colorretal, no geral e após levar em conta as informações de covariáveis.
-
-## Instruções
-
-### Dataset
-
-Use o dataset Core_Temperature.xlsx, e consulte a documentação em Core_Temperature_Data_Dictionary2.pdf na pasta de datasets. O objetivo geral do exercício é avaliar o efeito da temperatura (TWATemp) no risco de ISCs (AnyInfection).
-
-1. Importar para um objeto "temperature_data" com o dataset
-2. Limpar o nome das variáveis
-
+Para os exercicios deve utilizar o dataset hypoxia
 ```{r}
-temperature_data <- import("datasets/Core_Temperature.xlsx") |> 
-  clean_names() |> 
-  mutate(
-   any_infection = factor(
-     any_infection,
-     levels = c(0,1),
-     labels = c("Não", "Sim")
-   )
-  )
+
+hypoxia <- import("datasets/hypoxia.csv") |> 
+  clean_names()
 ```
 
-### Exercicio M5.1 Estatística Descritiva
+## Exercicio M4.1 Distribuições
 
-Deve criar uma Tabela 1 comparando a distribuição das variáveis de confundimento (Age, FEMALE, BMI, CharlsonScore, SurgeryType, CHF) pelos pacientes que tiveram ISC (AnyInfection).
-
-1. O nome do objeto deve ser tabela 1
-
-```{r}
-tabela1 <- tbl_summary(
-  temperature_data,
-  include = c(age, female, bmi, charlson_score, surgery_type), # Selecionar variáveis específicas para o resumo
-  by = any_infection, # Dividir a tabela pelo estado da doença cardíaca
-  missing = "no",# Excluir dados ausentes do resumo
-  statistic = list(
-  all_continuous() ~ "{mean} ({sd})",
-  all_categorical() ~ "{n} / {N} ({p}%)"),
-  label =list(
-    age= "Idade", 
-    female="Sexo", 
-    bmi="Índice de Massa Corporal", 
-    charlson_score="Score de Charlson", 
-    surgery_type="Tipo de Cirugia"
-  )   
-) |> 
-  modify_spanning_header(c("stat_1", "stat_2") ~ "**Infecção do Sítio Cirúrgico**") %>%
-  add_n() |>  # Adicionar uma coluna para contar observações não ausentes
-  add_p() |>  # Realizar testes estatísticos para comparar grupos
-  modify_header(label = "**Característica**") |>  # Personalizar o cabeçalho da tabela
-  bold_labels()|> # Tornar as etiquetas em negrito para ênfase
-  as_gt() |>  
-  tab_header(
-    title = md("**Modelo de Risco para Infecção do Sítio cirúrgico**") ,
-    subtitle = "Por Idade, Sexo, BMI, Score Charlson, Tipo de cirurgia"
-  ) |>
-  tab_source_note(
-    source_note = md("Source: Core Temperature Dataset")
-  ) |>
-  fmt_number( decimals = 3) |>   
-  opt_stylize(style = 1, color = "gray") |> 
-  opt_align_table_header(align = "left") 
-
-# Visualizar a tabela criada
-tabela1
-```
-
-
-### Exercicio M5.2 Visualização
-
-Deve criar uma visualização comparando a distribuição da temperatura (TWATemp) pelo risco de ISCs (AnyInfection).
-
-1. Visualização deve ser criada no objeto p1
-
+Compara a distribuição de idades entre homens e mulheres. O gráfico deve ter um título, caption, legenda. A distribuição estar preenchido por cor "#91bfdb" e "#ef8a62". Utiliza o tema classic.  
 
 ```{r}
 #| fig-height: 5
 #| fig-width: 7.5
 #| 
 
-p1<- ggplot(data= temperature_data, 
-            aes(x = any_infection, y = twa_temp)) +
-  geom_boxplot(outlier.shape = NA) + 
-  labs(title = "Distribuição da média ponderada do tempo da temperatura central\nPor ocorrência de Infecção do Sítio Cirúrgico",
-         y = "Média ponderada do tempo da temperatura central",
-         x = "Infecção do Sítio Cirúrgico", 
-         caption = "Fonte: Core Temperature Dataset") +
-  theme_minimal() 
+p1<- ggplot(data=hypoxia, 
+       aes(x=age,
+           fill=as.factor(female)
+       ) )+
+  geom_histogram(alpha=.4) +
+    labs(title = "Distribuição de idades",
+         subtitle = "Hypoxia MAP Treatment Dataset",
+         y = "Contagem da frequência de idades",
+         fill= "Género",
+         x = "Idade", 
+         caption = "Source: Amy S. Nowacki, TSHS Resources Portal (2022)") +
+  coord_cartesian(expand=FALSE)+
+  theme_classic()+
+  scale_fill_manual(values=c("#91bfdb","#ef8a62"),
+                    labels=c("Homem", "Mulher"))
   
 
 p1
@@ -177,305 +106,82 @@ p1
 ```
 
 
-### Exercicio M5.3 Modelos
+## Exercicio M4.2 Relação entre variáveis
 
-#### Exercicio M5.3.1 Univariado
-
-Crie um modelo de regressão logística para avaliar o efeito da temperatura no risco de ISCs (AnyInfection).
-
-1. Criar modelo no objeto model_logit_uni
-2. Criar tabela com dados da regressão no objeto model_logit_uni_tidy
-
+Explora a relaçao entre MinSao2 e o BMI. O gráfico deve ter um título, caption, legenda. Usa o theme minimal e adiciona uma linha tendência linear para explorar a relação.
 
 ```{r}
-model_logit_uni <- glm(
-  any_infection ~ twa_temp,  # Definir a fórmula do modelo
-  family = "binomial",                   # Especificar a função de ligação binomial para resposta binária
-  data = temperature_data                            # Usar o conjunto de dados 'hd'
+#| fig-height: 5
+#| fig-width: 7.5
+#| 
+
+p2<- ggplot(data=hypoxia, 
+       aes(x=min_sao2,
+           y=bmi
+       ) )+
+  geom_point(alpha=0.5) +
+  geom_smooth(method=lm, 
+              se=FALSE,
+              linetype="dashed") +
+    labs(title = "Indice de Massa Corporal por Saturação mínima de oxigénio",
+         subtitle = "Hypoxia MAP Treatment Dataset",
+         y = "Indice de Massa Corporal",
+         x = "Saturação mínima de oxigénio", 
+         caption = "Source: Amy S. Nowacki, TSHS Resources Portal (2022)") +
+  theme_minimal()
+  
+
+p2
+
+```
+
+
+## Exercicio M4.3 Mapa
+
+Cria um mapa usado o shapefile comm_pt, e as caracteristicas da base de dados "mortalidade_coracao_2021.csv" na pasta datasets.O mapa deve conter a mortalidade por doenças cardiovasculares com uma escala de 5 cores. O gráfico deve ter um título, caption, legenda.
+
+```{r}
+
+comm_pt <- st_read(
+  "datasets/map_json_portugal/concelhos_portugal_light.json") |> 
+  clean_names()
+
+mortalidade_coracao_2021 <- import("datasets/mortalidade_coracao_2021.csv") |> 
+  clean_names() |> 
+  mutate(
+    quintil_mortalidade= as.factor(ntile(valor, n=5))
+  )
+
+mortalidade_coracao_2021_mapeado <- left_join(
+  comm_pt,
+  mortalidade_coracao_2021,
+  by= join_by(name_2==geodsg)
 )
 
-# Utilizar a função tidy para criar um resumo do modelo
-# 'exponentiate = TRUE' transforma os coeficientes em razões de probabilidades
-# 'conf.int = TRUE' inclui os intervalos de confiança
-model_logit_uni_tidy <- tidy(model_logit_uni, exponentiate = TRUE, conf.int = TRUE)
-model_logit_uni_tidy
 ```
-
-
-#### Exercicio M5.3.2 Múltiplo
-
-Crie um modelo de regressão logística para avaliar o efeito da temperatura no risco de ISCs (AnyInfection) ajustado para Age, FEMALE, BMI, CharlsonScore e CHF.
-
-1. Criar modelo no objeto model_logit_multi
-2. Criar tabela com dados da regressão no objeto model_logit_multi_tidy
 
 
 ```{r}
-# Criar um modelo de regressão logística para prever a ocorrência de risco de ISCs (AnyInfection).
-model_logit_multi <- glm(
-  any_infection ~ twa_temp+ 
-                       age+ 
-                    female+ 
-                       bmi+ 
-            charlson_score+ 
-                       chf,  # Definir a fórmula do modelo
-  family = "binomial",                   # Especificar a função de ligação binomial para resposta binária
-  data = temperature_data                            # Usar o conjunto de dados 'hd'
-)
+#| fig-height: 10
+#| fig-width: 7
+#| 
 
-# Utilizar a função tidy para criar um resumo do modelo
-# 'exponentiate = TRUE' transforma os coeficientes em razões de probabilidades
-# 'conf.int = TRUE' inclui os intervalos de confiança
-model_logit_multi_tidy <- tidy(model_logit_multi, exponentiate = TRUE, conf.int = TRUE) 
-  # Modificar os nomes dos termos para torná-los mais legíveis
-  # mutate(
-  #   term = case_when(
-  #     term == "(Intercept)" ~ "Intercept", 
-  #     term == "twa_temp" ~ "Temperatura Média", # Renomear '(Intercept)' para 'Intercept'
-  #     term == "age" ~ "Idade",                 # Renomear 'age' para 'Age'
-  #     term == "female" ~ "Sexo",
-  #     term == "bmi" ~ "IMC",
-  #     term == "charlson_score" ~ "Score de Charlson",
-  #     term == "chf" ~ "Insuficiência Cardíaca",
-  #   )
-  # ) 
+
+p3 <- ggplot() +
+    geom_sf(data = mortalidade_coracao_2021_mapeado, 
+          aes(fill = quintil_mortalidade),
+              size = 0.1,
+              color = "white"
+          ) +
+   theme_minimal() +
+    labs(x = NULL, 
+         y = NULL, 
+         title = "Quintil Mortalidade por Doenças Cardiovasculares",
+         fill= "Quintil",
+         caption = "Data: INE, 2021")
+p3
 
 ```
 
 
-#### Exercicio M5.3.3 Performance
-
-Compare os dois modelos em termos de performance.
-
-```{r}
-#Usando o pacote performance
-# Verificar as suposições do modelo de regressão linear 'model3'
-# Esta função verifica várias suposições importantes, como normalidade dos resíduos, homocedasticidade, entre outras.
-# check_model(model_logit_multi)
-
-#Usando o pacote performance
-
-model_performance(model_logit_uni)
-
-model_performance(model_logit_multi)
-
-```
-
-Resposta: O AIC é mais baixo para model_logit_multi, sugerindo que tem um melhor ajuste aos dados com menos penalizações pelo número de parâmetros no modelo.
-O BIC mais baixo para model_logit_uni sugere que pode ser o modelo mais apropriado ao considerar a complexidade do modelo pois esta métrcia penaliza complexidade.
-O Tjur's R2, uma medida de ajuste do modelo, é maior para model_logit_multi, indicando um poder discriminatório ligeiramente melhor, mas ambos não se afastam muito do zero indicando uma baixa capacidade preditiva de ambos os modelos.
-Ambos os modelos têm um PCP quase idêntico, indicando um desempenho preditivo geral similar.
-Apesar de melhor em termos preditivos, o modelo multivariado é mais complexo.
-
-### Exercicio M5.4 Tabelas de Regressão
-
-Crie uma tabela com os OR, p-value e Confidence Intervals do modelo construído em 5.3.2. Exporte a tabela criada para Word.
-
-1. O objeto tabela deve-se chamar tbl_multi
-
-```{r}
-# Criar uma tabela com o pacote gt a partir do resumo do modelo 'model4_tidy'
-tbl_multi <- 
-  gt(model_logit_multi_tidy) |>
-  # Adicionar um cabeçalho com título e subtítulo
-  tab_header(
-    title = md("**Modelo de Risco para Infecção do Sítio Cirúrgico**"),
-    subtitle = "Por Média ponderada do tempo da temperatura central Idade, Sexo, BMI, Score Charlson, Tipo de cirurgia"
-  ) |>
-  # Adicionar uma nota de rodapé com a fonte dos dados
-  tab_source_note(
-    source_note = md("Fonte: Core Temperature Dataset")
-  ) |> 
-  # Renomear os rótulos das colunas
-  cols_label(
-    term = "Preditor",
-    estimate = "Razão de Probabilidades (OR)",
-    p.value = "Valor p",
-    conf.low = "IC Inferior",
-    conf.high = "IC Superior"
-  ) |> 
-  # Formatar todos os números com três casas decimais
-  fmt_number(decimals = 3) |>
-  # Aplicar um estilo visual às células dos rótulos das colunas
-  tab_style(
-    style = cell_fill(color = "grey95"),
-    locations = list(cells_column_labels())
-  ) |>
-  # Alinhar o cabeçalho da tabela à esquerda
-  opt_align_table_header(align = "left") 
-
-# Mostrar a tabela gt
-tbl_multi
-
-gtsave(
-  tbl_multi,
-  "tabela.docx"
-)
-```
-
-## FIM
-
-# Validation - NÃO ALTERAR
-
-```{r validation for objects}
-#| code-fold: true
-#| echo: false
-if(exists("tabela1")) {
-  print(":) Objeto 'tabela1' criado com sucesso")
-} else {
-  print(":( Objeto 'tabela1' não existe")
-  tabela1 <- list(
-    '_data' = data.frame(variable = "A")
-  )
-}
-
-if(exists("p1")) {
-  print(":) Objeto 'p1' criado com sucesso")
-  if("any_infection" %in% as.character(p1$mapping[["x"]])){
-    print(":) Objeto 'p1' com variável correta no X")
-  }else {
-  print(":( X não está associado à variável correta")}
-  if("twa_temp" %in% as.character(p1$mapping[["y"]])){
-    print(":) Objeto 'p1' com variável correta no Y")
-  }else {
-  print(":( Y não está associado à variável correta")}
-    
-} else {
-  print(":( Objeto 'p1' não existe")
-  p1 <- data.frame(
-    ID = "A"
-  )
-}
-
-if(exists("model_logit_uni")) {
-  print(":) Objeto 'model_logit_uni' criado com sucesso")
-} else {
-  print(":( Objeto 'model_logit_uni' não existe")
-  model_logit_uni <- data.frame(
-    term = "A",
-    std.error = -20,
-    statistic = 10
-  )
-}
-
-if(exists("model_logit_uni_tidy")) {
-  print(":) Objeto 'model_logit_uni_tidy' criado com sucesso")
-} else {
-  print(":( Objeto 'model_logit_uni_tidy' não existe")
-  model_logit_uni_tidy <- data.frame(
-        term = "A",
-    std.error = -20,
-    statistic = 10,
-    estimate = 15
-  )
-}
-
-
-if(exists("model_logit_multi")) {
-  print(":) Objeto 'model_logit_multi' criado com sucesso")
-} else {
-  print(":( Objeto 'model_logit_multi' não existe")
-  model_logit_multi <- data.frame(
-        term = "A",
-    std.error = -20,
-    statistic = 10,
-    estimate = 15
-  )
-}
-
-if(exists("model_logit_multi_tidy")) {
-  print(":) Objeto 'model_logit_multi_tidy' criado com sucesso")
-} else {
-  print(":( Objeto 'model_logit_multi_tidy' não existe")
-  model_logit_multi_tidy <- data.frame(
-        term = "A",
-    std.error = -20,
-    statistic = 10,
-    estimate = 25
-  )
-}
-
-if(exists("tbl_multi")) {
-  print(":) Objeto 'tbl_multi' criado com sucesso")
-} else {
-  print(":( Objeto 'tbl_multi' não existe")
-  tbl_multi <- list(
-    '_data' = data_frame(term = "A")
-  )
-}
-```
-
-
-```{r validation for outputs}
-#| code-fold: true
-#| include: false
-
-require(data.validator)
-require(assertr)
-
-report <- data_validation_report()
-
-between <- function(a, b) {
-  function(x) { a <= x & x <= b }
-}
-
-# model_logit_uni_tidy
-# model_logit_multi_tidy
-
-
-validate(tabela1[["_data"]], name = "Verifying tabela1") |>
-  validate_if(has_all_names("p.value"),colnames(), description = "Tabela1 pede p-value") |>
-  validate_if(unique(variable) %in% c("age",
-    "female",
-    "bmi",
-    "charlson_score",
-    "surgery_type"),variable,description = "Tem as variáveis pedidas para a tabela 1") |> 
-  validate_if(nrow(tabela1[["_data"]])==5, description = "Tem apenas as variáveis pedidas para a tabela 1") |> 
-  add_results(report)
-
-
-validate(model_logit_uni_tidy, name = "Verifying model_logit_uni_tidy") |>
-  validate_if(has_all_names("p.value", "conf.low","conf.high"),colnames(), description = "Modelo univariado pede p-value e intervalos de confiança") |>
-  validate_if(unique(term) %in% c("(Intercept)","twa_temp")
-              ,term,description = "Tem as variáveis pedidas para a tabela 1") |> 
-  validate_if(nrow(model_logit_uni_tidy)==2, description = "Tem apenas as variáveis pedidas para a regressão univariada") |>
-  validate_cols(between(0,1.4),"estimate",description = "Valor dos coeficientes dentro do esperado") |> 
-  validate_cols(between(0.05,2.3),"std.error",description = "Valor do Desvio-padrão dentro do esperado") |> 
-  validate_cols(between(-5.4,5),"statistic",description = "Valor do Desvio-padrão dentro do esperado") |> 
-  add_results(report)
-
-validate(model_logit_multi_tidy, name = "Verifying model_logit_multi_tidy") |>
-  validate_if(has_all_names("p.value", "conf.low","conf.high"),colnames(), description = "Modelo multivariado pede p-value e intervalos de confiança") |>
-  validate_if(unique(term) %in% c("(Intercept)","twa_temp","age","female","bmi","charlson_score", "chf")
-              ,term,description = "Tem as variáveis pedidas para a tabela 1") |> 
-  validate_if(nrow(model_logit_multi_tidy)==7, description = "Tem apenas as variáveis pedidas para a regressão multivariada") |>
-  validate_cols(between(0,1.41),"estimate",description = "Valor dos coeficientes dentro do esperado") |> 
-  validate_cols(between(0.001,2.29),"std.error",description = "Valor do Desvio-padrão dentro do esperado") |> 
-  validate_cols(between(-4.8,4.3),"statistic",description = "Valor do Desvio-padrão dentro do esperado") |> 
-  add_results(report)
-
-validate(tbl_multi[["_data"]] , name = "Verifying tbl_multi") |>
-  validate_if(has_all_names("term", "estimate" , "p.value"   ,"conf.low" , "conf.high"),colnames(), description = "Tabela tem as colunas pedidas") |>
-  validate_if(unique(term) %in% c("(Intercept)",
-                                  "twa_temp",
-                                  "age",
-                                  "female",
-                                  "bmi",
-                                  "charlson_score",
-                                  "chf"),term,description = "Tem as variáveis pedidas para a tabela final") |> 
-  validate_if(nrow(tbl_multi[["_data"]])==7, description = "Tem apenas as variáveis pedidas para a tabela final") |> 
-  add_results(report)
-
-get_results(report)
-
-save_report(report, output_file ="validation_report5_resolvido.html")
-
-rm(list = ls())
-
-```
-
-```{=html}
-<iframe width="100%" height=1000 src="validation_report5_resolvido.html"></iframe>
-```
-
-
+# FIM
